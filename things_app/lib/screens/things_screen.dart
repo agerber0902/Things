@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:things_app/models/thing.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:things_app/widgets/add_thing.dart';
 
 final String kBaseFirebaseUrl = 'things-a-default-rtdb.firebaseio.com';
 
@@ -84,7 +85,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
                 showModalBottomSheet(
                     context: context,
                     builder: (ctx) {
-                      return Placeholder();//AddThing(addThing: _addThing,);
+                      return AddThing(addThing: _addThing,);
                     });
               },
               icon: const Icon(Icons.add)),
