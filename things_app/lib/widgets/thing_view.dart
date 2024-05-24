@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:things_app/helpers/firebase_helper.dart';
 import 'package:things_app/models/thing.dart';
 
 import 'package:http/http.dart' as http;
 
-final String kBaseFirebaseUrl = 'things-a-default-rtdb.firebaseio.com';
+final ThingsFirebaseHelper _firebaseHelper = ThingsFirebaseHelper();
+const double height = 150;
 
 class ThingView extends StatefulWidget {
   const ThingView({
     super.key,
-    required this.thing,
+    required this.thing, required this.deleteThing,
   });
 
   final Thing thing;
+  final void Function(Thing thing) deleteThing;
 
   @override
   State<ThingView> createState() => _ThingViewState();
 }
 
-class _ThingViewState extends State<ThingView>
-    with TickerProviderStateMixin {
+class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
   late final AnimationController _controller;
-  
   late final Animation<double> _animation;
 
   @override
@@ -45,17 +46,18 @@ class _ThingViewState extends State<ThingView>
     ).animate(_controller);
 
     _controller.forward();
-
   }
 
-  void _deleteThing(Thing thingToDelete) async{
-    final url = Uri.https(kBaseFirebaseUrl, 'things-list/${thingToDelete.id}.json');
+  // void _deleteThing(Thing thingToDelete) async {
+  //   // final url =
+  //   //     Uri.https(kBaseFirebaseUrl, 'things-list/${thingToDelete.id}.json');
 
-    final response = await http.delete(url);
+  //   // final response = await http.delete(url);
 
-    print(response.statusCode);
-
-  }
+  //   await _firebaseHelper.deleteThing(thingToDelete);
+    
+  //   return;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -66,26 +68,60 @@ class _ThingViewState extends State<ThingView>
           opacity: _animation.value,
           child: Dismissible(
             onDismissed: (direction) {
-              _deleteThing(widget.thing);
+              widget.deleteThing(widget.thing);
             },
             key: Key(widget.thing.id),
             child: SizedBox(
-              height: 100,
+              height: height,
               width: double.infinity,
               child: Container(
                 padding: const EdgeInsets.all(10),
-                child: Card(
-                  margin: const EdgeInsets.only(left: 20, right: 20),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(widget.thing.title),
-                  ),
-                ),
+                child: ThingCard(widget: widget),
               ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class ThingCard extends StatelessWidget {
+  const ThingCard({
+    super.key,
+    required this.widget,
+  });
+
+  final ThingView widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(left: 20, right: 20),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: Text(widget.thing.title, maxLines: 1, overflow: TextOverflow.ellipsis,)),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                    child: Text(
+                  widget.thing.description ?? '',
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                )),
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
 }
