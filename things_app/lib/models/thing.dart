@@ -10,5 +10,36 @@ class Thing {
   const Thing({required this.id, required this.title, required this.description});
   Thing.createWithTitleAndDescription({required this.title, required this.description}) : id = uuid;
 
-  //Map<String, String> get ThingFor
+}
+
+class ThingJsonHelper{
+  List<Thing> decodedThings({required data}){
+
+    List<Thing> thingsToReturn = [];
+    for (final entry in data.entries) {
+      thingsToReturn.add(decodedThing(entry: entry));
+    }
+
+    return thingsToReturn;
+  }
+
+  Thing decodedThing({required entry}){
+
+    final decodedThing = Thing(
+          id: entry.key,
+          title: entry.value['title'],
+          description: entry.value['description']
+        );
+
+    return decodedThing;
+  }
+
+  Map<String, String?> ThingToMap({required Thing thing}){
+    final encodedThing = {
+      'title': thing.title,
+      'description': thing.description,
+    };
+    return encodedThing;
+  }
+
 }

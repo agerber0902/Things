@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:things_app/helpers/firebase_helper.dart';
 import 'package:things_app/models/thing.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:things_app/widgets/add_thing.dart';
 import 'package:things_app/widgets/things_list_view.dart';
 
-final String kBaseFirebaseUrl = 'things-a-default-rtdb.firebaseio.com';
+final ThingsFirebaseHelper _firebaseHelper = ThingsFirebaseHelper();
 
 class ThingsScreen extends StatefulWidget {
   const ThingsScreen({super.key});
@@ -27,48 +25,21 @@ class _ThingsScreenState extends State<ThingsScreen> {
     _getThings();
   }
 
-  void _addThing(Thing thingToAdd) {
-    _addThingToFirebase(thingToAdd);
+  void _addThing(Thing thingToAdd) async {
+    await _firebaseHelper.postThing(thingToAdd);
+
+    _getThings();
   }
 
-  Future<void> _addThingToFirebase(Thing thingToAdd) async {
-    final Uri url = Uri.https(kBaseFirebaseUrl, 'things-list.json');
-
-    //We dont need the response at this point, but setting it anyway
-    await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'title': thingToAdd.title,
-        'description': thingToAdd.description,
-      }),
-    );
+  void _deleteThing(Thing thingToDelete) async{
+    await _firebaseHelper.deleteThing(thingToDelete);
 
     _getThings();
   }
 
   void _getThings() async {
-    //Call Firebase to get things list
-    final Uri url = Uri.https(kBaseFirebaseUrl, 'things-list.json');
-    final response = await http.get(url);
-
-    final data = json.decode(response.body);
-
-    if(data == null || data.entries == null){
-      setState(() {
-        _thingsToDisplay = [];
-      });
-      return;
-    }
-
-    List<Thing> thingsToReturn = [];
-    for (final d in data.entries) {
-      thingsToReturn.add(Thing(
-          id: d.key,
-          title: d.value['title'],
-          description: d.value['description']));
-    }
-
+    List<Thing> thingsToReturn = await _firebaseHelper.getThings();
+    print('called get things');
     setState(() {
       _thingsToDisplay = thingsToReturn;
     });
@@ -94,7 +65,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
       ),
       body: _thingsToDisplay.isEmpty
           ? const NoThingsView()
-          : ThingsListView(things: _thingsToDisplay),
+          : ThingsListView(things: _thingsToDisplay, deleteThing: _deleteThing,),
     );
   }
 }
