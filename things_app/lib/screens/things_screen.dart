@@ -5,6 +5,7 @@ import 'package:things_app/models/thing.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:things_app/widgets/add_thing.dart';
+import 'package:things_app/widgets/things_list_view.dart';
 
 final String kBaseFirebaseUrl = 'things-a-default-rtdb.firebaseio.com';
 
@@ -53,7 +54,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
 
     final data = json.decode(response.body);
 
-    if(data.entries == null){
+    if(data == null || data.entries == null){
       setState(() {
         _thingsToDisplay = [];
       });
@@ -93,7 +94,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
       ),
       body: _thingsToDisplay.isEmpty
           ? const NoThingsView()
-          : Placeholder()//ThingsListView(things: _thingsToDisplay),
+          : ThingsListView(things: _thingsToDisplay),
     );
   }
 }
