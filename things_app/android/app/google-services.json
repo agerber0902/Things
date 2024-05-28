@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "245842204517",
+    "firebase_url": "https://things-a-default-rtdb.firebaseio.com",
+    "project_id": "things-a",
+    "storage_bucket": "things-a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:245842204517:android:7818c97ab5e57b790d738c",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkCWjkIrrNohuKDOVgwCrDjmRsIfH4UJ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:245842204517:android:239e5b2727789f8f0d738c",
+        "android_client_info": {
+          "package_name": "com.example.thingsapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkCWjkIrrNohuKDOVgwCrDjmRsIfH4UJ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

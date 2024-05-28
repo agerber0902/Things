@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:things_app/helpers/firebase_helper.dart';
+import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 
-import 'package:http/http.dart' as http;
-
-final ThingsFirebaseHelper _firebaseHelper = ThingsFirebaseHelper();
 const double height = 150;
 
 class ThingView extends StatefulWidget {
@@ -47,17 +44,6 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
 
     _controller.forward();
   }
-
-  // void _deleteThing(Thing thingToDelete) async {
-  //   // final url =
-  //   //     Uri.https(kBaseFirebaseUrl, 'things-list/${thingToDelete.id}.json');
-
-  //   // final response = await http.delete(url);
-
-  //   await _firebaseHelper.deleteThing(thingToDelete);
-    
-  //   return;
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -111,10 +97,29 @@ class ThingCard extends StatelessWidget {
             const SizedBox(height: 10),
             Row(
               children: [
+                //Display Categories
+                Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Row(
+                      children: widget.thing.categories.map((category){
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 0, right: 8),
+                          child: Icon(categoryIcons[category]),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
                 Expanded(
                     child: Text(
                   widget.thing.description ?? '',
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.fade,
                 )),
               ],
