@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/widgets/add_thing.dart';
 
 const double height = 150;
 
 class ThingView extends StatefulWidget {
   const ThingView({
     super.key,
-    required this.thing, required this.deleteThing,
+    required this.thing, required this.deleteThing, required this.addThing, required this.editThing,
   });
 
   final Thing thing;
   final void Function(Thing thing) deleteThing;
+  final void Function(Thing thing) addThing;
+  final void Function(Thing thing) editThing;
 
   @override
   State<ThingView> createState() => _ThingViewState();
@@ -82,49 +85,62 @@ class ThingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(left: 20, right: 20),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: Text(widget.thing.title, maxLines: 1, overflow: TextOverflow.ellipsis,)),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                //Display Categories
-                Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Row(
-                      children: widget.thing.categories.map((category){
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 0, right: 8),
-                          child: Icon(categoryIcons[category]),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                    child: Text(
-                  widget.thing.description ?? '',
-                  maxLines: 2,
-                  overflow: TextOverflow.fade,
-                )),
-              ],
-            )
-          ],
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+                    context: context,
+                    builder: (ctx) {
+                      return AddThing(
+                        addThing: widget.addThing,
+                        editThing: widget.editThing,
+                        thing: widget.thing,
+                      );
+                    });
+      },
+      child: Card(
+        margin: const EdgeInsets.only(left: 20, right: 20),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: Text(widget.thing.title, maxLines: 1, overflow: TextOverflow.ellipsis,)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  //Display Categories
+                  Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Row(
+                        children: widget.thing.categories.map((category){
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 0, right: 8),
+                            child: Icon(categoryIcons[category]),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                      child: Text(
+                    widget.thing.description ?? '',
+                    maxLines: 2,
+                    overflow: TextOverflow.fade,
+                  )),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

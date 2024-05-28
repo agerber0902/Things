@@ -9,12 +9,12 @@ const String descriptionHintText = 'Enter a short description';
 const String descriptionValidationText = 'Enter a valid description';
 
 class AddThing extends StatefulWidget {
-  const AddThing({
-    super.key,
-    required this.addThing,
-  });
+  const AddThing(
+      {super.key, required this.addThing, required this.editThing, this.thing});
 
   final void Function(Thing thingToAdd) addThing;
+  final void Function(Thing thingToEdit) editThing;
+  final Thing? thing;
 
   @override
   State<AddThing> createState() => _AddThingState();
@@ -32,7 +32,10 @@ class _AddThingState extends State<AddThing> {
   void initState() {
     super.initState();
 
-    _selectedCategories = [];
+    _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
+    _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
+    _descriptionTextController.text =
+        widget.thing != null ? widget.thing!.description ?? '' : '';
   }
 
   @override
@@ -94,6 +97,7 @@ class _AddThingState extends State<AddThing> {
                           ),
                           const SizedBox(height: 16),
                           DropdownMenu(
+                            initialSelection: categoryIcons.entries.first.key,
                             onSelected: (value) {
                               setState(() {
                                 _selectedCategories.add(value ?? '');
@@ -112,19 +116,38 @@ class _AddThingState extends State<AddThing> {
                           ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                final thingToAdd =
-                                    Thing.createWithTitleAndDescription(
-                                        title: _titleTextController.text,
-                                        description:
-                                            _descriptionTextController.text,
-                                        categories: _selectedCategories);
+                                //Add
+                                if (widget.thing == null) {
+                                  final thingToAdd =
+                                      Thing.createWithTitleAndDescription(
+                                          title: _titleTextController.text,
+                                          description:
+                                              _descriptionTextController.text,
+                                          categories: _selectedCategories
+                                              .where(
+                                                  (category) => category != '')
+                                              .toList());
 
-                                widget.addThing(thingToAdd);
+                                  widget.addThing(thingToAdd);
 
-                                Navigator.pop(context);
+                                  Navigator.pop(context);
+                                }
+                                //edit
+                                else{
+                                  final thingToEdit = Thing(id: widget.thing!.id, title: _titleTextController.text, description: _descriptionTextController.text, 
+                                  categories: _selectedCategories
+                                              .where(
+                                                  (category) => category != '')
+                                              .toList()
+                                  );
+
+                                  widget.editThing(thingToEdit);
+
+                                  Navigator.pop(context);
+                                }
                               }
                             },
-                            child: const Text('Add'),
+                            child: Text(widget.thing == null ? 'Add' : 'Save'),
                           ),
                         ],
                       ),
@@ -157,7 +180,7 @@ class _SelectedCategoriesState extends State<SelectedCategories> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: widget._selectedCategories.map((c) {
+      children: widget._selectedCategories.where((sc) => sc != '').map((c) {
         return Padding(
           padding: const EdgeInsets.all(10),
           child: Card(

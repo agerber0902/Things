@@ -32,6 +32,13 @@ class _ThingsScreenState extends State<ThingsScreen> {
     _getThings();
   }
 
+  void _editThing(Thing thingToEdit) async {
+    print('edit thing');
+    await _firebaseHelper.putThing(thingToEdit);
+
+    _getThings();
+  }
+
   void _deleteThing(Thing thingToDelete) async {
     await _firebaseHelper.deleteThing(thingToDelete);
 
@@ -58,6 +65,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
                     builder: (ctx) {
                       return AddThing(
                         addThing: _addThing,
+                        editThing: _editThing,
                       );
                     });
               },
@@ -106,6 +114,8 @@ class _ThingsScreenState extends State<ThingsScreen> {
           : ThingsListView(
               things: _thingsToDisplay,
               deleteThing: _deleteThing,
+              addThing: _addThing,
+              editThing: _editThing,
             ),
     );
   }
