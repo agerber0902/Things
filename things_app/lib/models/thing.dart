@@ -16,8 +16,10 @@ class Thing {
 
 class ThingJsonHelper{
   List<Thing> decodedThings({required data}){
+    print('data: ${data.entries}');
     List<Thing> thingsToReturn = [];
-    for (final entry in data.entries) {
+    for (final MapEntry<String, dynamic> entry in data.entries) {
+      print(entry);
       thingsToReturn.add(decodedThing(entry: entry));
     }
 
@@ -25,7 +27,6 @@ class ThingJsonHelper{
   }
 
   Thing decodedThing({required entry}){
-
     final decodedThing = Thing(
           id: entry.key,
           title: entry.value['title'],

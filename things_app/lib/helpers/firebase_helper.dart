@@ -87,6 +87,10 @@ class ThingsFirebaseHelper extends FirebaseHelper {
     return Uri.https(baseFirebaseUrl, '$collectionName.json');
   }
 
+  Uri getHttpsPutUrl(String id) {
+    return Uri.https(baseFirebaseUrl, '$collectionName/$id.json');
+  }
+
   Uri get getHttpsGetUrl {
     return Uri.https(baseFirebaseUrl, '$collectionName.json');
   }
@@ -120,6 +124,14 @@ class ThingsFirebaseHelper extends FirebaseHelper {
     return;
   }
 
+  Future<void> putThing(Thing thing) async{
+    await httpHelper!.httpPut(
+      url: getHttpsPutUrl(thing.id), 
+      body: ThingJsonHelper().thingToMap(thing: thing)
+    );
+    return;
+  }
+
   Future<void> deleteThing(Thing thing) async{
     await httpHelper!.httpDelete(url: getHttpsDeleteUrl(thing.id));
     return;
@@ -134,7 +146,13 @@ class HttpHelper {
 
   Future<Response> httpPost({required Uri url, required Map<String, String?> body}) async {
 
-    return await http.post(url, headers: headers, body: jsonEncode(body));
+    return await http.post(url, headers: headers, body: json.encode(body));
+
+  }
+
+  Future<Response> httpPut({required Uri url, required Map<String, String?> body}) async {
+
+    return await http.put(url, headers: headers, body: json.encode(body));
 
   }
 
