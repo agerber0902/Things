@@ -1,55 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 
-final uuid = const Uuid().v4();
+// const Map<String, IconData> categoryIcons = {
+//     //'favorite': Icons.favorite,
+//     'house': Icons.home,
+//     //'settings': Icons.settings,
+//     'restaurants': Icons.dining,
+//     'recipes': Icons.restaurant,
+//     'chores': Icons.agriculture_sharp,
+//     'vacation': Icons.beach_access,
+// };
 
-const Map<String, IconData> categoryIcons = {
-    //'favorite': Icons.favorite,
-    'house': Icons.home,
-    //'settings': Icons.settings,
-    'restaurants': Icons.dining,
-    'recipes': Icons.restaurant,
-    'chores': Icons.agriculture_sharp,
-    'vacation': Icons.beach_access,
+const Map<String, CategoryIcon> categoryIcons = {
+
+  'house' : CategoryIcon('house', Icons.home, Colors.deepPurpleAccent),
+  'favorite' : CategoryIcon('favorite', Icons.favorite, Colors.red),
+  'restaurants' : CategoryIcon('restaurants', Icons.restaurant, Colors.blue),
+  'recipes' : CategoryIcon('recipes', Icons.dining, Colors.amber),
+  'chores' : CategoryIcon('chores', Icons.agriculture_sharp, Colors.green),
+  'vacation' : CategoryIcon('vacation', Icons.beach_access, Colors.pink),
+
 };
 
-class Category {
-  final String id;
+class CategoryIcon {
   final String name;
-  final String iconName;
+  final IconData iconData;
+  final Color iconColor;
 
-  const Category.toAdd({required this.id, required this.name, required this.iconName});
-  Category({required this.name, required this.iconName}) : id = uuid;
-}
-
-class CategoryJsonHelper{
-  List<Category> decodedCategories({required data}){
-
-    List<Category> categoriesToReturn = [];
-    for (final entry in data.entries) {
-      categoriesToReturn.add(decodedCategory(entry: entry));
-    }
-
-    return categoriesToReturn;
-  }
-
-  Category decodedCategory({required entry}){
-
-    final decodedCategory = Category.toAdd(
-          id: entry.key,
-          name: entry.value['name'],
-          iconName: entry.value['iconName'],
-        );
-
-    return decodedCategory;
-  }
-
-  Map<String, Object> categoryToMap({required Category category}){
-    final encodedCategory = {
-      'name': category.name,
-      'iconName': category.iconName,
-    };
-    return encodedCategory;
-  }
-
+  const CategoryIcon(this.name, this.iconData, this.iconColor);
 }

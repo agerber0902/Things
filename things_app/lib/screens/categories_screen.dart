@@ -48,7 +48,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(icon.key),
-                                  Icon(icon.value),
+                                  Icon(icon.value.iconData, color: icon.value.iconColor),
                                 ],
                               ),
                             ],

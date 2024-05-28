@@ -8,7 +8,10 @@ const double height = 150;
 class ThingView extends StatefulWidget {
   const ThingView({
     super.key,
-    required this.thing, required this.deleteThing, required this.addThing, required this.editThing,
+    required this.thing,
+    required this.deleteThing,
+    required this.addThing,
+    required this.editThing,
   });
 
   final Thing thing;
@@ -65,7 +68,7 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
               width: double.infinity,
               child: Container(
                 padding: const EdgeInsets.all(10),
-                child: ThingCard(widget: widget),
+                child: ThingCard(widget: widget, height: height),
               ),
             ),
           ),
@@ -75,71 +78,113 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
   }
 }
 
-class ThingCard extends StatelessWidget {
+class ThingCard extends StatefulWidget {
   const ThingCard({
     super.key,
     required this.widget,
+    required this.height,
   });
 
   final ThingView widget;
+  final double height;
 
   @override
+  State<ThingCard> createState() => _ThingCardState();
+}
+
+class _ThingCardState extends State<ThingCard> {
+  @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    double _height = height;
+
+    @override
+    void initState() {
+      super.initState();
+
+      _height = height;
+    }
+
     return GestureDetector(
       onTap: () {
-        showModalBottomSheet(
-                    context: context,
-                    builder: (ctx) {
-                      return AddThing(
-                        addThing: widget.addThing,
-                        editThing: widget.editThing,
-                        thing: widget.thing,
-                      );
-                    });
+        print('tapped');
+        setState(() {
+          _height += 50;
+        });
       },
-      child: Card(
-        margin: const EdgeInsets.only(left: 20, right: 20),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: Text(widget.thing.title, maxLines: 1, overflow: TextOverflow.ellipsis,)),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  //Display Categories
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Row(
-                        children: widget.thing.categories.map((category){
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 0, right: 8),
-                            child: Icon(categoryIcons[category]),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                      child: Text(
-                    widget.thing.description ?? '',
-                    maxLines: 2,
-                    overflow: TextOverflow.fade,
-                  )),
-                ],
-              )
-            ],
+      onDoubleTap: () {
+        showModalBottomSheet(
+            context: context,
+            builder: (ctx) {
+              return AddThing(
+                addThing: widget.widget.addThing,
+                editThing: widget.widget.editThing,
+                thing: widget.widget.thing,
+              );
+            });
+      },
+      child: AnimatedContainer(
+        duration: const Duration(seconds: 1),
+        height: widget.height,
+        child: Card(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          margin: const EdgeInsets.only(left: 20, right: 20),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                        child: Text(
+                      widget.widget.thing.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.displaySmall!.copyWith(
+                          fontSize: textTheme.displaySmall!.fontSize! - 5.0),
+                    )),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    //Display Categories
+                    Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Row(
+                          children:
+                              widget.widget.thing.categories.map((category) {
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 0, right: 8),
+                              child: Icon(
+                                categoryIcons[category]!.iconData,
+                                color: categoryIcons[category]!.iconColor,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                        child: Text(
+                      widget.widget.thing.description ?? '',
+                      maxLines: 1,
+                      overflow: TextOverflow.fade,
+                      style: textTheme.bodySmall,
+                    )),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

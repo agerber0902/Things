@@ -33,7 +33,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
   }
 
   void _editThing(Thing thingToEdit) async {
-    print('edit thing');
     await _firebaseHelper.putThing(thingToEdit);
 
     _getThings();
@@ -54,10 +53,15 @@ class _ThingsScreenState extends State<ThingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Things'),
+        title: Text('Things', style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),),
         actions: [
+          IconButton(onPressed: (){}, icon: const Icon(Icons.filter_list),),
           IconButton(
               onPressed: () {
                 showModalBottomSheet(
@@ -69,11 +73,10 @@ class _ThingsScreenState extends State<ThingsScreen> {
                       );
                     });
               },
-              icon: const Icon(Icons.add)),
+              icon: Icon(Icons.add, color: colorScheme.primary,)),
         ],
       ),
       drawer: Drawer(
-        backgroundColor: Colors.amber,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -128,11 +131,12 @@ class NoThingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('No things!'),
+          Text('No things!', style: Theme.of(context).textTheme.displayMedium!.copyWith(color: Colors.white,),),
+          Text('Add whatever you want!', style: Theme.of(context).textTheme.displaySmall!.copyWith(color: Colors.white.withOpacity(0.6)),),
         ],
       ),
     );
