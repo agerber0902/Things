@@ -27,6 +27,7 @@ class _AddThingState extends State<AddThing> {
   final TextEditingController _descriptionTextController =
       TextEditingController();
   late List<String> _selectedCategories = [];
+  String? _selectedDropDownValue = null;
 
   @override
   void initState() {
@@ -47,8 +48,11 @@ class _AddThingState extends State<AddThing> {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return SizedBox(
-      height: 550,
+      height: 600,
       width: double.infinity,
       child: Column(
         children: [
@@ -67,7 +71,6 @@ class _AddThingState extends State<AddThing> {
           Expanded(
             child: SingleChildScrollView(
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Form(
                     key: _formKey,
@@ -96,24 +99,56 @@ class _AddThingState extends State<AddThing> {
                                 selectedCategories: _selectedCategories),
                           ),
                           const SizedBox(height: 16),
-                          DropdownMenu(
-                            initialSelection: categoryIcons.entries.first.key,
-                            onSelected: (value) {
-                              setState(() {
-                                _selectedCategories.add(value ?? '');
-                              });
-                            },
-                            dropdownMenuEntries:
-                                categoryIcons.entries.map((icon) {
-                              return DropdownMenuEntry(
+                          // DropdownMenu(
+                          //   //initialSelection: categoryIcons.entries.first.key,
+                          //   initialSelection: _selectedDropDownValue,
+                          //   helperText: 'Select Categories',
+                          //   hintText: 'Select Categories',
+                          //   onSelected: (value) {
+                          //     setState(() {
+                          //       _selectedCategories.add(value ?? '');
+                          //       _selectedDropDownValue = null;
+                          //     });
+                          //   },
+                          //   dropdownMenuEntries:
+                          //       categoryIcons.entries.map((icon) {
+                          //     return DropdownMenuEntry(
+                          //       value: icon.key,
+                          //       label: icon.key,
+                          //       leadingIcon: Icon(
+                          //         icon.value.iconData,
+                          //         color: icon.value.iconColor,
+                          //       ),
+                          //     );
+                          //   }).toList(),
+                          // ),
+                          DropdownButton<String>(
+                            hint: const Text('Select Categories'),
+                            value: _selectedDropDownValue,
+                            items: categoryIcons.entries
+                                .map((icon) {
+                              return DropdownMenuItem<String>(
                                 value: icon.key,
-                                label: icon.key,
-                                leadingIcon: Icon(icon.value),
+                                child: Row(
+                                  children: [
+                                    Icon(icon.value.iconData, color: icon.value.iconColor,),
+                                    Text(icon.key),
+                                  ],
+                                ),
                               );
                             }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedCategories.add(value ?? '');
+                                _selectedDropDownValue = null;
+                              });
+                            },
                           ),
                           const SizedBox(height: 16),
                           ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    colorScheme.onPrimaryContainer),
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 //Add
@@ -133,13 +168,15 @@ class _AddThingState extends State<AddThing> {
                                   Navigator.pop(context);
                                 }
                                 //edit
-                                else{
-                                  final thingToEdit = Thing(id: widget.thing!.id, title: _titleTextController.text, description: _descriptionTextController.text, 
-                                  categories: _selectedCategories
-                                              .where(
-                                                  (category) => category != '')
-                                              .toList()
-                                  );
+                                else {
+                                  final thingToEdit = Thing(
+                                      id: widget.thing!.id,
+                                      title: _titleTextController.text,
+                                      description:
+                                          _descriptionTextController.text,
+                                      categories: _selectedCategories
+                                          .where((category) => category != '')
+                                          .toList());
 
                                   widget.editThing(thingToEdit);
 
@@ -147,7 +184,11 @@ class _AddThingState extends State<AddThing> {
                                 }
                               }
                             },
-                            child: Text(widget.thing == null ? 'Add' : 'Save'),
+                            child: Text(
+                              widget.thing == null ? 'Add' : 'Save',
+                              style: textTheme.bodyLarge!
+                                  .copyWith(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),
@@ -178,20 +219,28 @@ class SelectedCategories extends StatefulWidget {
 class _SelectedCategoriesState extends State<SelectedCategories> {
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: widget._selectedCategories.where((sc) => sc != '').map((c) {
         return Padding(
           padding: const EdgeInsets.all(10),
           child: Card(
+            color: colorScheme.primaryContainer,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(c),
+                  Text(
+                    c,
+                    style: textTheme.displaySmall!.copyWith(fontSize: 18),
+                  ),
                   const SizedBox(width: 10),
-                  Icon(categoryIcons[c]),
+                  Icon(categoryIcons[c]!.iconData,
+                      color: categoryIcons[c]!.iconColor),
                   const SizedBox(width: 5),
                   Opacity(
                     opacity: 0.4,
@@ -232,6 +281,9 @@ class AddThingTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
@@ -240,8 +292,11 @@ class AddThingTextFormField extends StatelessWidget {
         maxLength: maxLength,
         maxLines: maxLines,
         controller: controller,
+        style: textTheme.bodyLarge!.copyWith(color: colorScheme.primary),
         decoration: InputDecoration(
           hintText: hintText,
+          labelStyle: TextStyle(color: colorScheme.primary),
+          hintStyle: TextStyle(color: colorScheme.primary),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
