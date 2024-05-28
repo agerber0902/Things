@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/helpers/firebase_helper.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/screens/categories_screen.dart';
 
 import 'package:things_app/widgets/add_thing.dart';
 import 'package:things_app/widgets/things_list_view.dart';
@@ -31,7 +32,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
     _getThings();
   }
 
-  void _deleteThing(Thing thingToDelete) async{
+  void _deleteThing(Thing thingToDelete) async {
     await _firebaseHelper.deleteThing(thingToDelete);
 
     _getThings();
@@ -39,7 +40,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
 
   void _getThings() async {
     List<Thing> thingsToReturn = await _firebaseHelper.getThings();
-    print('called get things');
     setState(() {
       _thingsToDisplay = thingsToReturn;
     });
@@ -51,21 +51,62 @@ class _ThingsScreenState extends State<ThingsScreen> {
       appBar: AppBar(
         title: const Text('Things'),
         actions: [
-          //None at this time.
           IconButton(
               onPressed: () {
                 showModalBottomSheet(
                     context: context,
                     builder: (ctx) {
-                      return AddThing(addThing: _addThing,);
+                      return AddThing(
+                        addThing: _addThing,
+                      );
                     });
               },
               icon: const Icon(Icons.add)),
         ],
       ),
+      drawer: Drawer(
+        backgroundColor: Colors.amber,
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              child: Center(
+                child: Text('Header Placeholder'),
+              ),
+            ),
+            ListTile(
+              title: const Text('Categories'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => const CategoriesScreen()));
+              },
+            ),
+            ListTile(
+              title: const Text('Reminders'),
+              onTap: () {
+                // Implement what you want to happen when Reminders is tapped
+                Navigator.pop(context);
+              },
+            ),
+            
+            ListTile(
+              title: const Text('Things'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder: (ctx){
+                  return const ThingsScreen();
+                }));
+              },
+            ),
+          ],
+        ),
+      ),
       body: _thingsToDisplay.isEmpty
           ? const NoThingsView()
-          : ThingsListView(things: _thingsToDisplay, deleteThing: _deleteThing,),
+          : ThingsListView(
+              things: _thingsToDisplay,
+              deleteThing: _deleteThing,
+            ),
     );
   }
 }

@@ -7,14 +7,15 @@ class Thing {
   final String title;
   final String? description;
 
-  const Thing({required this.id, required this.title, required this.description});
-  Thing.createWithTitleAndDescription({required this.title, required this.description}) : id = uuid;
+  final List<String> categories;
+
+  const Thing({required this.id, required this.title, required this.description, required this.categories});
+  Thing.createWithTitleAndDescription({required this.title, required this.description, required this.categories}) : id = uuid;
 
 }
 
 class ThingJsonHelper{
   List<Thing> decodedThings({required data}){
-
     List<Thing> thingsToReturn = [];
     for (final entry in data.entries) {
       thingsToReturn.add(decodedThing(entry: entry));
@@ -28,16 +29,18 @@ class ThingJsonHelper{
     final decodedThing = Thing(
           id: entry.key,
           title: entry.value['title'],
-          description: entry.value['description']
+          description: entry.value['description'],
+          categories: entry.value['categories'].split(','),
         );
 
     return decodedThing;
   }
 
-  Map<String, String?> ThingToMap({required Thing thing}){
+  Map<String, String?> thingToMap({required Thing thing}){
     final encodedThing = {
       'title': thing.title,
       'description': thing.description,
+      'categories': thing.categories.join(','),
     };
     return encodedThing;
   }
