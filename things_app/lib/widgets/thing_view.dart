@@ -3,7 +3,7 @@ import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/widgets/add_thing.dart';
 
-const double initHeight = 150;
+const double initHeight = 200;
 
 class ThingView extends StatefulWidget {
   const ThingView({
@@ -26,7 +26,6 @@ class ThingView extends StatefulWidget {
 class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
-  late final double _height;
 
   @override
   void dispose() {
@@ -37,8 +36,6 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
-    _height = initHeight;
 
     _controller = AnimationController(
       vsync: this,
@@ -51,14 +48,7 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
     ).animate(_controller);
 
     _controller.forward();
-  }
 
-  void _changeHeight(bool expand){
-    const double heightChange = 50;
-
-    setState(() {
-      _height = expand ? _height + heightChange : _height - heightChange;
-    });
   }
 
   @override
@@ -78,7 +68,7 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
               width: double.infinity,
               child: Container(
                 padding: const EdgeInsets.all(10),
-                child: ThingCard(widget: widget, changeHeight : _changeHeight),
+                child: ThingCard(widget: widget),
               ),
             ),
           ),
@@ -91,11 +81,10 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
 class ThingCard extends StatefulWidget {
   const ThingCard({
     super.key,
-    required this.widget, required this.changeHeight,
+    required this.widget,
   });
 
   final ThingView widget;
-  final void Function(bool expand) changeHeight;
 
   @override
   State<ThingCard> createState() => _ThingCardState();
@@ -108,13 +97,8 @@ class _ThingCardState extends State<ThingCard> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    bool isExpanded = false;
-
     return GestureDetector(
       onTap: () {
-        widget.changeHeight(!isExpanded);
-      },
-      onDoubleTap: () {
         showModalBottomSheet(
             context: context,
             builder: (ctx) {

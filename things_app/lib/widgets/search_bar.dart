@@ -12,7 +12,7 @@ class CollapsableSearchBar extends StatefulWidget{
 class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
 
   bool _isSearching = false;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   double _searchBarWidth = 0;
 
   @override
@@ -44,7 +44,7 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
             secondChild: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Container(
+                SizedBox(
                   width: _searchBarWidth,
                   child: TextField(
                     controller: _searchController,
