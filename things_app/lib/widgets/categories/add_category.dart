@@ -37,8 +37,9 @@
 
 //   @override
 //   void dispose() {
+  // _nameTextController.dispose();
 //     super.dispose();
-//     _nameTextController.dispose();
+//     
 //   }
 
 //   @override

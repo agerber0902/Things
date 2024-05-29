@@ -41,9 +41,9 @@ class _AddThingState extends State<AddThing> {
 
   @override
   void dispose() {
-    super.dispose();
     _titleTextController.dispose();
     _descriptionTextController.dispose();
+    super.dispose();
   }
 
   @override
