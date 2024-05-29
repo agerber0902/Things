@@ -23,8 +23,9 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
 
   @override
   void dispose() {
-    super.dispose();
     _searchController.dispose();
+    super.dispose();
+    
   }
 
   @override
