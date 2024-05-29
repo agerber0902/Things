@@ -21,9 +21,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Categories'),
+        title: Text(
+          'Categories',
+          style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),
+        ),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -45,10 +51,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           child: Column(
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(icon.key),
-                                  Icon(icon.value.iconData, color: icon.value.iconColor),
+                                  Icon(icon.value.iconData,
+                                      color: icon.value.iconColor),
                                 ],
                               ),
                             ],

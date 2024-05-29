@@ -3,6 +3,7 @@ import 'package:things_app/helpers/firebase_helper.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/screens/categories_screen.dart';
+import 'package:things_app/screens/reminders_screen.dart';
 
 import 'package:things_app/widgets/add_thing.dart';
 import 'package:things_app/widgets/filter_modal.dart';
@@ -255,8 +256,9 @@ class _ThingsScreenState extends State<ThingsScreen> {
             ListTile(
               title: const Text('Reminders'),
               onTap: () {
-                // Implement what you want to happen when Reminders is tapped
                 Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (ctx) => const RemindersScreen()));
               },
             ),
             ListTile(
