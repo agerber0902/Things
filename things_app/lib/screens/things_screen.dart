@@ -6,6 +6,7 @@ import 'package:things_app/screens/categories_screen.dart';
 
 import 'package:things_app/widgets/add_thing.dart';
 import 'package:things_app/widgets/filter_modal.dart';
+import 'package:things_app/widgets/search_bar.dart';
 import 'package:things_app/widgets/things_list_view.dart';
 
 final ThingsFirebaseHelper _firebaseHelper = ThingsFirebaseHelper();
@@ -21,11 +22,13 @@ class _ThingsScreenState extends State<ThingsScreen> {
   List<Thing> _thingsToDisplay = [];
   late List<Map<MapEntry<String, CategoryIcon>, bool>> _availableFilters;
   late IconData? _filterIconData;
+  late String _searchValue;
 
   @override
   void initState() {
     super.initState();
 
+    _searchValue = '';
     //Get things calls set state and updates _thingsToDisplay
     _getThings();
 
@@ -54,17 +57,31 @@ class _ThingsScreenState extends State<ThingsScreen> {
     _getThings();
   }
 
-  void _getThings({bool filter = false}) async {
+  void _getThings() async {
     List<Thing> thingsToReturn = await _firebaseHelper.getThings();
-    if (filter) {
-      List<String> filterValues = _availableFilters
-          .where((filter) => filter.entries.first.value)
-          .map((filter) => filter.entries.first.key.key)
-          .toList();
 
+    List<String> filterValues = _availableFilters
+        .where((filter) => filter.entries.first.value)
+        .map((filter) => filter.entries.first.key.key)
+        .toList();
+
+    //Filter the things
+    if (filterValues.isNotEmpty) {
       thingsToReturn = thingsToReturn
           .where((thing) => thing.categories
               .any((category) => filterValues.contains(category)))
+          .toList();
+    }
+
+    //Search the things
+    if (_searchValue.trim().isNotEmpty) {
+      thingsToReturn = thingsToReturn
+          .where((thing) =>
+              thing.title.toLowerCase().contains(_searchValue) ||
+              (thing.description != null &&
+                  thing.description!.toLowerCase().contains(_searchValue)) ||
+              thing.categories.any(
+                  (category) => category.toLowerCase().contains(_searchValue)))
           .toList();
     }
 
@@ -119,7 +136,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
       _setFilterImage(0);
     });
 
-    _getThings(filter: false);
+    _getThings();
   }
 
   void _openFilters() {
@@ -171,7 +188,15 @@ class _ThingsScreenState extends State<ThingsScreen> {
       _setFilterImage(filterCount);
     });
 
-    _getThings(filter: filterCount > 0);
+    _getThings();
+  }
+
+  void _searchThings(String searchValue) {
+    setState(() {
+      _searchValue = searchValue;
+    });
+
+    _getThings();
   }
 
   @override
@@ -186,6 +211,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
           style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),
         ),
         actions: [
+          CollapsableSearchBar(searchThings: _searchThings),
           IconButton(
             onPressed: () {
               _openFilters();

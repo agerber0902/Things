@@ -30,9 +30,8 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    super.dispose();
-
     _controller.dispose();
+    super.dispose();
   }
 
   @override
