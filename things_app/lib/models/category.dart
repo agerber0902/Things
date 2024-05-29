@@ -15,6 +15,7 @@ const Map<String, CategoryIcon> categoryIcons = {
   'house' : CategoryIcon('house', Icons.home, Colors.deepPurpleAccent),
   'favorite' : CategoryIcon('favorite', Icons.favorite, Colors.red),
   'restaurants' : CategoryIcon('restaurants', Icons.restaurant, Colors.blue),
+  'drinks' : CategoryIcon('drinks', Icons.local_drink, Colors.deepOrange),
   'recipes' : CategoryIcon('recipes', Icons.dining, Colors.amber),
   'chores' : CategoryIcon('chores', Icons.agriculture_sharp, Colors.green),
   'vacation' : CategoryIcon('vacation', Icons.beach_access, Colors.pink),

@@ -27,7 +27,7 @@ class _AddThingState extends State<AddThing> {
   final TextEditingController _descriptionTextController =
       TextEditingController();
   late List<String> _selectedCategories = [];
-  String? _selectedDropDownValue = null;
+  String? _selectedDropDownValue;
 
   @override
   void initState() {
