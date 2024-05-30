@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CollapsableSearchBar extends StatefulWidget{
-  const CollapsableSearchBar({super.key, required this.searchThings});
+  const CollapsableSearchBar({super.key, required this.searchThings, required this.expandedWidth});
 
   final void Function(String searchValue) searchThings;
-
+  final double expandedWidth; 
   @override
   State<CollapsableSearchBar> createState() => _CollapsableSearchBarState();
 }
@@ -37,7 +37,7 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
               onPressed: () {
                 setState(() {
                   _isSearching = true;
-                  _searchBarWidth = 200;
+                  _searchBarWidth = widget.expandedWidth;
                 });
               },
             ),

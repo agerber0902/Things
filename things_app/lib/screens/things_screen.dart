@@ -212,7 +212,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
           style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),
         ),
         actions: [
-          CollapsableSearchBar(searchThings: _searchThings),
+          CollapsableSearchBar(expandedWidth: 200, searchThings: _searchThings),
           IconButton(
             onPressed: () {
               _openFilters();

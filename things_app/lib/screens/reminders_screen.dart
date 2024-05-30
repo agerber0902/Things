@@ -16,18 +16,21 @@ class RemindersScreen extends StatefulWidget {
 
 class _RemindersScreenState extends State<RemindersScreen> {
   List<Reminder> _remindersToDisplay = [];
-  late IconData? _filterIconData;
-  late String _searchValue;
+  bool? isSearching;
+  //late IconData? _filterIconData;
+  //late String _searchValue;
 
   @override
   void initState() {
     super.initState();
 
-    _searchValue = '';
+    isSearching = false;
+
+    //_searchValue = '';
     //Get Reminders calls set state and updates _RemindersToDisplay
     _getReminders();
 
-    _filterIconData = Icons.filter_list;
+    //_filterIconData = Icons.filter_list;
   }
 
   void _addReminder(Reminder reminderToAdd) async {
@@ -93,13 +96,20 @@ class _RemindersScreenState extends State<RemindersScreen> {
           style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),
         ),
         actions: [
-          CollapsableSearchBar(searchThings: (value) {}),
-          IconButton(
-            onPressed: () {
-              //_openFilters();
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isSearching = isSearching == null ? false : !isSearching!;
+              });
             },
-            icon: Icon(_filterIconData),
+            child: CollapsableSearchBar(expandedWidth: 250, searchThings: (value) {}),
           ),
+          // IconButton(
+          //   onPressed: () {
+          //     //_openFilters();
+          //   },
+          //   icon: Icon(_filterIconData),
+          // ),
           IconButton(
               onPressed: () {
                 showModalBottomSheet(

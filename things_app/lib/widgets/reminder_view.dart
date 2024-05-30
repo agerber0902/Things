@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:things_app/models/category.dart';
 import 'package:things_app/models/reminder.dart';
-import 'package:things_app/models/thing.dart';
 import 'package:things_app/widgets/add_reminder.dart';
-import 'package:things_app/widgets/add_thing.dart';
 
 const double initHeight = 150;
 
@@ -13,7 +10,7 @@ class ReminderView extends StatefulWidget {
     required this.reminder,
     required this.deleteReminder,
     required this.addReminder,
-    required this.editReminder,
+    required this.editReminder, 
   });
 
   final Reminder reminder;
@@ -25,7 +22,8 @@ class ReminderView extends StatefulWidget {
   State<ReminderView> createState() => _ReminderViewState();
 }
 
-class _ReminderViewState extends State<ReminderView> with TickerProviderStateMixin {
+class _ReminderViewState extends State<ReminderView>
+    with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
@@ -50,7 +48,6 @@ class _ReminderViewState extends State<ReminderView> with TickerProviderStateMix
     ).animate(_controller);
 
     _controller.forward();
-
   }
 
   @override
@@ -93,7 +90,6 @@ class ReminderCard extends StatefulWidget {
 }
 
 class _ReminderCardState extends State<ReminderCard> {
-  
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -132,34 +128,17 @@ class _ReminderCardState extends State<ReminderCard> {
                 ],
               ),
               const SizedBox(height: 10),
-              // Row(
-              //   children: [
-              //     //Display Categories
-              //     Column(
-              //       mainAxisSize: MainAxisSize.max,
-              //       children: [
-              //         Row(
-              //           children:
-              //               widget.widget.reminder.categories.map((category) {
-              //             return Padding(
-              //               padding: const EdgeInsets.only(left: 0, right: 8),
-              //               child: Icon(
-              //                 categoryIcons[category]!.iconData,
-              //                 color: categoryIcons[category]!.iconColor,
-              //               ),
-              //             );
-              //           }).toList(),
-              //         ),
-              //       ],
-              //     ),
-              //   ],
-              // ),
+              Row(
+                children: [
+                  Text(widget.widget.reminder.reminderDateToDisplay)
+                ],
+              ),
               const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
                       child: Text(
-                    widget.widget.reminder.message ?? '',
+                    widget.widget.reminder.message,
                     maxLines: 1,
                     overflow: TextOverflow.fade,
                     style: textTheme.bodyMedium,
