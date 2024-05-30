@@ -96,7 +96,8 @@ class _AddThingState extends State<AddThing> {
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: SelectedCategories(
-                                selectedCategories: _selectedCategories),
+                                selectedCategories: _selectedCategories.where((c) => c != 'favorite').toList()
+                                ),
                           ),
                           const SizedBox(height: 16),
                           // DropdownMenu(
@@ -125,7 +126,7 @@ class _AddThingState extends State<AddThing> {
                           DropdownButton<String>(
                             hint: const Text('Select Categories'),
                             value: _selectedDropDownValue,
-                            items: categoryIcons.entries
+                            items: categoryIcons.entries.where((c) => c.key != 'favorite')
                                 .map((icon) {
                               return DropdownMenuItem<String>(
                                 value: icon.key,

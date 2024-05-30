@@ -48,7 +48,6 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
     ).animate(_controller);
 
     _controller.forward();
-
   }
 
   @override
@@ -91,7 +90,15 @@ class ThingCard extends StatefulWidget {
 }
 
 class _ThingCardState extends State<ThingCard> {
-  
+  bool? _isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _isFavorite = widget.widget.thing.categoriesContainsFavorite;
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -120,13 +127,42 @@ class _ThingCardState extends State<ThingCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                      child: Text(
-                    widget.widget.thing.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.displaySmall!.copyWith(
-                        fontSize: textTheme.displaySmall!.fontSize! - 5.0),
-                  )),
+                    child: Text(
+                      widget.widget.thing.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.displaySmall!.copyWith(
+                          fontSize: textTheme.displaySmall!.fontSize! - 5.0),
+                    ),
+                  ),
+                  _isFavorite ?? false
+                      ? IconButton(
+                          onPressed: () {
+                            widget.widget.thing.categories.remove('favorite');
+                            widget.widget.editThing(widget.widget.thing);
+
+                            setState(() {
+                              _isFavorite = false;
+                            });
+                          },
+                          icon: Icon(
+                            categoryIcons['favorite']!.iconData,
+                            color: categoryIcons['favorite']!.iconColor,
+                          ),
+                        )
+                      : IconButton(
+                          onPressed: () {
+                            widget.widget.thing.categories.add('favorite');
+                            widget.widget.editThing(widget.widget.thing);
+
+                            setState(() {
+                              _isFavorite = true;
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.favorite_outline,
+                          ),
+                        ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -137,8 +173,9 @@ class _ThingCardState extends State<ThingCard> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Row(
-                        children:
-                            widget.widget.thing.categories.map((category) {
+                        children: widget.widget.thing.categories
+                            .where((c) => c != 'favorite')
+                            .map((category) {
                           return Padding(
                             padding: const EdgeInsets.only(left: 0, right: 8),
                             child: Icon(

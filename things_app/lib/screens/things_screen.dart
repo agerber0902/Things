@@ -86,6 +86,25 @@ class _ThingsScreenState extends State<ThingsScreen> {
           .toList();
     }
 
+    // Sort the list by whether categories contain 'favorite'
+    thingsToReturn.sort((a, b) {
+      bool aContainsFavorite = a.categories.contains('favorite');
+      bool bContainsFavorite = b.categories.contains('favorite');
+
+      // If both contain 'favorite' or neither contain 'favorite', preserve the original order
+      if (aContainsFavorite == bContainsFavorite) {
+        return 0;
+      }
+
+      // If a contains 'favorite' but b does not, a should come before b
+      if (aContainsFavorite) {
+        return -1;
+      }
+
+      // If b contains 'favorite' but a does not, b should come before a
+      return 1;
+    });
+
     setState(() {
       _thingsToDisplay = thingsToReturn;
     });

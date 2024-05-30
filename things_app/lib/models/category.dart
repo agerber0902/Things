@@ -22,6 +22,11 @@ const Map<String, CategoryIcon> categoryIcons = {
 
 };
 
+Map<String, CategoryIcon> categoryIconsWithoutFavorite = {
+  ...categoryIcons
+    ..remove('favorite')
+};
+
 class CategoryIcon {
   final String name;
   final IconData iconData;

@@ -9,6 +9,12 @@ class Thing {
 
   final List<String> categories;
 
+  bool get categoriesContainsFavorite{
+
+    return categories.contains('favorite');
+
+  }
+
   const Thing({required this.id, required this.title, required this.description, required this.categories});
   Thing.createWithTitleAndDescription({required this.title, required this.description, required this.categories}) : id = uuid;
 
