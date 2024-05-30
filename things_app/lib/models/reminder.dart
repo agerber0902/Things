@@ -1,4 +1,5 @@
 
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 final uuid = const Uuid().v4();
@@ -8,10 +9,15 @@ class Reminder{
   final String? thingId;
   final String title;
   final String message;
+  final DateTime date;
 
-  Reminder.forEdit({required this.id, this.thingId, required this.title, required this.message});
-  Reminder.decoded({required this.id, required this.thingId, required this.title, required this.message,});
-  Reminder({this.thingId, required this.title, required this.message}) : id = uuid;
+  String get reminderDateToDisplay{
+    return DateFormat.yMEd().add_jms().format(date.toLocal());
+  }
+
+  Reminder.forEdit({required this.id, this.thingId, required this.title, required this.message, required this.date,});
+  Reminder.decoded({required this.id, required this.thingId, required this.title, required this.message,required this.date,});
+  Reminder({this.thingId, required this.title, required this.message,required this.date,}) : id = uuid;
 }
 
 class ReminderJsonHelper{
@@ -25,11 +31,13 @@ class ReminderJsonHelper{
   }
 
   Reminder decodedReminder({required entry}){
+
     final decodedReminder = Reminder.decoded(
           id: entry.key,
           title: entry.value['title'],
           message: entry.value['message'],
           thingId: entry.value['thingId'],
+          date: DateFormat.yMEd().add_jms().parse(entry.value['date']),
         );
 
     return decodedReminder;
@@ -40,6 +48,7 @@ class ReminderJsonHelper{
       'title': reminder.title,
       'message': reminder.message,
       'thingId': reminder.thingId,
+      'date': DateFormat.yMEd().add_jms().format(reminder.date.toLocal()),
     };
     return encodedReminder;
   }
