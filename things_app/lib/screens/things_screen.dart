@@ -259,9 +259,9 @@ class _ThingsScreenState extends State<ThingsScreen> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
+            DrawerHeader(
               child: Center(
-                child: Text('Header Placeholder'),
+                child: Image.asset('assets/images/logo.png'),
               ),
             ),
             ListTile(
