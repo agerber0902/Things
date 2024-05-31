@@ -292,6 +292,7 @@ class AddThingTextFormField extends StatelessWidget {
       child: TextFormField(
         maxLength: maxLength,
         maxLines: maxLines,
+        textInputAction: TextInputAction.done,
         controller: controller,
         style: textTheme.bodyLarge!.copyWith(color: colorScheme.primary),
         decoration: InputDecoration(

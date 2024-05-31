@@ -59,7 +59,9 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
           opacity: _animation.value,
           child: Dismissible(
             onDismissed: (direction) {
-              widget.deleteThing(widget.thing);
+              setState(() {
+                widget.deleteThing(widget.thing);
+              });
             },
             key: Key(widget.thing.id),
             child: SizedBox(
