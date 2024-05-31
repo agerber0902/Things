@@ -4,6 +4,9 @@ import 'package:things_app/models/reminder.dart';
 import 'package:things_app/widgets/add_reminder.dart';
 import 'package:things_app/widgets/reminders_list_view.dart';
 import 'package:things_app/widgets/search_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
+FirebaseMessaging messaging = FirebaseMessaging.instance;
 
 final RemindersFirebaseHelper _firebaseHelper = RemindersFirebaseHelper();
 
