@@ -8,6 +8,8 @@ const String titleValidationText = 'Enter a valid title';
 const String descriptionHintText = 'Enter a short description';
 const String descriptionValidationText = 'Enter a valid description';
 
+const String categoriesValidationText = 'Select at least one category.';
+
 class AddThing extends StatefulWidget {
   const AddThing(
       {super.key, required this.addThing, required this.editThing, this.thing});
@@ -34,6 +36,7 @@ class _AddThingState extends State<AddThing> {
     super.initState();
 
     _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
+    print(_selectedCategories);
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
         widget.thing != null ? widget.thing!.description ?? '' : '';
@@ -44,6 +47,12 @@ class _AddThingState extends State<AddThing> {
     _titleTextController.dispose();
     _descriptionTextController.dispose();
     super.dispose();
+  }
+
+  void removeCategory(String category){
+    setState(() {
+      _selectedCategories.remove(category);
+    });
   }
 
   @override
@@ -93,12 +102,20 @@ class _AddThingState extends State<AddThing> {
                           ),
                           const SizedBox(height: 16),
                           //Display selected categories
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: SelectedCategories(
-                                selectedCategories: _selectedCategories.where((c) => c != 'favorite').toList()
+                          _selectedCategories.isEmpty
+                              ? Text(
+                                  categoriesValidationText,
+                                  style: textTheme.bodySmall!
+                                      .copyWith(color: colorScheme.error),
+                                )
+                              : SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: SelectedCategories(
+                                    removeCategory: removeCategory,
+                                      selectedCategories: _selectedCategories
+                                          .where((c) => c != 'favorite')
+                                          .toList()),
                                 ),
-                          ),
                           const SizedBox(height: 16),
                           // DropdownMenu(
                           //   //initialSelection: categoryIcons.entries.first.key,
@@ -126,13 +143,17 @@ class _AddThingState extends State<AddThing> {
                           DropdownButton<String>(
                             hint: const Text('Select Categories'),
                             value: _selectedDropDownValue,
-                            items: categoryIcons.entries.where((c) => c.key != 'favorite')
+                            items: categoryIcons.entries
+                                .where((c) => c.key != 'favorite')
                                 .map((icon) {
                               return DropdownMenuItem<String>(
                                 value: icon.key,
                                 child: Row(
                                   children: [
-                                    Icon(icon.value.iconData, color: icon.value.iconColor,),
+                                    Icon(
+                                      icon.value.iconData,
+                                      color: icon.value.iconColor,
+                                    ),
                                     Text(icon.key),
                                   ],
                                 ),
@@ -152,6 +173,10 @@ class _AddThingState extends State<AddThing> {
                                     colorScheme.onPrimaryContainer),
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
+                                if (_selectedCategories.isEmpty) {
+                                  return;
+                                }
+
                                 //Add
                                 if (widget.thing == null) {
                                   final thingToAdd =
@@ -208,10 +233,11 @@ class _AddThingState extends State<AddThing> {
 class SelectedCategories extends StatefulWidget {
   const SelectedCategories({
     super.key,
-    required List<String> selectedCategories,
+    required List<String> selectedCategories, required this.removeCategory,
   }) : _selectedCategories = selectedCategories;
 
   final List<String> _selectedCategories;
+  final void Function(String category) removeCategory;
 
   @override
   State<SelectedCategories> createState() => _SelectedCategoriesState();
@@ -248,9 +274,7 @@ class _SelectedCategoriesState extends State<SelectedCategories> {
                     child: IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () {
-                        setState(() {
-                          widget._selectedCategories.remove(c);
-                        });
+                        widget.removeCategory(c);
                       },
                     ),
                   ),
