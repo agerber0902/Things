@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/widgets/add_thing.dart';
+import 'package:things_app/widgets/notes_modal.dart';
 
 const double initHeight = 200;
 
@@ -59,9 +60,7 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
           opacity: _animation.value,
           child: Dismissible(
             onDismissed: (direction) {
-              
-                widget.deleteThing(widget.thing);
-              
+              widget.deleteThing(widget.thing);
             },
             key: Key(widget.thing.id),
             child: SizedBox(
@@ -93,12 +92,39 @@ class ThingCard extends StatefulWidget {
 
 class _ThingCardState extends State<ThingCard> {
   bool? _isFavorite;
+  late bool _isCompleted;
 
   @override
   void initState() {
     super.initState();
 
     _isFavorite = widget.widget.thing.categoriesContainsFavorite;
+    _isCompleted = widget.widget.thing.isMarkedComplete;
+  }
+
+  Future<void> _notesDialogBuilder(
+    BuildContext context,
+    String text
+  ) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return NotesModal(
+              title: widget.widget.thing.title,
+              notes: widget.widget.thing.notes,
+              onAdd: (notes) {
+                widget.widget.thing.notes = notes;
+                widget.widget.editThing(widget.widget.thing);
+              },
+              onEdit: (notes) {
+                widget.widget.thing.notes = notes;
+                widget.widget.editThing(widget.widget.thing);
+              },
+            );
+          });
+        });
   }
 
   @override
@@ -203,6 +229,34 @@ class _ThingCardState extends State<ThingCard> {
                   )),
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _notesDialogBuilder(context, 'test');
+                    },
+                    child: widget.widget.thing.notes == null || widget.widget.thing.notes!.isEmpty ? Icon(Icons.note_add_outlined) : Icon(Icons.sticky_note_2),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.check_box,
+                      color:
+                          _isCompleted ? Colors.green : colorScheme.onPrimary,
+                    ),
+                    onPressed: () {
+                      //edit thing
+                      widget.widget.thing.isMarkedComplete = !_isCompleted;
+                      widget.widget.editThing(widget.widget.thing);
+
+                      setState(() {
+                        _isCompleted = !_isCompleted;
+                      });
+                    },
+                  ),
+                ],
+              )
             ],
           ),
         ),
