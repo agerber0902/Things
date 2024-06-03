@@ -184,6 +184,7 @@ class _AddThingState extends State<AddThing> {
                                           title: _titleTextController.text,
                                           description:
                                               _descriptionTextController.text,
+                                          isMarkedComplete: false,
                                           categories: _selectedCategories
                                               .where(
                                                   (category) => category != '')
@@ -200,6 +201,7 @@ class _AddThingState extends State<AddThing> {
                                       title: _titleTextController.text,
                                       description:
                                           _descriptionTextController.text,
+                                      isMarkedComplete: widget.thing!.isMarkedComplete,
                                       categories: _selectedCategories
                                           .where((category) => category != '')
                                           .toList());
