@@ -10,7 +10,7 @@ class ReminderView extends StatefulWidget {
     required this.reminder,
     required this.deleteReminder,
     required this.addReminder,
-    required this.editReminder, 
+    required this.editReminder,
   });
 
   final Reminder reminder;
@@ -129,9 +129,7 @@ class _ReminderCardState extends State<ReminderCard> {
               ),
               const SizedBox(height: 10),
               Row(
-                children: [
-                  Text(widget.widget.reminder.reminderDateToDisplay)
-                ],
+                children: [Text(widget.widget.reminder.reminderDateToDisplay)],
               ),
               const SizedBox(height: 10),
               Row(

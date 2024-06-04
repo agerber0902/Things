@@ -19,6 +19,7 @@ const Map<String, CategoryIcon> categoryIcons = {
   'recipes' : CategoryIcon('recipes', Icons.dining, Colors.amber),
   'chores' : CategoryIcon('chores', Icons.agriculture_sharp, Color.fromARGB(255, 3, 76, 41)),
   'vacation' : CategoryIcon('vacation', Icons.beach_access, Colors.pink),
+  'work' : CategoryIcon('work', Icons.work, Colors.blueGrey),
   'complete' : CategoryIcon('complete', Icons.check_box, Colors.green)
 
 };

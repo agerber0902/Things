@@ -102,10 +102,7 @@ class _ThingCardState extends State<ThingCard> {
     _isCompleted = widget.widget.thing.isMarkedComplete;
   }
 
-  Future<void> _notesDialogBuilder(
-    BuildContext context,
-    String text
-  ) {
+  Future<void> _notesDialogBuilder(BuildContext context, String text) {
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -237,7 +234,10 @@ class _ThingCardState extends State<ThingCard> {
                     onTap: () {
                       _notesDialogBuilder(context, 'test');
                     },
-                    child: widget.widget.thing.notes == null || widget.widget.thing.notes!.isEmpty ? const Icon(Icons.note_add_outlined) : const Icon(Icons.sticky_note_2),
+                    child: widget.widget.thing.notes == null ||
+                            widget.widget.thing.notes!.isEmpty
+                        ? const Icon(Icons.note_add_outlined)
+                        : const Icon(Icons.sticky_note_2),
                   ),
                   IconButton(
                     icon: Icon(
