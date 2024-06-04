@@ -224,7 +224,7 @@ class _ThingCardState extends State<ThingCard> {
                       child: Text(
                     widget.widget.thing.description ?? '',
                     maxLines: 1,
-                    overflow: TextOverflow.fade,
+                    overflow: TextOverflow.ellipsis,
                     style: textTheme.bodySmall,
                   )),
                 ],
