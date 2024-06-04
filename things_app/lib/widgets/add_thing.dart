@@ -36,7 +36,6 @@ class _AddThingState extends State<AddThing> {
     super.initState();
 
     _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
-    print(_selectedCategories);
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
         widget.thing != null ? widget.thing!.description ?? '' : '';

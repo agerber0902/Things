@@ -7,7 +7,6 @@ import 'package:things_app/screens/reminders_screen.dart';
 
 import 'package:things_app/widgets/add_thing.dart';
 import 'package:things_app/widgets/filter_modal.dart';
-import 'package:things_app/widgets/notes_modal.dart';
 import 'package:things_app/widgets/search_bar.dart';
 import 'package:things_app/widgets/things_list_view.dart';
 
@@ -48,7 +47,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
   }
 
   void _editThing(Thing thingToEdit) async {
-    print(thingToEdit.isMarkedComplete);
     await _firebaseHelper.putThing(thingToEdit);
 
     _getThings();

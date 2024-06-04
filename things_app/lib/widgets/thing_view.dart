@@ -237,7 +237,7 @@ class _ThingCardState extends State<ThingCard> {
                     onTap: () {
                       _notesDialogBuilder(context, 'test');
                     },
-                    child: widget.widget.thing.notes == null || widget.widget.thing.notes!.isEmpty ? Icon(Icons.note_add_outlined) : Icon(Icons.sticky_note_2),
+                    child: widget.widget.thing.notes == null || widget.widget.thing.notes!.isEmpty ? const Icon(Icons.note_add_outlined) : const Icon(Icons.sticky_note_2),
                   ),
                   IconButton(
                     icon: Icon(
