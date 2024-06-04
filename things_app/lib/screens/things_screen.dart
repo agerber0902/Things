@@ -7,7 +7,6 @@ import 'package:things_app/screens/reminders_screen.dart';
 
 import 'package:things_app/widgets/add_thing.dart';
 import 'package:things_app/widgets/filter_modal.dart';
-import 'package:things_app/widgets/notes_modal.dart';
 import 'package:things_app/widgets/search_bar.dart';
 import 'package:things_app/widgets/things_list_view.dart';
 
@@ -48,7 +47,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
   }
 
   void _editThing(Thing thingToEdit) async {
-    print(thingToEdit.isMarkedComplete);
     await _firebaseHelper.putThing(thingToEdit);
 
     _getThings();
@@ -67,6 +65,16 @@ class _ThingsScreenState extends State<ThingsScreen> {
         .where((filter) => filter.entries.first.value)
         .map((filter) => filter.entries.first.key.key)
         .toList();
+
+    //Filter the completed things
+    if (filterValues.contains('complete')) {
+
+      //remove complete from the filter values, then continue as usual
+      filterValues.remove('complete');
+
+      thingsToReturn =
+          thingsToReturn.where((thing) => thing.isMarkedComplete).toList();
+    }
 
     //Filter the things
     if (filterValues.isNotEmpty) {
@@ -88,27 +96,29 @@ class _ThingsScreenState extends State<ThingsScreen> {
           .toList();
     }
 
-    // Sort the list by whether categories contain 'favorite'
-    thingsToReturn.sort((a, b) {
-      bool aContainsFavorite = a.categories.contains('favorite');
-      bool bContainsFavorite = b.categories.contains('favorite');
+    //Start by filtering out marked as complete.
+    //Get list of things marked as complete, add them to the end of the list
+    List<Thing> completedThings =
+        thingsToReturn.where((thing) => thing.isMarkedComplete).toList();
+    thingsToReturn =
+        thingsToReturn.where((thing) => !thing.isMarkedComplete).toList();
 
-      // If both contain 'favorite' or neither contain 'favorite', preserve the original order
-      if (aContainsFavorite == bContainsFavorite) {
-        return 0;
-      }
+    //Then filter out the favorites
+    //Get list of favorite things, add them to the beginning of the list
+    List<Thing> favoriteThings = thingsToReturn
+        .where((thing) => thing.categories.contains('favorite'))
+        .toList();
 
-      // If a contains 'favorite' but b does not, a should come before b
-      if (aContainsFavorite) {
-        return -1;
-      }
-
-      // If b contains 'favorite' but a does not, b should come before a
-      return 1;
-    });
+    //finally filter out the things
+    //Get list of things that are NOT favorites or complete, and those will go in the middle
+    List<Thing> things = thingsToReturn
+        .where((thing) =>
+            !thing.isMarkedComplete && !thing.categories.contains('favorite'))
+        .toList();
 
     setState(() {
-      _thingsToDisplay = thingsToReturn;
+      //_thingsToDisplay = thingsToReturn;
+      _thingsToDisplay = [...favoriteThings, ...things, ...completedThings];
     });
   }
 

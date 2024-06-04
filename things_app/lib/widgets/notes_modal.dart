@@ -60,6 +60,9 @@ class _NotesModalState extends State<NotesModal> {
       setState(() {
         widget.notes!.remove(note);
 
+        //need to decrement the note index to avoid out of range exeption
+        _noteIndex = 0; //reset to 0 makes it similar to manage
+
         _isAdd = widget.notes?.isEmpty ?? true;
         _isDisplay = widget.notes?.isNotEmpty ?? false;
         _isEdit = false;
@@ -87,7 +90,6 @@ class _NotesModalState extends State<NotesModal> {
     void swipe(String direction) {
       if (direction == 'left') {
         if (_noteIndex == 0) {
-          print('already first');
           return;
         }
 
@@ -98,7 +100,6 @@ class _NotesModalState extends State<NotesModal> {
       }
       if (direction == 'right') {
         if (_noteIndex == widget.notes!.length - 1) {
-          print('maxxed');
           return;
         }
         setState(() {
@@ -134,13 +135,15 @@ class _NotesModalState extends State<NotesModal> {
                           ? Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  swipe('left');
-                                  print(_noteIndex);
-                                },
-                                icon: Icon(Icons.arrow_back_ios,
-                                    color: colorScheme.primaryContainer),
+                              Opacity(
+                                opacity: _noteIndex == 0 ? 0 : 1,
+                                child: IconButton(
+                                  onPressed: () {
+                                    swipe('left');
+                                  },
+                                  icon: Icon(Icons.arrow_back_ios,
+                                      color: colorScheme.primaryContainer),
+                                ),
                               ),
                               Expanded(
                                 child: Center(
@@ -155,13 +158,15 @@ class _NotesModalState extends State<NotesModal> {
                                   ),
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  swipe('right');
-                                  print(_noteIndex);
-                                },
-                                icon: Icon(Icons.arrow_forward_ios,
-                                    color: colorScheme.primaryContainer),
+                              Opacity(
+                                opacity: widget.notes != null && _noteIndex == widget.notes!.length-1 ? 0 : 1,
+                                child: IconButton(
+                                  onPressed: () {
+                                    swipe('right');
+                                  },
+                                  icon: Icon(Icons.arrow_forward_ios,
+                                      color: colorScheme.primaryContainer),
+                                ),
                               ),
                             ],
                           )

@@ -36,7 +36,6 @@ class _AddThingState extends State<AddThing> {
     super.initState();
 
     _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
-    print(_selectedCategories);
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
         widget.thing != null ? widget.thing!.description ?? '' : '';
@@ -113,7 +112,7 @@ class _AddThingState extends State<AddThing> {
                                   child: SelectedCategories(
                                     removeCategory: removeCategory,
                                       selectedCategories: _selectedCategories
-                                          .where((c) => c != 'favorite')
+                                          .where((c) => c != 'favorite' && c != 'complete')
                                           .toList()),
                                 ),
                           const SizedBox(height: 16),
@@ -144,7 +143,7 @@ class _AddThingState extends State<AddThing> {
                             hint: const Text('Select Categories'),
                             value: _selectedDropDownValue,
                             items: categoryIcons.entries
-                                .where((c) => c.key != 'favorite')
+                                .where((c) => c.key != 'favorite' && c.key != 'complete')
                                 .map((icon) {
                               return DropdownMenuItem<String>(
                                 value: icon.key,

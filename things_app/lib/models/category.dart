@@ -17,14 +17,16 @@ const Map<String, CategoryIcon> categoryIcons = {
   'restaurants' : CategoryIcon('restaurants', Icons.restaurant, Colors.blue),
   'drinks' : CategoryIcon('drinks', Icons.local_drink, Colors.deepOrange),
   'recipes' : CategoryIcon('recipes', Icons.dining, Colors.amber),
-  'chores' : CategoryIcon('chores', Icons.agriculture_sharp, Colors.green),
+  'chores' : CategoryIcon('chores', Icons.agriculture_sharp, Color.fromARGB(255, 3, 76, 41)),
   'vacation' : CategoryIcon('vacation', Icons.beach_access, Colors.pink),
+  'complete' : CategoryIcon('complete', Icons.check_box, Colors.green)
 
 };
 
-Map<String, CategoryIcon> categoryIconsWithoutFavorite = {
+Map<String, CategoryIcon> categoryIconsWithoutCardValues = {
   ...categoryIcons
     ..remove('favorite')
+    ..remove('complete')
 };
 
 class CategoryIcon {
