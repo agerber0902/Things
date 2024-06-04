@@ -32,6 +32,28 @@ class Thing {
       required this.categories,
       required this.isMarkedComplete, this.notes})
       : id = uuid;
+
+  factory Thing.fromJson(Map<String, dynamic> json) {
+    return Thing(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      isMarkedComplete: json['isMarkedComplete'] ?? false,
+      categories: List<String>.from(json['categories']),
+      notes: json['notes'] != null ? List<String>.from(json['notes']) : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'isMarkedComplete': isMarkedComplete,
+      'categories': categories,
+      'notes': notes,
+    };
+  }
 }
 
 class ThingJsonHelper {

@@ -10,8 +10,10 @@ import 'package:things_app/widgets/filter_modal.dart';
 import 'package:things_app/widgets/search_bar.dart';
 import 'package:things_app/widgets/things_list_view.dart';
 
-final ThingsFirebaseHelper _firebaseHelper = ThingsFirebaseHelper();
+import 'package:things_app/helpers/file_manager.dart';
 
+final ThingsFirebaseHelper _firebaseHelper = ThingsFirebaseHelper();
+final FileManager fileManager = FileManager(); 
 class ThingsScreen extends StatefulWidget {
   const ThingsScreen({super.key});
 
@@ -29,7 +31,11 @@ class _ThingsScreenState extends State<ThingsScreen> {
   void initState() {
     super.initState();
 
+    //Check for things list and verify it exists. should exist unless its the first time on the screen.
+    fileManager.verifyThingsList();
+
     _searchValue = '';
+
     //Get things calls set state and updates _thingsToDisplay
     _getThings();
 
@@ -41,25 +47,27 @@ class _ThingsScreenState extends State<ThingsScreen> {
   }
 
   void _addThing(Thing thingToAdd) async {
-    await _firebaseHelper.postThing(thingToAdd);
+    await fileManager.addThing(thingToAdd);
 
     _getThings();
   }
 
   void _editThing(Thing thingToEdit) async {
-    await _firebaseHelper.putThing(thingToEdit);
+    await fileManager.updateThing(thingToEdit);
 
     _getThings();
   }
 
   void _deleteThing(Thing thingToDelete) async {
-    await _firebaseHelper.deleteThing(thingToDelete);
+    //await _firebaseHelper.deleteThing(thingToDelete);
+    await fileManager.deleteThing(thingToDelete);
 
     _getThings();
   }
 
   void _getThings() async {
-    List<Thing> thingsToReturn = await _firebaseHelper.getThings();
+
+    List<Thing> thingsToReturn = await fileManager.readThingList();
 
     List<String> filterValues = _availableFilters
         .where((filter) => filter.entries.first.value)
@@ -68,7 +76,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
 
     //Filter the completed things
     if (filterValues.contains('complete')) {
-
       //remove complete from the filter values, then continue as usual
       filterValues.remove('complete');
 
