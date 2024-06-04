@@ -1,4 +1,3 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
@@ -243,20 +242,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          AwesomeNotifications().createNotification(
-              content: NotificationContent(
-            id: 1,
-            channelKey: 'things_channel',
-            title: 'Test Notification',
-            body: 'We did it.',
-            bigPicture: 'asset://assets/images/your_image.png', // Reference to your asset image
-        notificationLayout: NotificationLayout.BigPicture,
-          ));
-        },
-        child: Icon(Icons.notification_add),
-      ),
       appBar: AppBar(
         title: Text(
           'Things',
