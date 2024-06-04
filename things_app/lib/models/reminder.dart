@@ -18,6 +18,15 @@ class Reminder{
   Reminder.forEdit({required this.id, this.thingId, required this.title, required this.message, required this.date,});
   Reminder.decoded({required this.id, required this.thingId, required this.title, required this.message,required this.date,});
   Reminder({this.thingId, required this.title, required this.message,required this.date,}) : id = uuid;
+
+  factory Reminder.fromJson(Map<String, dynamic> json) {
+    return Reminder.forEdit(
+      id: json['id'],
+      title: json['title'],
+      message: json['message'],
+      date: json['date'],
+    );
+  }
 }
 
 class ReminderJsonHelper{
