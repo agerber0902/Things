@@ -44,16 +44,6 @@ class Thing {
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'isMarkedComplete': isMarkedComplete,
-      'categories': categories,
-      'notes': notes,
-    };
-  }
 }
 
 class ThingJsonHelper {

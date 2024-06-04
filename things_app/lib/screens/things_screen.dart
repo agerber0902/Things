@@ -1,5 +1,5 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:things_app/helpers/firebase_helper.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/screens/categories_screen.dart';
@@ -12,8 +12,8 @@ import 'package:things_app/widgets/things_list_view.dart';
 
 import 'package:things_app/helpers/file_manager.dart';
 
-final ThingsFirebaseHelper _firebaseHelper = ThingsFirebaseHelper();
-final FileManager fileManager = FileManager(); 
+final ThingFileManager fileManager = ThingFileManager();
+
 class ThingsScreen extends StatefulWidget {
   const ThingsScreen({super.key});
 
@@ -66,7 +66,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
   }
 
   void _getThings() async {
-
     List<Thing> thingsToReturn = await fileManager.readThingList();
 
     List<String> filterValues = _availableFilters
@@ -244,6 +243,20 @@ class _ThingsScreenState extends State<ThingsScreen> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          AwesomeNotifications().createNotification(
+              content: NotificationContent(
+            id: 1,
+            channelKey: 'things_channel',
+            title: 'Test Notification',
+            body: 'We did it.',
+            bigPicture: 'asset://assets/images/your_image.png', // Reference to your asset image
+        notificationLayout: NotificationLayout.BigPicture,
+          ));
+        },
+        child: Icon(Icons.notification_add),
+      ),
       appBar: AppBar(
         title: Text(
           'Things',
