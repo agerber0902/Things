@@ -1,14 +1,12 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:things_app/helpers/reminders_firebase_helper.dart';
+import 'package:things_app/helpers/file_manager.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/widgets/add_reminder.dart';
 import 'package:things_app/widgets/reminders_list_view.dart';
 import 'package:things_app/widgets/search_bar.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
-FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-final RemindersFirebaseHelper _firebaseHelper = RemindersFirebaseHelper();
+final ReminderFileManager fileManager = ReminderFileManager();
 
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
@@ -29,58 +27,76 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
     isSearching = false;
 
-    //_searchValue = '';
+    //Check for things list and verify it exists. should exist unless its the first time on the screen.
+    fileManager.verifyRemindersList();
+
     //Get Reminders calls set state and updates _RemindersToDisplay
     _getReminders();
 
     //_filterIconData = Icons.filter_list;
   }
 
+  void _editReminderNotification(Reminder reminder) {
+    _deleteReminderNotification(reminder);
+    _scheduleReminderNotification(reminder);
+  }
+
+  void _deleteReminderNotification(Reminder reminder) {
+    int id = _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
+
+    AwesomeNotifications().cancel(id);
+  }
+
+  void _scheduleReminderNotification(Reminder reminder) {
+    int id = _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
+
+    AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: id != -1 ? id : _remindersToDisplay.length,
+        channelKey: 'things_channel',
+        title: reminder.title,
+        body: reminder.message,
+        bigPicture:
+            'asset://assets/images/logo.png', // Reference to your asset image
+        notificationLayout: NotificationLayout.BigPicture,
+      ),
+      schedule: NotificationCalendar(
+        year: reminder.date.year,
+        month: reminder.date.month,
+        day: reminder.date.day,
+        hour: reminder.date.hour,
+        minute: reminder.date.minute,
+        second: reminder.date.second,
+        millisecond: reminder.date.millisecond,
+        repeats: false, // set to true to repeat the notification
+      ),
+    );
+  }
+
   void _addReminder(Reminder reminderToAdd) async {
-    await _firebaseHelper.postReminder(reminderToAdd);
+    await fileManager.addReminder(reminderToAdd);
+    _scheduleReminderNotification(reminderToAdd);
 
     _getReminders();
   }
 
   void _editReminder(Reminder reminderToEdit) async {
-    await _firebaseHelper.putReminder(reminderToEdit);
+    await fileManager.updateReminder(reminderToEdit);
+    _editReminderNotification(reminderToEdit);
 
     _getReminders();
   }
 
   void _deleteReminder(Reminder reminderToDelete) async {
-    await _firebaseHelper.deleteReminder(reminderToDelete);
+    _deleteReminderNotification(reminderToDelete);
+
+    await fileManager.deleteReminder(reminderToDelete);
 
     _getReminders();
   }
 
   void _getReminders() async {
-    List<Reminder> remindersToReturn = await _firebaseHelper.getReminders();
-
-    // List<String> filterValues = _availableFilters
-    //     .where((filter) => filter.entries.first.value)
-    //     .map((filter) => filter.entries.first.key.key)
-    //     .toList();
-
-    //Filter the Reminders
-    // if (filterValues.isNotEmpty) {
-    //   remindersToReturn = remindersToReturn
-    //       .where((Reminder) => Reminder.categories
-    //           .any((category) => filterValues.contains(category)))
-    //       .toList();
-    // }
-
-    // //Search the Reminders
-    // if (_searchValue.trim().isNotEmpty) {
-    //   RemindersToReturn = RemindersToReturn
-    //       .where((Reminder) =>
-    //           Reminder.title.toLowerCase().contains(_searchValue) ||
-    //           (Reminder.description != null &&
-    //               Reminder.description!.toLowerCase().contains(_searchValue)) ||
-    //           Reminder.categories.any(
-    //               (category) => category.toLowerCase().contains(_searchValue)))
-    //       .toList();
-    // }
+    List<Reminder> remindersToReturn = await fileManager.readReminderList();
 
     setState(() {
       _remindersToDisplay = remindersToReturn;
@@ -105,7 +121,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
                 isSearching = isSearching == null ? false : !isSearching!;
               });
             },
-            child: CollapsableSearchBar(expandedWidth: 250, searchThings: (value) {}),
+            child: CollapsableSearchBar(
+                expandedWidth: 250, searchThings: (value) {}),
           ),
           // IconButton(
           //   onPressed: () {

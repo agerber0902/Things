@@ -127,13 +127,13 @@ class ReminderFileManager extends FileManager {
         //Parse List
         final decodedReminders = jsonDecode(contents);
 
-        List<Reminder> Reminders = [];
-        for (Map<String, dynamic> ReminderMap in decodedReminders) {
-          Reminder reminder = Reminder.fromJson(ReminderMap);
-          Reminders.add(reminder);
+        List<Reminder> reminders = [];
+        for (Map<String, dynamic> reminderMap in decodedReminders) {
+          Reminder reminder = Reminder.fromJson(reminderMap);
+          reminders.add(reminder);
         }
 
-        return Reminders;
+        return reminders;
       }
     } catch (e) {
       return [];
@@ -158,6 +158,7 @@ class ReminderFileManager extends FileManager {
     //Add Reminder to list of Reminders
     reminders.add(reminder);
     final file = await _localFile(remindersListFileName);
+    
     return file.writeAsString(jsonEncode(reminders));
   }
 

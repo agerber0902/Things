@@ -117,7 +117,7 @@ class _AddReminderState extends State<AddReminder> {
                             controller: _messageTextController,
                             hintText: messageHintText,
                             validationText: messageValidationText,
-                            maxLength: 25,
+                            maxLength: 35,
                             maxLines: 1,
                           ),
                           ElevatedButton(

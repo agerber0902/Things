@@ -138,7 +138,7 @@ class _ReminderCardState extends State<ReminderCard> {
                       child: Text(
                     widget.widget.reminder.message,
                     maxLines: 1,
-                    overflow: TextOverflow.fade,
+                    overflow: TextOverflow.ellipsis,
                     style: textTheme.bodyMedium,
                   )),
                 ],
