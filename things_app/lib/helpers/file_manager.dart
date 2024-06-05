@@ -6,8 +6,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
 
-
-
 class FileManager {
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -81,7 +79,14 @@ class ThingFileManager extends FileManager {
     //Add thing to list of things
     things.add(thing);
     final file = await _localFile(thingsListFileName);
-    return file.writeAsString(jsonEncode(things));
+    // Convert the list of objects to a list of JSON maps
+    List<Map<String, dynamic>> jsonList =
+        things.map((thing) => thing.toJson()).toList();
+
+    // Encode the list of JSON maps to a JSON string
+    String jsonString = jsonEncode(jsonList);
+
+    return file.writeAsString(jsonString);
   }
 
   Future<File> updateThing(Thing thing) async {
@@ -158,8 +163,15 @@ class ReminderFileManager extends FileManager {
     //Add Reminder to list of Reminders
     reminders.add(reminder);
     final file = await _localFile(remindersListFileName);
-    
-    return file.writeAsString(jsonEncode(reminders));
+
+    // Convert the list of objects to a list of JSON maps
+    List<Map<String, dynamic>> jsonList =
+        reminders.map((reminder) => reminder.toJson()).toList();
+
+    // Encode the list of JSON maps to a JSON string
+    String jsonString = jsonEncode(jsonList);
+
+    return file.writeAsString(jsonString);
   }
 
   Future<File> updateReminder(Reminder reminder) async {
