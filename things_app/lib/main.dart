@@ -40,7 +40,7 @@ void main() async {
 }
 
 final ColorScheme kColorScheme =
-    ColorScheme.fromSeed(seedColor: Colors.blueGrey);
+    ColorScheme.fromSeed(seedColor: const Color.fromRGBO(96, 125, 139, 1));
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -67,6 +67,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: kColorScheme,
