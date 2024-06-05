@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:things_app/helpers/firebase_helper.dart';
 import 'package:things_app/models/category.dart';
-//import 'package:things_app/widgets/categories/add_category.dart';
-
-//CategoryFirebaseHelper _firebaseHelper = CategoryFirebaseHelper();
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -39,7 +35,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                for (final icon in categoryIcons.entries)
+                for (final icon in categoryIcons.entries.where((c) => c.key != 'favorite' && c.key != 'complete' ))
                   Padding(
                     padding: const EdgeInsets.all(10),
                     child: SizedBox(
