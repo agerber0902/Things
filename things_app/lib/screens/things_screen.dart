@@ -99,6 +99,14 @@ class _ThingsScreenState extends State<ThingsScreen> {
               thing.categories.any(
                   (category) => category.toLowerCase().contains(_searchValue)))
           .toList();
+
+      //search on notes
+      thingsToReturn = thingsToReturn
+          .where((thing) =>
+              thing.notes == null ||
+              thing.notes!
+                  .any((note) => note.toLowerCase().contains(_searchValue)))
+          .toList();
     }
 
     //Start by filtering out marked as complete.

@@ -31,7 +31,7 @@ class Thing {
       required this.description,
       required this.categories,
       required this.isMarkedComplete, this.notes})
-      : id = uuid;
+      : id = const Uuid().v4();
 
   factory Thing.fromJson(Map<String, dynamic> json) {
     return Thing(
@@ -42,6 +42,16 @@ class Thing {
       categories: List<String>.from(json['categories']),
       notes: json['notes'] != null ? List<String>.from(json['notes']) : null,
     );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'categories': categories,
+      'isMarkedComplete': isMarkedComplete,
+      'notes': notes,
+    };
   }
 
 }
