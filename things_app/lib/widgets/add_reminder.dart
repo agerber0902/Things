@@ -59,6 +59,7 @@ class _AddReminderState extends State<AddReminder> {
       final TimeOfDay? pickedTime = await showTimePicker(
         // ignore: use_build_context_synchronously
         context: context,
+        initialEntryMode: TimePickerEntryMode.input,
         initialTime:
             TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),
       );

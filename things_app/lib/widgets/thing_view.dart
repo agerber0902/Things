@@ -53,6 +53,9 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -60,7 +63,22 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
           opacity: _animation.value,
           child: Dismissible(
             onDismissed: (direction) {
+              Thing thing = widget.thing;
               widget.deleteThing(widget.thing);
+
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  "${thing.title} was deleted.",
+                  style: textTheme.bodyLarge!.copyWith(color: colorScheme.onPrimary),
+                ),
+                action: SnackBarAction(
+                  label: "Undo",
+                  onPressed: () {
+                    widget.addThing(thing);
+                  },
+                ),
+              ));
             },
             key: Key(widget.thing.id),
             child: SizedBox(
