@@ -4,16 +4,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:things_app/controllers/notification_controller.dart';
 import 'package:things_app/screens/things_screen.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
   await AwesomeNotifications().initialize(
-    null, //change this for icon in notification
+    null,
     [
       NotificationChannel(
         channelGroupKey: 'things_channel_group',

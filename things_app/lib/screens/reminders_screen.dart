@@ -5,6 +5,8 @@ import 'package:things_app/models/reminder.dart';
 import 'package:things_app/widgets/add_reminder.dart';
 import 'package:things_app/widgets/reminders_list_view.dart';
 import 'package:things_app/widgets/search_bar.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final ReminderFileManager fileManager = ReminderFileManager();
 
@@ -37,12 +39,13 @@ class _RemindersScreenState extends State<RemindersScreen> {
   }
 
   void _editReminderNotification(Reminder reminder) {
-    _deleteReminderNotification(reminder);
+    int notificationId = _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
+    _deleteReminderNotification(notificationId);
     _scheduleReminderNotification(reminder);
   }
 
-  void _deleteReminderNotification(Reminder reminder) {
-    int id = _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
+  void _deleteReminderNotification(int id) {
+    //int id = _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
 
     AwesomeNotifications().cancel(id);
   }
@@ -50,15 +53,15 @@ class _RemindersScreenState extends State<RemindersScreen> {
   void _scheduleReminderNotification(Reminder reminder) {
     int id = _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
 
+    tz.initializeTimeZones();
+    final String localTimeZone = tz.local.name;
+
     AwesomeNotifications().createNotification(
       content: NotificationContent(
         id: id != -1 ? id : _remindersToDisplay.length,
-        channelKey: 'things_channel',
+        channelKey: 'reminders_channel',
         title: reminder.title,
         body: reminder.message,
-        bigPicture:
-            'asset://assets/images/logo.png', // Reference to your asset image
-        notificationLayout: NotificationLayout.BigPicture,
       ),
       schedule: NotificationCalendar(
         year: reminder.date.year,
@@ -68,6 +71,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
         minute: reminder.date.minute,
         second: reminder.date.second,
         millisecond: reminder.date.millisecond,
+        timeZone: localTimeZone,
         repeats: false, // set to true to repeat the notification
       ),
     );
@@ -88,9 +92,11 @@ class _RemindersScreenState extends State<RemindersScreen> {
   }
 
   void _deleteReminder(Reminder reminderToDelete) async {
-    _deleteReminderNotification(reminderToDelete);
-
+    int id = _remindersToDisplay.indexWhere((r) => r.id == reminderToDelete.id);
+    
     await fileManager.deleteReminder(reminderToDelete);
+    
+    _deleteReminderNotification(id);
 
     _getReminders();
   }
