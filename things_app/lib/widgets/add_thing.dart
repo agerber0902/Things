@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/widgets/notes_modal.dart';
 
 const String titleHintText = 'Enter a title';
 const String titleValidationText = 'Enter a valid title';
@@ -30,6 +31,7 @@ class _AddThingState extends State<AddThing> {
       TextEditingController();
   late List<String> _selectedCategories = [];
   String? _selectedDropDownValue;
+  late List<String> _notesOnAdd;
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _AddThingState extends State<AddThing> {
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
         widget.thing != null ? widget.thing!.description ?? '' : '';
+    _notesOnAdd = [];
   }
 
   @override
@@ -48,10 +51,39 @@ class _AddThingState extends State<AddThing> {
     super.dispose();
   }
 
-  void removeCategory(String category){
+  void removeCategory(String category) {
     setState(() {
       _selectedCategories.remove(category);
     });
+  }
+
+  void handleNotes(List<String> notes) {
+    print('handling...');
+    setState(() {
+      _notesOnAdd = [...notes];
+    });
+
+    print(_notesOnAdd);
+  }
+
+  Future<void> _notesDialogBuilder(BuildContext context, Thing? thing) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return NotesModal(
+              title: thing != null ? thing.title : '',
+              notes: thing != null ? thing.notes : _notesOnAdd,
+              onAdd: (notes) {
+                handleNotes(notes ?? []);
+              },
+              onEdit: (notes) {
+                handleNotes(notes ?? []);
+              },
+            );
+          });
+        });
   }
 
   @override
@@ -97,9 +129,50 @@ class _AddThingState extends State<AddThing> {
                             hintText: descriptionHintText,
                             validationText: descriptionValidationText,
                             maxLength: 100,
-                            maxLines: 2,
+                            maxLines: 1,
                           ),
                           const SizedBox(height: 16),
+
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () {},
+                                label: Text(
+                                  'Add Reminders',
+                                  style: TextStyle(
+                                    color: colorScheme.primary,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                                icon: const Icon(Icons.access_time),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TextButton.icon(
+                                onPressed: () {
+                                  _notesDialogBuilder(context, widget.thing);
+                                },
+                                label: Text(
+                                  'Add Notes',
+                                  style: TextStyle(
+                                    color: colorScheme.primary,
+                                    decoration: TextDecoration.underline,
+                                  ),
+                                ),
+                                icon: const Icon(Icons.note_add_outlined),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 16),
+
                           //Display selected categories
                           _selectedCategories.isEmpty
                               ? Text(
@@ -110,9 +183,11 @@ class _AddThingState extends State<AddThing> {
                               : SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: SelectedCategories(
-                                    removeCategory: removeCategory,
+                                      removeCategory: removeCategory,
                                       selectedCategories: _selectedCategories
-                                          .where((c) => c != 'favorite' && c != 'complete')
+                                          .where((c) =>
+                                              c != 'favorite' &&
+                                              c != 'complete')
                                           .toList()),
                                 ),
                           const SizedBox(height: 16),
@@ -143,7 +218,8 @@ class _AddThingState extends State<AddThing> {
                             hint: const Text('Select Categories'),
                             value: _selectedDropDownValue,
                             items: categoryIcons.entries
-                                .where((c) => c.key != 'favorite' && c.key != 'complete')
+                                .where((c) =>
+                                    c.key != 'favorite' && c.key != 'complete')
                                 .map((icon) {
                               return DropdownMenuItem<String>(
                                 value: icon.key,
@@ -184,6 +260,7 @@ class _AddThingState extends State<AddThing> {
                                           description:
                                               _descriptionTextController.text,
                                           isMarkedComplete: false,
+                                          notes: _notesOnAdd,
                                           categories: _selectedCategories
                                               .where(
                                                   (category) => category != '')
@@ -200,7 +277,9 @@ class _AddThingState extends State<AddThing> {
                                       title: _titleTextController.text,
                                       description:
                                           _descriptionTextController.text,
-                                      isMarkedComplete: widget.thing!.isMarkedComplete,
+                                      isMarkedComplete:
+                                          widget.thing!.isMarkedComplete,
+                                      notes: _notesOnAdd,
                                       categories: _selectedCategories
                                           .where((category) => category != '')
                                           .toList());
@@ -234,7 +313,8 @@ class _AddThingState extends State<AddThing> {
 class SelectedCategories extends StatefulWidget {
   const SelectedCategories({
     super.key,
-    required List<String> selectedCategories, required this.removeCategory,
+    required List<String> selectedCategories,
+    required this.removeCategory,
   }) : _selectedCategories = selectedCategories;
 
   final List<String> _selectedCategories;
