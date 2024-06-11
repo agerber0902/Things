@@ -5,7 +5,7 @@ final uuid = const Uuid().v4();
 
 class Reminder {
   final String id;
-  final String? thingId;
+  final List<String>? thingIds;
   final String title;
   final String message;
   final DateTime date;
@@ -16,20 +16,20 @@ class Reminder {
 
   Reminder.forEdit({
     required this.id,
-    this.thingId,
+    this.thingIds,
     required this.title,
     required this.message,
     required this.date,
   });
   Reminder.decoded({
     required this.id,
-    required this.thingId,
+    required this.thingIds,
     required this.title,
     required this.message,
     required this.date,
   });
   Reminder({
-    this.thingId,
+    this.thingIds,
     required this.title,
     required this.message,
     required this.date,
@@ -41,7 +41,7 @@ class Reminder {
       title: json['title'],
       message: json['message'],
       date: DateTime.parse(json['date']),
-      thingId: null,
+      thingIds: json['thingIds'] != null ? List<String>.from(json['thingIds']) : null,
     );
   }
 
@@ -51,6 +51,7 @@ class Reminder {
       'title': title,
       'message': message,
       'date': date.toIso8601String(),
+      'thingsIds': thingIds,
     };
   }
 
@@ -71,7 +72,7 @@ class ReminderJsonHelper {
       id: entry.key,
       title: entry.value['title'],
       message: entry.value['message'],
-      thingId: entry.value['thingId'],
+      thingIds: entry.value['thingIds'].split(','),
       date: DateFormat.yMEd().add_jms().parse(entry.value['date']),
     );
 
@@ -82,7 +83,7 @@ class ReminderJsonHelper {
     final encodedReminder = {
       'title': reminder.title,
       'message': reminder.message,
-      'thingId': reminder.thingId,
+      'thingIds': reminder.thingIds?.join(','),
       'date': DateFormat.yMEd().add_jms().format(reminder.date.toLocal()),
     };
     return encodedReminder;

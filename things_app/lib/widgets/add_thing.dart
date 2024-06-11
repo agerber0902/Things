@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/category.dart';
+import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/screens/things_screen.dart';
+import 'package:things_app/widgets/add_reminder.dart';
+import 'package:things_app/widgets/add_reminders_Modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 
 const String titleHintText = 'Enter a title';
@@ -12,8 +16,12 @@ const String descriptionValidationText = 'Enter a valid description';
 const String categoriesValidationText = 'Select at least one category.';
 
 class AddThing extends StatefulWidget {
-  const AddThing(
-      {super.key, required this.addThing, required this.editThing, this.thing});
+  const AddThing({
+    super.key,
+    required this.addThing,
+    required this.editThing,
+    this.thing,
+  });
 
   final void Function(Thing thingToAdd) addThing;
   final void Function(Thing thingToEdit) editThing;
@@ -32,16 +40,21 @@ class _AddThingState extends State<AddThing> {
   late List<String> _selectedCategories = [];
   String? _selectedDropDownValue;
   late List<String> _notesOnAdd;
+  late List<Reminder> _remindersOnAdd;
+  late List<Thing> availableThings;
 
   @override
   void initState() {
     super.initState();
+
+    getAvailableThings();
 
     _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
         widget.thing != null ? widget.thing!.description ?? '' : '';
     _notesOnAdd = [];
+    _remindersOnAdd = [];
   }
 
   @override
@@ -51,6 +64,15 @@ class _AddThingState extends State<AddThing> {
     super.dispose();
   }
 
+  void getAvailableThings() async {
+    var things = await fileManager.readThingList();
+
+    setState(() {
+      availableThings = things;
+    });
+    return;
+  }
+
   void removeCategory(String category) {
     setState(() {
       _selectedCategories.remove(category);
@@ -58,12 +80,33 @@ class _AddThingState extends State<AddThing> {
   }
 
   void handleNotes(List<String> notes) {
-    print('handling...');
     setState(() {
       _notesOnAdd = [...notes];
     });
+  }
 
-    print(_notesOnAdd);
+  void handleAddReminder(Reminder reminder) {
+    setState(() {
+      _remindersOnAdd = [reminder, ..._remindersOnAdd];
+    });
+  }
+
+  Future<void> _remindersDialogBuilder(BuildContext context) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return AddRemindersModal(
+              createReminderBottomSheet: AddReminder(
+                addReminder: (Reminder r){},
+                editReminder: (Reminder r){},
+                reminder: Reminder(title: 'title', message: 'message', date: DateTime.now()),
+                availableThings: []
+              ),
+            );
+          });
+        });
   }
 
   Future<void> _notesDialogBuilder(BuildContext context, Thing? thing) {
@@ -81,6 +124,9 @@ class _AddThingState extends State<AddThing> {
               onEdit: (notes) {
                 handleNotes(notes ?? []);
               },
+              onDelete: (notes) {
+                handleNotes(notes ?? []);
+              },
             );
           });
         });
@@ -92,219 +138,219 @@ class _AddThingState extends State<AddThing> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
-      height: 600,
-      width: double.infinity,
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                padding: const EdgeInsets.all(8),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.close),
-              ),
-            ],
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Row(
-                children: [
-                  Form(
-                    key: _formKey,
-                    child: Expanded(
-                      child: Column(
-                        children: [
-                          AddThingTextFormField(
-                            controller: _titleTextController,
-                            hintText: titleHintText,
-                            validationText: titleValidationText,
-                            maxLength: 50,
-                            maxLines: 1,
-                          ),
-                          AddThingTextFormField(
-                            controller: _descriptionTextController,
-                            hintText: descriptionHintText,
-                            validationText: descriptionValidationText,
-                            maxLength: 100,
-                            maxLines: 1,
-                          ),
-                          const SizedBox(height: 16),
+      height: MediaQuery.of(context).size.height - kToolbarHeight,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                IconButton(
+                  padding: const EdgeInsets.all(8),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.close),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                Form(
+                  key: _formKey,
+                  child: Expanded(
+                    child: Column(
+                      children: [
+                        AddThingTextFormField(
+                          controller: _titleTextController,
+                          hintText: titleHintText,
+                          validationText: titleValidationText,
+                          maxLength: 50,
+                          maxLines: 1,
+                        ),
+                        AddThingTextFormField(
+                          controller: _descriptionTextController,
+                          hintText: descriptionHintText,
+                          validationText: descriptionValidationText,
+                          maxLength: 100,
+                          maxLines: 1,
+                        ),
+                        const SizedBox(height: 16),
 
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextButton.icon(
-                                onPressed: () {},
-                                label: Text(
-                                  'Add Reminders',
-                                  style: TextStyle(
-                                    color: colorScheme.primary,
-                                    decoration: TextDecoration.underline,
-                                  ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                _remindersDialogBuilder(context);
+                              },
+                              label: Text(
+                                'Add Reminders',
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                  decoration: TextDecoration.underline,
                                 ),
-                                icon: const Icon(Icons.access_time),
                               ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextButton.icon(
-                                onPressed: () {
-                                  _notesDialogBuilder(context, widget.thing);
-                                },
-                                label: Text(
-                                  'Add Notes',
-                                  style: TextStyle(
-                                    color: colorScheme.primary,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                                icon: const Icon(Icons.note_add_outlined),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          //Display selected categories
-                          _selectedCategories.isEmpty
-                              ? Text(
-                                  categoriesValidationText,
-                                  style: textTheme.bodySmall!
-                                      .copyWith(color: colorScheme.error),
-                                )
-                              : SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: SelectedCategories(
-                                      removeCategory: removeCategory,
-                                      selectedCategories: _selectedCategories
-                                          .where((c) =>
-                                              c != 'favorite' &&
-                                              c != 'complete')
-                                          .toList()),
-                                ),
-                          const SizedBox(height: 16),
-                          // DropdownMenu(
-                          //   //initialSelection: categoryIcons.entries.first.key,
-                          //   initialSelection: _selectedDropDownValue,
-                          //   helperText: 'Select Categories',
-                          //   hintText: 'Select Categories',
-                          //   onSelected: (value) {
-                          //     setState(() {
-                          //       _selectedCategories.add(value ?? '');
-                          //       _selectedDropDownValue = null;
-                          //     });
-                          //   },
-                          //   dropdownMenuEntries:
-                          //       categoryIcons.entries.map((icon) {
-                          //     return DropdownMenuEntry(
-                          //       value: icon.key,
-                          //       label: icon.key,
-                          //       leadingIcon: Icon(
-                          //         icon.value.iconData,
-                          //         color: icon.value.iconColor,
-                          //       ),
-                          //     );
-                          //   }).toList(),
-                          // ),
-                          DropdownButton<String>(
-                            hint: const Text('Select Categories'),
-                            value: _selectedDropDownValue,
-                            items: categoryIcons.entries
-                                .where((c) =>
-                                    c.key != 'favorite' && c.key != 'complete')
-                                .map((icon) {
-                              return DropdownMenuItem<String>(
-                                value: icon.key,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      icon.value.iconData,
-                                      color: icon.value.iconColor,
-                                    ),
-                                    Text(icon.key),
-                                  ],
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCategories.add(value ?? '');
-                                _selectedDropDownValue = null;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    colorScheme.onPrimaryContainer),
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                if (_selectedCategories.isEmpty) {
-                                  return;
-                                }
-
-                                //Add
-                                if (widget.thing == null) {
-                                  final thingToAdd =
-                                      Thing.createWithTitleAndDescription(
-                                          title: _titleTextController.text,
-                                          description:
-                                              _descriptionTextController.text,
-                                          isMarkedComplete: false,
-                                          notes: _notesOnAdd,
-                                          categories: _selectedCategories
-                                              .where(
-                                                  (category) => category != '')
-                                              .toList());
-
-                                  widget.addThing(thingToAdd);
-
-                                  Navigator.pop(context);
-                                }
-                                //edit
-                                else {
-                                  final thingToEdit = Thing(
-                                      id: widget.thing!.id,
-                                      title: _titleTextController.text,
-                                      description:
-                                          _descriptionTextController.text,
-                                      isMarkedComplete:
-                                          widget.thing!.isMarkedComplete,
-                                      notes: _notesOnAdd,
-                                      categories: _selectedCategories
-                                          .where((category) => category != '')
-                                          .toList());
-
-                                  widget.editThing(thingToEdit);
-
-                                  Navigator.pop(context);
-                                }
-                              }
-                            },
-                            child: Text(
-                              widget.thing == null ? 'Add' : 'Save',
-                              style: textTheme.bodyLarge!
-                                  .copyWith(color: Colors.white),
+                              icon: const Icon(Icons.access_time),
                             ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                _notesDialogBuilder(context, widget.thing);
+                              },
+                              label: Text(
+                                _notesOnAdd.isEmpty
+                                    ? 'Add Notes'
+                                    : 'Edit Notes',
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                              icon: _notesOnAdd.isEmpty
+                                  ? const Icon(Icons.note_add_outlined)
+                                  : const Icon(Icons.sticky_note_2),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        //Display selected categories
+                        _selectedCategories.isEmpty
+                            ? Text(
+                                categoriesValidationText,
+                                style: textTheme.bodySmall!
+                                    .copyWith(color: colorScheme.error),
+                              )
+                            : SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: SelectedCategories(
+                                    removeCategory: removeCategory,
+                                    selectedCategories: _selectedCategories
+                                        .where((c) =>
+                                            c != 'favorite' && c != 'complete')
+                                        .toList()),
+                              ),
+                        const SizedBox(height: 16),
+                        // DropdownMenu(
+                        //   //initialSelection: categoryIcons.entries.first.key,
+                        //   initialSelection: _selectedDropDownValue,
+                        //   helperText: 'Select Categories',
+                        //   hintText: 'Select Categories',
+                        //   onSelected: (value) {
+                        //     setState(() {
+                        //       _selectedCategories.add(value ?? '');
+                        //       _selectedDropDownValue = null;
+                        //     });
+                        //   },
+                        //   dropdownMenuEntries:
+                        //       categoryIcons.entries.map((icon) {
+                        //     return DropdownMenuEntry(
+                        //       value: icon.key,
+                        //       label: icon.key,
+                        //       leadingIcon: Icon(
+                        //         icon.value.iconData,
+                        //         color: icon.value.iconColor,
+                        //       ),
+                        //     );
+                        //   }).toList(),
+                        // ),
+                        DropdownButton<String>(
+                          hint: const Text('Select Categories'),
+                          value: _selectedDropDownValue,
+                          items: categoryIcons.entries
+                              .where((c) =>
+                                  c.key != 'favorite' && c.key != 'complete')
+                              .map((icon) {
+                            return DropdownMenuItem<String>(
+                              value: icon.key,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    icon.value.iconData,
+                                    color: icon.value.iconColor,
+                                  ),
+                                  Text(icon.key),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCategories.add(value ?? '');
+                              _selectedDropDownValue = null;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.onPrimaryContainer),
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              if (_selectedCategories.isEmpty) {
+                                return;
+                              }
+
+                              //Add
+                              if (widget.thing == null) {
+                                final thingToAdd =
+                                    Thing.createWithTitleAndDescription(
+                                        title: _titleTextController.text,
+                                        description:
+                                            _descriptionTextController.text,
+                                        isMarkedComplete: false,
+                                        notes: _notesOnAdd,
+                                        categories: _selectedCategories
+                                            .where((category) => category != '')
+                                            .toList());
+
+                                widget.addThing(thingToAdd);
+
+                                Navigator.pop(context);
+                              }
+                              //edit
+                              else {
+                                final thingToEdit = Thing(
+                                    id: widget.thing!.id,
+                                    title: _titleTextController.text,
+                                    description:
+                                        _descriptionTextController.text,
+                                    isMarkedComplete:
+                                        widget.thing!.isMarkedComplete,
+                                    notes: _notesOnAdd,
+                                    categories: _selectedCategories
+                                        .where((category) => category != '')
+                                        .toList());
+
+                                widget.editThing(thingToEdit);
+
+                                Navigator.pop(context);
+                              }
+                            }
+                          },
+                          child: Text(
+                            widget.thing == null ? 'Add' : 'Save',
+                            style: textTheme.bodyLarge!
+                                .copyWith(color: Colors.white),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
