@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:intl/intl.dart';
+import 'package:things_app/models/thing.dart';
+import 'package:things_app/screens/things_screen.dart';
 
 const String titleHintText = 'Enter a title';
 const String titleValidationText = 'Enter a valid title';
@@ -13,11 +15,13 @@ class AddReminder extends StatefulWidget {
       {super.key,
       required this.addReminder,
       required this.editReminder,
-      this.reminder});
+      this.reminder,
+      required this.availableThings});
 
   final void Function(Reminder reminderToAdd) addReminder;
   final void Function(Reminder reminderToEdit) editReminder;
   final Reminder? reminder;
+  final List<Thing> availableThings;
 
   @override
   State<AddReminder> createState() => _AddReminderState();
@@ -29,6 +33,8 @@ class _AddReminderState extends State<AddReminder> {
   final TextEditingController _titleTextController = TextEditingController();
   final TextEditingController _messageTextController = TextEditingController();
   DateTime? _selectedDateTime;
+  late Thing? _selectedThingDropdownValue;
+  late List<Thing> _selectedThings = [];
 
   @override
   void initState() {
@@ -39,6 +45,8 @@ class _AddReminderState extends State<AddReminder> {
     _messageTextController.text =
         widget.reminder != null ? widget.reminder!.message : '';
     _selectedDateTime = widget.reminder?.date;
+    _selectedThingDropdownValue = null;
+    setSelectedThings();
   }
 
   @override
@@ -46,6 +54,38 @@ class _AddReminderState extends State<AddReminder> {
     _titleTextController.dispose();
     _messageTextController.dispose();
     super.dispose();
+  }
+
+  void removeThing(Thing thing) {
+    setState(() {
+      _selectedThings.remove(thing);
+    });
+  }
+
+  void setSelectedThings() {
+    List<String> ids = widget.reminder?.thingIds ?? [];
+    print(ids);
+
+    List<Thing> things =
+        widget.availableThings.where((t) => ids.contains(t.id)).toList();
+
+    print(things);
+
+    setState(() {
+      //add mode
+      if (widget.reminder == null) {
+        _selectedThings = [];
+      }
+
+      //edit mode
+      else {
+        if (ids.isEmpty) {
+          _selectedThings = [];
+        }
+
+        _selectedThings = things;
+      }
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -122,6 +162,58 @@ class _AddReminderState extends State<AddReminder> {
                             maxLength: 35,
                             maxLines: 1,
                           ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                margin:
+                                    const EdgeInsets.only(left: 10, right: 10),
+                                child: DropdownButton<String>(
+                                  hint: const Text('Link Things'),
+                                  value: _selectedThingDropdownValue?.title,
+                                  items: widget.availableThings
+                                      .where((t) => !t.isMarkedComplete)
+                                      .map((thing) {
+                                    return DropdownMenuItem<String>(
+                                      value: thing.id,
+                                      child: Row(
+                                        children: [
+                                          Text(thing.title),
+                                        ],
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      if (value != null) {
+                                        Thing? thing = widget.availableThings
+                                            .firstWhere((t) => t.id == value);
+
+                                        if (thing != null) {
+                                          _selectedThings.add(thing);
+                                          _selectedThingDropdownValue = null;
+                                        }
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          //Display selected things
+                          Visibility(
+                            visible: _selectedThings.isNotEmpty,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: SelectedThings(
+                                  removeThing: removeThing,
+                                  selectedThings: _selectedThings,
+                                      ),
+                            ),
+                          ),
+
                           ElevatedButton(
                             onPressed: () => _selectDate(context),
                             child: const Text(
@@ -167,7 +259,6 @@ class _AddReminderState extends State<AddReminder> {
                               if (_formKey.currentState!.validate()) {
                                 //validate date
                                 if (_selectedDateTime == null) {
-                                  
                                   return;
                                 }
 
@@ -215,6 +306,63 @@ class _AddReminderState extends State<AddReminder> {
     );
   }
 }
+
+class SelectedThings extends StatefulWidget {
+  const SelectedThings({
+    super.key,
+    required List<Thing> selectedThings,
+    required this.removeThing,
+  }) : _selectedThings = selectedThings;
+
+  final List<Thing> _selectedThings;
+  final void Function(Thing thing) removeThing;
+
+  @override
+  State<SelectedThings> createState() => _SelectedThingsState();
+}
+
+class _SelectedThingsState extends State<SelectedThings> {
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: widget._selectedThings.map((thing) {
+        return Padding(
+          padding: const EdgeInsets.all(10),
+          child: Card(
+            color: colorScheme.primaryContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    thing.title,
+                    style: textTheme.displaySmall!.copyWith(fontSize: 18),
+                  ),
+                  const SizedBox(width: 10),
+                  Opacity(
+                    opacity: 0.4,
+                    child: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        widget.removeThing(thing);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
 
 class AddReminderTextFormField extends StatelessWidget {
   const AddReminderTextFormField({

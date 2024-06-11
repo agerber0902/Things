@@ -7,12 +7,13 @@ class NotesModal extends StatefulWidget {
       required this.title,
       required this.notes,
       required this.onEdit,
-      required this.onAdd});
+      required this.onAdd, this.onDelete});
 
   final String title;
   List<String>? notes;
   final void Function(List<String>? note) onEdit;
   final void Function(List<String>? note) onAdd;
+  final void Function(List<String>? note)? onDelete;
 
   @override
   State<NotesModal> createState() => _NotesModalState();

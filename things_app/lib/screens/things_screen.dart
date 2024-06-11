@@ -267,6 +267,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
               onPressed: () {
                 showModalBottomSheet(
                     context: context,
+                    isScrollControlled: true,
                     builder: (ctx) {
                       return AddThing(
                         addThing: _addThing,

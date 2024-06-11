@@ -62,6 +62,26 @@ class ThingFileManager extends FileManager {
     return [];
   }
 
+  Future<List<Thing>> readThingListByIds(List<String> ids) async {
+    try {
+        List<Thing> things = await readThingList();
+
+        return things.where((t) => ids.contains(t.id)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<Thing?> readThingById(String id) async {
+    try {
+        List<Thing> things = await readThingList();
+
+        return things.firstWhere((t) => id == t.id);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<File> deleteThing(Thing thing) async {
     List<Thing> things = await readThingList();
 

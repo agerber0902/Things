@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/reminder.dart';
+import 'package:things_app/models/thing.dart';
+import 'package:things_app/screens/things_screen.dart';
 import 'package:things_app/widgets/add_reminder.dart';
 
 const double initHeight = 150;
@@ -27,6 +29,8 @@ class _ReminderViewState extends State<ReminderView>
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
+  List<Thing> availableThings = [];
+
   @override
   void dispose() {
     _controller.dispose();
@@ -37,6 +41,8 @@ class _ReminderViewState extends State<ReminderView>
   void initState() {
     super.initState();
 
+    getAvailableThings();
+    
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -48,6 +54,15 @@ class _ReminderViewState extends State<ReminderView>
     ).animate(_controller);
 
     _controller.forward();
+  }
+
+  void getAvailableThings() async {
+    var things = await fileManager.readThingList();
+
+    setState(() {
+      availableThings = things;
+    });
+    return;
   }
 
   @override
@@ -69,7 +84,8 @@ class _ReminderViewState extends State<ReminderView>
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
                   "${reminder.title} was deleted.",
-                  style: textTheme.bodyLarge!.copyWith(color: colorScheme.onPrimary),
+                  style: textTheme.bodyLarge!
+                      .copyWith(color: colorScheme.onPrimary),
                 ),
                 action: SnackBarAction(
                   label: "Undo",
@@ -85,7 +101,10 @@ class _ReminderViewState extends State<ReminderView>
               width: double.infinity,
               child: Container(
                 padding: const EdgeInsets.all(10),
-                child: ReminderCard(widget: widget),
+                child: ReminderCard(
+                  widget: widget,
+                  availableThings: availableThings,
+                ),
               ),
             ),
           ),
@@ -99,9 +118,11 @@ class ReminderCard extends StatefulWidget {
   const ReminderCard({
     super.key,
     required this.widget,
+    required this.availableThings,
   });
 
   final ReminderView widget;
+  final List<Thing> availableThings;
 
   @override
   State<ReminderCard> createState() => _ReminderCardState();
@@ -122,6 +143,7 @@ class _ReminderCardState extends State<ReminderCard> {
                 addReminder: widget.widget.addReminder,
                 editReminder: widget.widget.editReminder,
                 reminder: widget.widget.reminder,
+                availableThings: widget.availableThings,
               );
             });
       },

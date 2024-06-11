@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:things_app/helpers/file_manager.dart';
 import 'package:things_app/models/reminder.dart';
+import 'package:things_app/models/thing.dart';
 import 'package:things_app/widgets/add_reminder.dart';
 import 'package:things_app/widgets/reminders_list_view.dart';
 import 'package:things_app/widgets/search_bar.dart';
@@ -9,6 +10,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 final ReminderFileManager fileManager = ReminderFileManager();
+final ThingFileManager thingFileManager = ThingFileManager();
 
 class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
@@ -20,8 +22,18 @@ class RemindersScreen extends StatefulWidget {
 class _RemindersScreenState extends State<RemindersScreen> {
   List<Reminder> _remindersToDisplay = [];
   bool? isSearching;
+  late List<Thing> availableThings;
   //late IconData? _filterIconData;
   //late String _searchValue;
+
+  void getAvailableThings() async{
+    var things = await thingFileManager.readThingList();
+
+    setState(() {
+      availableThings = things;
+    });
+    return;
+  }
 
   @override
   void initState() {
@@ -34,6 +46,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
     //Get Reminders calls set state and updates _RemindersToDisplay
     _getReminders();
+
+    getAvailableThings();
 
     //_filterIconData = Icons.filter_list;
   }
@@ -144,6 +158,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                       return AddReminder(
                         addReminder: _addReminder,
                         editReminder: _editReminder,
+                        availableThings: availableThings,
                       );
                     });
               },
