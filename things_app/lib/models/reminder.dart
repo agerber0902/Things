@@ -5,7 +5,7 @@ final uuid = const Uuid().v4();
 
 class Reminder {
   final String id;
-  final List<String>? thingIds;
+  List<String>? thingIds;
   final String title;
   final String message;
   final DateTime date;
@@ -21,6 +21,13 @@ class Reminder {
     required this.message,
     required this.date,
   });
+  Reminder.create(
+      {this.thingIds,
+      required this.title,
+      required this.message,
+      required this.date})
+      : id = const Uuid().v4();
+      
   Reminder.decoded({
     required this.id,
     required this.thingIds,
@@ -41,7 +48,8 @@ class Reminder {
       title: json['title'],
       message: json['message'],
       date: DateTime.parse(json['date']),
-      thingIds: json['thingIds'] != null ? List<String>.from(json['thingIds']) : null,
+      thingIds:
+          json['thingIds'] != null ? List<String>.from(json['thingIds']) : null,
     );
   }
 
@@ -54,7 +62,6 @@ class Reminder {
       'thingsIds': thingIds,
     };
   }
-
 }
 
 class ReminderJsonHelper {

@@ -1,7 +1,13 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
+import 'package:things_app/providers/category_provider.dart';
+import 'package:things_app/providers/notes_provider.dart';
+import 'package:things_app/providers/reminders_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
+import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
 
 void main() async {
@@ -31,7 +37,16 @@ void main() async {
     AwesomeNotifications().requestPermissionToSendNotifications();
   }
 
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => ThingsProvider()),
+      ChangeNotifierProvider(create: (context) => ThingReminderProvider()),
+      ChangeNotifierProvider(create: (context) => NotesProvider()),
+      ChangeNotifierProvider(create: (context) => CategoryProvider()),
+      ChangeNotifierProvider(create: (context) => RemindersProvider())
+    ],
+    child: const MyApp(),
+  ));
 }
 
 final ColorScheme kColorScheme =

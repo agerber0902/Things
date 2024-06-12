@@ -11,6 +11,7 @@ class Thing {
   final List<String> categories;
 
   List<String>? notes;
+  List<String>? reminderIds;
 
   bool get notesExist {
     return notes != null && notes!.isNotEmpty;
@@ -25,12 +26,12 @@ class Thing {
       required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes});
-  Thing.createWithTitleAndDescription(
+      required this.isMarkedComplete, this.notes, this.reminderIds});
+  Thing.create(
       {required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes})
+      required this.isMarkedComplete, this.notes, this.reminderIds})
       : id = const Uuid().v4();
 
   factory Thing.fromJson(Map<String, dynamic> json) {

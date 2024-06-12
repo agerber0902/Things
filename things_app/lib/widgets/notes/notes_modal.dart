@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 // ignore: must_be_immutable
 class NotesModal extends StatefulWidget {
   NotesModal(
