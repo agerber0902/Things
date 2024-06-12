@@ -50,4 +50,12 @@ class ThingsProvider extends ChangeNotifier{
     //This will notify listeners
     getThings();
   }
+
+  Thing? getById(String id) {
+    try {
+      return _things.firstWhere((r) => r.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
 }

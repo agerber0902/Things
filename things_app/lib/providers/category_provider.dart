@@ -5,17 +5,14 @@ class CategoryProvider extends ChangeNotifier {
   List<String> get categories => _categories.where((sc) => sc != '').toList();
   void addcategory(String category) {
     _categories = [category, ..._categories];
-    print(_categories);
     notifyListeners();
   }
   void deletecategory(String category) {
-    _categories?.remove(category);
-    print(_categories);
+    _categories.remove(category);
     notifyListeners();
   }
   void editcategory(String category, int index) {
-    _categories?[index] = category;
-    print(_categories);
+    _categories[index] = category;
     notifyListeners();
   }
   void reset(){

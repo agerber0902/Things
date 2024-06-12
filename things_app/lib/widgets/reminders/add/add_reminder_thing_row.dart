@@ -4,8 +4,8 @@ import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/dialog_builders.dart';
 import 'package:things_app/utils/icon_data.dart';
 
-class AddThingReminderRow extends StatelessWidget {
-  const AddThingReminderRow({super.key});
+class AddReminderThingRow extends StatelessWidget {
+  const AddReminderThingRow({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +22,10 @@ class AddThingReminderRow extends StatelessWidget {
           children: [
             TextButton.icon(
               onPressed: () {
-                remindersThingsDialogBuilder(context: context, isReminder: true);
+                remindersThingsDialogBuilder(context : context, isReminder: false);
               },
               label: Text(
-                hasReminders ? 'Edit Reminders' : 'Add Reminders',
+                hasReminders ? 'Edit Things' : 'Add Things',
                 style: TextStyle(
                   color: colorScheme.primary,
                   decoration: TextDecoration.underline,

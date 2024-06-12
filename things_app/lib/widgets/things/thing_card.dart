@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/reminders_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/utils/dialog_builders.dart';
 import 'package:things_app/utils/icon_data.dart';
@@ -131,7 +132,7 @@ class ThingCard extends StatelessWidget {
                               child) {
                             return GestureDetector(
                               onTap: () {
-                                remindersDialogBuilder(context);
+                                remindersThingsDialogBuilder(context: context, isReminder: true);
                               },
                               child: reminderProvider
                                       .getByThingId(thing.id)

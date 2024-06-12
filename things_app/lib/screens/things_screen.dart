@@ -4,6 +4,7 @@ import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/widgets/shared/appbar/shared_app_bar.dart';
 import 'package:things_app/widgets/shared/appbar/shared_app_bar_add_button.dart';
+import 'package:things_app/widgets/shared/shared_drawer.dart';
 import 'package:things_app/widgets/shared/shared_list_view.dart';
 import 'package:things_app/widgets/things/add/add_thing.dart';
 import 'package:things_app/widgets/things/no_things_view.dart';
@@ -13,13 +14,6 @@ class ThingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // State update that causes rebuilds
-      final provider = Provider.of<ThingsProvider>(context, listen: false);
-      provider.getThings();
-    });
-
     return Scaffold(
       appBar: const SharedAppBar(
         title: 'Things',
@@ -29,6 +23,7 @@ class ThingsScreen extends StatelessWidget {
           ),
         ],
       ),
+      drawer: const SharedDrawer(),
       body: Consumer<ThingsProvider>(
         builder: (context, value, child) {
           return value.things.isEmpty

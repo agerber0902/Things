@@ -76,6 +76,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+
+    //call this to set up inital values
+    Provider.of<RemindersProvider>(context, listen: false).getReminders();
+    Provider.of<ThingsProvider>(context, listen: false).getThings();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',

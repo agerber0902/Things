@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/providers/reminders_provider.dart';
 import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/value_utils.dart';
+import 'package:things_app/widgets/reminders/add/add_reminder_thing_row.dart';
 import 'package:things_app/widgets/shared/selected_thing_view.dart';
 import 'package:things_app/widgets/shared/shared_bottom_sheet.dart';
 
@@ -134,12 +134,12 @@ class _AddReminderState extends State<AddReminder> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
-                      margin: const EdgeInsets.only(left: 10, right: 10),
+                      //padding: const EdgeInsets.all(10),
+                      //margin: const EdgeInsets.only(left: 10, right: 10),
                       child: Visibility(
                         visible: !widget
                             .isFromModal, //We dont want to show this if it is add thing, only edit thing + reminders
-                        child: const Placeholder(),
+                        child: const AddReminderThingRow(),
                       ),
                     ),
                   ],

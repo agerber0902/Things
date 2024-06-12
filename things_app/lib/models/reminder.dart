@@ -59,7 +59,7 @@ class Reminder {
       'title': title,
       'message': message,
       'date': date.toIso8601String(),
-      'thingsIds': thingIds,
+      'thingIds': thingIds,
     };
   }
 }
