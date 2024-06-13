@@ -43,11 +43,24 @@ class RemindersProvider extends ChangeNotifier {
     getReminders();
   }
 
-  void addThingIdsToReminders(List<String> reminderIds, String thingId) async{
+  void addThingIdToReminders(List<Reminder> remindersToEdit, String thingId) async{
 
-    for(Reminder reminder in reminders.where((r) => reminderIds.contains(r.id) )){
-      reminder.thingIds = [thingId, ...?reminder.thingIds];
-      print(reminder.thingIds);
+    List<String> remindersToEditIds = remindersToEdit.map((r) => r.id).toList();
+
+    for(Reminder reminder in reminders.where((r) => remindersToEditIds.contains(r.id) )){
+      reminder.thingIds = [thingId, ...?reminder.thingIds?.where((t) => t != thingId)];
+      await _fileManager.updateReminder(reminder);
+    }
+
+    getReminders();
+  }
+
+  void removeThingIdToReminders(List<Reminder> remindersToEdit, String thingId) async{
+
+    List<String> remindersToEditIds = remindersToEdit.map((r) => r.id).toList();
+
+    for(Reminder reminder in reminders.where((r) => remindersToEditIds.contains(r.id) )){
+      reminder.thingIds?.remove(thingId);
       await _fileManager.updateReminder(reminder);
     }
 
@@ -56,17 +69,20 @@ class RemindersProvider extends ChangeNotifier {
 
   Reminder? getById(String id) {
     try {
-      return _reminders.firstWhere((r) => r.id == id);
+      return reminders.firstWhere((r) => r.id == id);
     } catch (e) {
       return null;
     }
   }
 
-  List<Reminder> getByThingId(String thingId){
+  List<Reminder> _thingReminders = [];
+  List<Reminder> get thingReminders => _thingReminders;
+
+  void getThingReminders(String thingId){
     try{
-      return _reminders.where((r) => r.thingIds != null && r.thingIds!.contains(thingId)).toList();
+      _thingReminders = reminders.where((r) => r.thingIds != null && r.thingIds!.contains(thingId)).toList();
     }catch(e){
-      return [];
+      return;
     }
   }
 }

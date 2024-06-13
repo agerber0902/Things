@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/thing.dart';
-import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/providers/things_provider.dart';
-import 'package:things_app/widgets/shared/selected_thing_view.dart';
 import 'package:things_app/widgets/things/add/add_thing.dart';
 
 class AddThingModal extends StatelessWidget {
@@ -56,10 +54,10 @@ class AddThingModal extends StatelessWidget {
                             if (thing == null) {
                               return;
                             }
-                            Provider.of<ThingReminderProvider>(context,
-                                    listen: false)
-                                .add(ThingReminder.withThing(
-                                    thing: thing));
+                            // Provider.of<ThingReminderProvider>(context,
+                            //         listen: false)
+                            //     .add(ThingReminder.withThing(
+                            //         thing: thing));
                           },
                         );
                       },
@@ -67,7 +65,7 @@ class AddThingModal extends StatelessWidget {
                     const SizedBox(height: 10),
                     const SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      child: SelectedThingView(),
+                      //child: SelectedThingView(),
                     ),
                     const SizedBox(height: 10),
                     TextButton(

@@ -7,10 +7,9 @@ class Thing {
   final String title;
   final String? description;
   bool isMarkedComplete;
-
   final List<String> categories;
-
   List<String>? notes;
+  List<String>? reminderIds;
 
   bool get notesExist {
     return notes != null && notes!.isNotEmpty;
@@ -19,18 +18,21 @@ class Thing {
   bool get categoriesContainsFavorite {
     return categories.contains('favorite');
   }
+  bool get remindersExist {
+    return reminderIds != null && reminderIds!.isNotEmpty;
+  }
 
   Thing(
       {required this.id,
       required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes,});
+      required this.isMarkedComplete, this.notes, this.reminderIds});
   Thing.create(
       {required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes,})
+      required this.isMarkedComplete, this.notes, this.reminderIds})
       : id = const Uuid().v4();
 
   factory Thing.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class Thing {
       isMarkedComplete: json['isMarkedComplete'] ?? false,
       categories: List<String>.from(json['categories']),
       notes: json['notes'] != null ? List<String>.from(json['notes']) : null,
+      reminderIds: json['reminderIds'] != null ? List<String>.from(json['reminderIds']) : null,
     );
   }
   Map<String, dynamic> toJson() {
@@ -51,6 +54,7 @@ class Thing {
       'categories': categories,
       'isMarkedComplete': isMarkedComplete,
       'notes': notes,
+      'reminderIds': reminderIds,
     };
   }
 

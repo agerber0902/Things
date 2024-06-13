@@ -3,10 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/providers/reminders_provider.dart';
-import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/value_utils.dart';
-import 'package:things_app/widgets/reminders/add/add_reminder_thing_row.dart';
-import 'package:things_app/widgets/shared/selected_thing_view.dart';
 import 'package:things_app/widgets/shared/shared_bottom_sheet.dart';
 
 class AddReminder extends StatefulWidget {
@@ -50,8 +47,8 @@ class _AddReminderState extends State<AddReminder> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final provider = Provider.of<RemindersProvider>(context, listen: false);
-    final thingReminderProvider =
-        Provider.of<ThingReminderProvider>(context, listen: false);
+    // final thingReminderProvider =
+    //     Provider.of<ThingReminderProvider>(context, listen: false);
 
     void onAddEditPressed() {
       //If input is valid, continue
@@ -67,7 +64,7 @@ class _AddReminderState extends State<AddReminder> {
             date: _selectedDateTime!,
             thingIds: null,
           );
-          thingReminderProvider.createReminder(reminder);
+          //thingReminderProvider.createReminder(reminder);
 
           //Add the reminder
           provider.addReminder(reminder);
@@ -130,30 +127,26 @@ class _AddReminderState extends State<AddReminder> {
                 ),
                 const SizedBox(height: 16),
                 //Link Things
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      //padding: const EdgeInsets.all(10),
-                      //margin: const EdgeInsets.only(left: 10, right: 10),
-                      child: Visibility(
-                        visible: !widget
-                            .isFromModal, //We dont want to show this if it is add thing, only edit thing + reminders
-                        child: const AddReminderThingRow(),
-                      ),
-                    ),
-                  ],
-                ),
+                // Row(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     // Visibility(
+                //     //   visible: !widget
+                //     //       .isFromModal, //We dont want to show this if it is add thing, only edit thing + reminders
+                //       //child: const AddReminderThingRow(),
+                //     //),
+                //   ],
+                // ),
 
                 const SizedBox(height: 16),
                 //Display selected things
-                Visibility(
-                  visible: thingReminderProvider.thingRemindersExist,
-                  child: const SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: SelectedThingView(),
-                  ),
-                ),
+                // Visibility(
+                //   visible: thingReminderProvider.thingRemindersExist,
+                //   child: const SingleChildScrollView(
+                //     scrollDirection: Axis.horizontal,
+                //     child: SelectedThingView(),
+                //   ),
+                // ),
 
                 const SizedBox(height: 16),
 

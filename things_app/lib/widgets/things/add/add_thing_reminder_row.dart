@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:things_app/providers/thing_reminder_provider.dart';
+import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/utils/dialog_builders.dart';
 import 'package:things_app/utils/icon_data.dart';
 
@@ -12,17 +12,17 @@ class AddThingReminderRow extends StatelessWidget {
     //final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return Consumer<ThingReminderProvider>(
-      builder: (context, provider, child) {
-        List<ThingReminder> thingReminders = provider.thingRemindersWithReminders;
-        bool hasReminders = thingReminders.isNotEmpty;
+    return Consumer<ThingsProvider>(
+      builder: (context, thingProvider, child) {
+        bool hasReminders = thingProvider.remindersForThing.isNotEmpty;
 
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextButton.icon(
               onPressed: () {
-                remindersThingsDialogBuilder(context: context, isReminder: true);
+                remindersThingsDialogBuilder(
+                    context: context, isReminder: true);
               },
               label: Text(
                 hasReminders ? 'Edit Reminders' : 'Add Reminders',
@@ -31,7 +31,8 @@ class AddThingReminderRow extends StatelessWidget {
                   decoration: TextDecoration.underline,
                 ),
               ),
-              icon: Icon(hasReminders ? containsRemindersIcon : emptyReminderIcon),
+              icon: Icon(
+                  hasReminders ? containsRemindersIcon : emptyReminderIcon),
             ),
           ],
         );

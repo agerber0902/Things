@@ -1,24 +1,32 @@
+// import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:things_app/models/reminder.dart';
+// import 'package:things_app/providers/reminders_provider.dart';
+// import 'package:things_app/providers/thing_reminder_provider.dart';
+// import 'package:things_app/providers/things_provider.dart';
+// import 'package:things_app/widgets/reminders/add/add_reminder.dart';
+// import 'package:things_app/widgets/shared/selected_reminder_view.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/providers/reminders_provider.dart';
-import 'package:things_app/providers/thing_reminder_provider.dart';
-import 'package:things_app/widgets/reminders/add/add_reminder.dart';
+import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/widgets/shared/selected_reminder_view.dart';
 
 class AddRemindersModal extends StatelessWidget {
-  const AddRemindersModal({super.key});
+   const AddRemindersModal({super.key});
 
-  @override
-  Widget build(BuildContext context) {
+   @override
+   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    void onSave() {
-      Navigator.of(context).pop();
-    }
+     void onSave() {
+       Navigator.of(context).pop();
+     }
 
-    return LayoutBuilder(
+     return LayoutBuilder(
       builder: (context, constraints) {
         return AlertDialog(
           title: Text(
@@ -35,11 +43,11 @@ class AddRemindersModal extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Consumer<RemindersProvider>(
-                      builder: (context, provider, child) {
+                      builder: (context, reminderProvider, child) {
                         return DropdownButton<String>(
                           hint: const Text('Select Reminders'),
                           value: null,
-                          items: provider.reminders.map((reminder) {
+                          items: reminderProvider.reminders.map((reminder) {
                             return DropdownMenuItem<String>(
                               value: reminder.id,
                               child: Row(
@@ -50,14 +58,12 @@ class AddRemindersModal extends StatelessWidget {
                             );
                           }).toList(),
                           onChanged: (value) {
-                            Reminder? reminder = provider.getById(value!);
+                            Reminder? reminder = reminderProvider.getById(value!);
                             if (reminder == null) {
                               return;
                             }
-                            Provider.of<ThingReminderProvider>(context,
-                                    listen: false)
-                                .add(ThingReminder.withReminder(
-                                    reminder: reminder));
+                            Provider.of<ThingsProvider>(context,
+                                    listen: false).addReminderForThing(reminder);
                           },
                         );
                       },
@@ -68,25 +74,25 @@ class AddRemindersModal extends StatelessWidget {
                       child: SelectedReminderView(),
                     ),
                     const SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            builder: (ctx) {
-                              return const AddReminder(
-                                isFromModal: true,
-                              );
-                            });
-                      },
-                      child: Text(
-                        'Create New Reminder',
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
+                    // TextButton(
+                    //   onPressed: () {
+                    //     showModalBottomSheet(
+                    //         context: context,
+                    //         isScrollControlled: true,
+                    //         builder: (ctx) {
+                    //           return const AddReminder(
+                    //             isFromModal: true,
+                    //           );
+                    //         });
+                    //   },
+                    //   child: Text(
+                    //     'Create New Reminder',
+                    //     style: TextStyle(
+                    //       color: colorScheme.primary,
+                    //       decoration: TextDecoration.underline,
+                    //     ),
+                    //   ),
+                    // ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                           backgroundColor: colorScheme.onPrimaryContainer),
@@ -105,5 +111,5 @@ class AddRemindersModal extends StatelessWidget {
         );
       },
     );
-  }
+   }
 }

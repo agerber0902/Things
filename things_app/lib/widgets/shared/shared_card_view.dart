@@ -42,6 +42,9 @@ class SharedCardView<T> extends StatelessWidget {
           Provider.of<ThingsProvider>(context, listen: false);
       provider.deleteThing(thing);
 
+      Provider.of<RemindersProvider>(context, listen: false)
+          .removeThingIdToReminders(provider.remindersForThing, thing.id);
+
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
@@ -52,6 +55,11 @@ class SharedCardView<T> extends StatelessWidget {
           label: "Undo",
           onPressed: () {
             provider.addThing(thing);
+            //update reminders
+            if (provider.remindersForThing.isNotEmpty) {
+              Provider.of<RemindersProvider>(context, listen: false)
+                  .addThingIdToReminders(provider.remindersForThing, thing.id);
+            }
           },
         ),
       ));

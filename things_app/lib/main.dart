@@ -6,7 +6,6 @@ import 'package:things_app/controllers/notification_controller.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/notes_provider.dart';
 import 'package:things_app/providers/reminders_provider.dart';
-import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
 
@@ -40,7 +39,7 @@ void main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => ThingsProvider()),
-      ChangeNotifierProvider(create: (context) => ThingReminderProvider()),
+      //ChangeNotifierProvider(create: (context) => ThingReminderProvider()),
       ChangeNotifierProvider(create: (context) => NotesProvider()),
       ChangeNotifierProvider(create: (context) => CategoryProvider()),
       ChangeNotifierProvider(create: (context) => RemindersProvider())

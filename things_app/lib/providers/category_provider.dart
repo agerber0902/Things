@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 class CategoryProvider extends ChangeNotifier {
   List<String> _categories = [];
   List<String> get categories => _categories.where((sc) => sc != '').toList();
+  
+  void addCategoriesForEdit(List<String> categoriesForEdit){
+    _categories = categoriesForEdit;
+    notifyListeners();
+  }
   void addcategory(String category) {
     _categories = [category, ..._categories];
     notifyListeners();

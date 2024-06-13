@@ -5,7 +5,6 @@ import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/notes_provider.dart';
 import 'package:things_app/providers/reminders_provider.dart';
-import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/utils/value_utils.dart';
 import 'package:things_app/widgets/shared/shared_bottom_sheet.dart';
@@ -25,7 +24,6 @@ class _AddThingState extends State<AddThing> {
   final TextEditingController _descriptionController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool _isEdit = false;
 
   @override
   void dispose() {
@@ -39,11 +37,16 @@ class _AddThingState extends State<AddThing> {
   void initState() {
     super.initState();
 
-    _isEdit = false;
-
     _titleController.text = '';
     _descriptionController.text = '';
 
+    Future.microtask(() {
+      final provider = Provider.of<ThingsProvider>(context, listen: false);
+      if (provider.isEditMode) {
+        _titleController.text = provider.thingInEdit!.title;
+        _descriptionController.text = provider.thingInEdit!.description ?? '';
+      }
+    });
   }
 
   @override
@@ -51,31 +54,16 @@ class _AddThingState extends State<AddThing> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final provider = Provider.of<ThingsProvider>(context, listen: false);
-
-    void onClose(){
-      Provider.of<CategoryProvider>(context, listen: false).reset();
-      Provider.of<NotesProvider>(context, listen: false).reset();
-      Provider.of<ThingReminderProvider>(context, listen: false).reset();
-      Navigator.of(context).pop();
-    }
-
-    void onAddEditPressed() {
-      //If input is valid, continue
-      if (_formKey.currentState!.validate()) {
-        final categoryProvider =
-            Provider.of<CategoryProvider>(context, listen: false);
-        final notesProvider =
-            Provider.of<NotesProvider>(context, listen: false);
-        final remindersProvider =
-            Provider.of<RemindersProvider>(context, listen: false);
-        final thingReminderProvider =
-            Provider.of<ThingReminderProvider>(context, listen: false);
-
-        if (_isEdit) {
+    return Consumer<ThingsProvider>(
+      builder: (context, thingProvider, child) {
+        void onClose() {
+          thingProvider.setThingInEdit(null);
+          //Provider.of<ThingReminderProvider>(context, listen: false).reset();
+          Navigator.of(context).pop();
         }
-        //Add Thing
-        else {
+
+        void onAddPressed(
+            CategoryProvider categoryProvider, NotesProvider notesProvider) {
           //Create thing with values from the form
           Thing thing = Thing.create(
             title: _titleController.text,
@@ -83,104 +71,148 @@ class _AddThingState extends State<AddThing> {
             categories: categoryProvider.categories,
             isMarkedComplete: false,
             notes: notesProvider.notes,
+            reminderIds: thingProvider.remindersForThing.map((r) => r.id).toList(),
           );
 
-          //Add the thing
-          provider.addThing(thing);
+          thingProvider.addThing(thing);
 
-          //update the reminders by adding the newly created thing id to the thingids list
-          List<String> reminderIds =
-              thingReminderProvider.thingRemindersWithReminders.map((r) => r.reminder!.id).toList();
-          remindersProvider.addThingIdsToReminders(reminderIds, thing.id);
+          //update reminders
+          if(thingProvider.remindersForThing.isNotEmpty){
+            Provider.of<RemindersProvider>(context, listen: false).addThingIdToReminders(thingProvider.remindersForThing, thing.id);
+          }
         }
 
-        //Close the bottom sheet
-        onClose();
-      }
-    }
+        void onEditPressed(
+            CategoryProvider categoryProvider, NotesProvider notesProvider) {
+          Thing thing = Thing(
+            id: thingProvider.thingInEdit!.id,
+            title: _titleController.text,
+            description: _descriptionController.text,
+            categories: categoryProvider.categories,
+            isMarkedComplete: false,
+            notes: notesProvider.notes,
+            reminderIds: thingProvider.remindersForThing.map((r) => r.id).toList(),
 
-    return SharedBottomSheet(
-      children: [
-        Form(
-          key: _formKey,
-          child: Expanded(
-            child: Column(
-              children: [
-                AddThingTextFormField(
-                  controller: _titleController,
-                  hintText: ThingsUtils().titleHintText,
-                  validationText: ThingsUtils().titleValidationText,
-                  maxLength: 50,
-                  maxLines: 1,
-                ),
-                AddThingTextFormField(
-                  controller: _descriptionController,
-                  hintText: ThingsUtils().descriptionHintText,
-                  validationText: ThingsUtils().descriptionValidationText,
-                  maxLength: 100,
-                  maxLines: 1,
-                ),
-                const SizedBox(height: 16),
-                //Add Reminders
-                const AddThingReminderRow(),
-                const SizedBox(height: 16),
-                //Add Notes
-                const AddThingNotesRow(),
-                const SizedBox(height: 16),
-                //Display selected categories
-                !_isEdit
-                    ? const SingleChildScrollView(
+          );
+
+          thingProvider.editThing(thing);
+
+          //update reminders
+          if(thingProvider.remindersForThing.isNotEmpty){
+            Provider.of<RemindersProvider>(context, listen: false).addThingIdToReminders(thingProvider.remindersForThing, thingProvider.thingInEdit!.id);
+          }
+        }
+
+        void onAddEditPressed() {
+          //If input is valid, continue
+          if (_formKey.currentState!.validate()) {
+            final categoryProvider =
+                Provider.of<CategoryProvider>(context, listen: false);
+            final notesProvider =
+                Provider.of<NotesProvider>(context, listen: false);
+
+            //Validate Categories - return if empty
+            if (categoryProvider.categories.isEmpty) {
+              return;
+            }
+
+            if (thingProvider.isEditMode) {
+              onEditPressed(categoryProvider, notesProvider);
+            }
+            //Add Thing
+            else {
+              onAddPressed(categoryProvider, notesProvider);
+            }
+
+            //Close the bottom sheet
+            onClose();
+          }
+        }
+
+        return SharedBottomSheet(
+          children: [
+            Form(
+              key: _formKey,
+              child: Expanded(
+                child: Column(
+                  children: [
+                    AddThingTextFormField(
+                      controller: _titleController,
+                      hintText: ThingsUtils().titleHintText,
+                      validationText: ThingsUtils().titleValidationText,
+                      maxLength: 50,
+                      maxLines: 1,
+                    ),
+                    AddThingTextFormField(
+                      controller: _descriptionController,
+                      hintText: ThingsUtils().descriptionHintText,
+                      validationText: ThingsUtils().descriptionValidationText,
+                      maxLength: 100,
+                      maxLines: 1,
+                    ),
+                    //Display selected categories
+                    const SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        child: SelectedCategories(),
-                      )
-                    : const Placeholder(),
+                        child: SelectedCategories()),
+                    const SizedBox(height: 16),
 
-                const SizedBox(height: 16),
-                //Add Categories
-                DropdownButton<String>(
-                  hint: const Text('Select Categories'),
-                  value: null,
-                  items: categoryIcons.entries
-                      .where((c) => c.key != 'favorite' && c.key != 'complete')
-                      .map((icon) {
-                    return DropdownMenuItem<String>(
-                      value: icon.key,
-                      child: Row(
-                        children: [
-                          Icon(
-                            icon.value.iconData,
-                            color: icon.value.iconColor,
+                    //Add Categories
+                    DropdownButton<String>(
+                      hint: const Text('Select Categories'),
+                      value: null,
+                      items: categoryIcons.entries
+                          .where(
+                              (c) => c.key != 'favorite' && c.key != 'complete')
+                          .map((icon) {
+                        return DropdownMenuItem<String>(
+                          value: icon.key,
+                          child: Row(
+                            children: [
+                              Icon(
+                                icon.value.iconData,
+                                color: icon.value.iconColor,
+                              ),
+                              Text(icon.key),
+                            ],
                           ),
-                          Text(icon.key),
-                        ],
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value == null) {
+                          return;
+                        }
+
+                        Provider.of<CategoryProvider>(context, listen: false)
+                            .addcategory(value);
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    //Add Reminders
+                    const AddThingReminderRow(),
+                    const SizedBox(height: 16),
+                    //Add Notes
+                    AddThingNotesRow(
+                      thing: thingProvider.thingInEdit,
+                    ),
+                    const SizedBox(height: 16),
+
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.onPrimaryContainer),
+                      onPressed: onAddEditPressed,
+                      child: Text(
+                        'Add',
+                        style:
+                            textTheme.bodyLarge!.copyWith(color: Colors.white),
                       ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value == null) {
-                      return;
-                    }
-
-                    Provider.of<CategoryProvider>(context, listen: false)
-                        .addcategory(value!);
-                  },
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 16),
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.onPrimaryContainer),
-                  onPressed: onAddEditPressed,
-                  child: Text(
-                    'Add',
-                    style: textTheme.bodyLarge!.copyWith(color: Colors.white),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      },
     );
   }
 }

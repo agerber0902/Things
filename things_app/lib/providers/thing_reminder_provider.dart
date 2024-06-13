@@ -1,67 +1,79 @@
-import 'package:flutter/material.dart';
-import 'package:things_app/models/reminder.dart';
-import 'package:things_app/models/thing.dart';
+// import 'package:flutter/material.dart';
+// import 'package:things_app/models/reminder.dart';
+// import 'package:things_app/models/thing.dart';
 
-class ThingReminderProvider extends ChangeNotifier{
+// class ThingReminderProvider extends ChangeNotifier{
 
-  List<ThingReminder>? _thingReminders;
-  List<ThingReminder>? get thingReminders => _thingReminders;
-  bool get thingRemindersExist => thingReminders != null && thingReminders!.isNotEmpty;
-  List<ThingReminder> get thingRemindersWithThings => thingRemindersExist ? _thingReminders!.where((tr) => tr.thing != null).toList() : [];
-  List<ThingReminder> get thingRemindersWithReminders => thingRemindersExist ? _thingReminders!.where((tr) => tr.reminder != null).toList() : [];
-  List<ThingReminder> get thingRemindersWithBoth => thingRemindersExist ? _thingReminders!.where((tr) => tr.thing != null && tr.reminder != null).toList() : [];
+//   bool _isEditMode = false;
+//   bool get isEditMode => _isEditMode;
+//   void setEditMode(bool mode){
+//     _isEditMode = mode;
+//     notifyListeners();
+//   }
 
-  void reset() {
-    _thingReminders = null;
-    notifyListeners();
-  }
+//   List<ThingReminder>? _thingReminders;
+//   List<ThingReminder>? get thingReminders => _thingReminders;
+//   bool get thingRemindersExist => thingReminders != null && thingReminders!.isNotEmpty;
+//   List<ThingReminder> get thingRemindersWithThings => thingRemindersExist ? _thingReminders!.where((tr) => tr.thing != null).toList() : [];
+//   List<ThingReminder> get thingRemindersWithReminders => thingRemindersExist ? _thingReminders!.where((tr) => tr.reminder != null).toList() : [];
+//   List<ThingReminder> get thingRemindersWithBoth => thingRemindersExist ? _thingReminders!.where((tr) => tr.thing != null && tr.reminder != null).toList() : [];
 
-  void add(ThingReminder thingReminder){
-    _thingReminders = [thingReminder, ...?_thingReminders];
-    notifyListeners();
-  }
-  void delete(ThingReminder thingReminder){
-    _thingReminders?.remove(thingReminder);
-    notifyListeners();
-  }
-  void edit(ThingReminder thingReminder, int index){
-    _thingReminders?[index] = thingReminder;
-    notifyListeners();
-  }
+//   void reset() {
+//     _thingReminders = null;
+//     _isEditMode = false;
+//     notifyListeners();
+//   }
+//   void set(List<Reminder> reminders, Thing thing){
+//     _thingReminders = reminders.map((reminder) => ThingReminder(thing: thing, reminder: reminder)).toList();
+//     notifyListeners();
+//   }
 
-  Reminder? _newReminder;
-  Reminder? get newReminder => _newReminder;
+//   void add(ThingReminder thingReminder){
+//     _thingReminders = [thingReminder, ...?_thingReminders];
+//     notifyListeners();
+//   }
+//   void delete(ThingReminder thingReminder){
+//     _thingReminders?.remove(thingReminder);
+//     notifyListeners();
+//   }
+//   void edit(ThingReminder thingReminder, int index){
+//     _thingReminders?[index] = thingReminder;
+//     notifyListeners();
+//   }
 
-  void createReminder(Reminder reminder){
-    //Create Reminder
-    _newReminder = reminder;
+//   Reminder? _newReminder;
+//   Reminder? get newReminder => _newReminder;
 
-    //Create Thing Reminder with no thing
-    ThingReminder.withReminder(reminder: reminder);
+//   void createReminder(Reminder reminder){
+//     //Create Reminder
+//     _newReminder = reminder;
 
-    notifyListeners();
-  }
+//     //Create Thing Reminder with no thing
+//     ThingReminder.withReminder(reminder: reminder);
 
-  Thing? _newThing;
-  Thing? get newThing => _newThing;
+//     notifyListeners();
+//   }
 
-  void createThing(Thing thing){
-    //Create Thing
-    _newThing = thing;
+//   Thing? _newThing;
+//   Thing? get newThing => _newThing;
 
-    //Create Thing Thing with no thing
-    ThingReminder.withThing(thing: thing);
+//   void createThing(Thing thing){
+//     //Create Thing
+//     _newThing = thing;
 
-    notifyListeners();
-  }
+//     //Create Thing Thing with no thing
+//     ThingReminder.withThing(thing: thing);
 
-}
+//     notifyListeners();
+//   }
 
-class ThingReminder{
-  Thing? thing;
-  Reminder? reminder;
+// }
 
-  ThingReminder({required this.thing, required this.reminder});
-  ThingReminder.withReminder({required this.reminder});
-  ThingReminder.withThing({required this.thing});
-}
+// class ThingReminder{
+//   Thing? thing;
+//   Reminder? reminder;
+
+//   ThingReminder({required this.thing, required this.reminder});
+//   ThingReminder.withReminder({required this.reminder});
+//   ThingReminder.withThing({required this.thing});
+// }

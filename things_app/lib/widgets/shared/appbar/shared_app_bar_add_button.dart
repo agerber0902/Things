@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:things_app/providers/provider_helper.dart';
 
 class SharedAppBarAddButton extends StatelessWidget {
   const SharedAppBarAddButton({super.key, required this.modalBottomSheet});
@@ -11,6 +12,10 @@ class SharedAppBarAddButton extends StatelessWidget {
 
     return IconButton(
         onPressed: () {
+
+          //set edit mode in trings provider
+          ProviderHelper().setAddThingProviders(context);
+
           showModalBottomSheet(
               context: context,
               isScrollControlled: true,

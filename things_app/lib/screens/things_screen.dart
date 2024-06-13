@@ -25,10 +25,10 @@ class ThingsScreen extends StatelessWidget {
       ),
       drawer: const SharedDrawer(),
       body: Consumer<ThingsProvider>(
-        builder: (context, value, child) {
-          return value.things.isEmpty
+        builder: (context, provider, child) {
+          return provider.things.isEmpty
               ? const NoThingsView()
-              : SharedListView<Thing>(listItems: value.things);
+              : SharedListView<Thing>(listItems: provider.things);
         },
       ),
     );

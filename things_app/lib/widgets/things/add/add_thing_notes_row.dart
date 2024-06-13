@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/notes_provider.dart';
-import 'package:things_app/providers/things_provider.dart';
+import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/notes/notes_modal.dart';
 
 class AddThingNotesRow extends StatelessWidget {
@@ -57,15 +57,15 @@ class AddThingNotesRow extends StatelessWidget {
                 notesDialogBuilder(context);
               },
               label: Text(
-                notesProvider.notesExist ? 'Edit Notes' : 'Add Notes',
+                notesProvider.notesExist || (thing != null && thing!.notesExist) ? 'Edit Notes' : 'Add Notes',
                 style: TextStyle(
                   color: colorScheme.primary,
                   decoration: TextDecoration.underline,
                 ),
               ),
-              icon: notesProvider.notesExist
-                  ? const Icon(Icons.sticky_note_2)
-                  : const Icon(Icons.note_add_outlined),
+              icon: notesProvider.notesExist || (thing != null && thing!.notesExist)
+                  ? addNoteIcon
+                  : containsNoteIcon,
             ),
           ],
         );
