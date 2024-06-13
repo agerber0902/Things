@@ -9,6 +9,7 @@ import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/utils/dialog_builders.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/notes/notes_modal.dart';
+import 'package:things_app/widgets/reminders/add/add_reminders_modal.dart';
 import 'package:things_app/widgets/things/add/add_thing.dart';
 
 class ThingCard extends StatelessWidget {
@@ -45,21 +46,40 @@ class ThingCard extends StatelessWidget {
               });
         }
 
+        Future<void> remindersDialogBuilder({required BuildContext context}) {
+          return showDialog<void>(
+              context: context,
+              builder: (BuildContext context) {
+                return StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                  return AddRemindersModal(triggerUpdate: true,);
+                });
+              });
+        }
+
+        void setReminders() {
+          //Set Reminders
+          RemindersProvider remindersProvider =
+              Provider.of<RemindersProvider>(context, listen: false);
+          remindersProvider.getThingReminders(thing.id);
+          provider.setRemindersForThing(remindersProvider.thingReminders);
+        }
+
         return GestureDetector(
           onTap: () {
             //Set thing in edit for bottom sheet
             provider.setThingInEdit(thing);
 
             //Set Categories
-            Provider.of<CategoryProvider>(context, listen: false).addCategoriesForEdit(thing.categories);
+            Provider.of<CategoryProvider>(context, listen: false)
+                .addCategoriesForEdit(thing.categories);
 
             //Set Notes
-            Provider.of<NotesProvider>(context, listen: false).addNotesForEdit(thing.notes);
+            Provider.of<NotesProvider>(context, listen: false)
+                .addNotesForEdit(thing.notes);
 
             //Set Reminders
-            RemindersProvider remindersProvider = Provider.of<RemindersProvider>(context, listen: false);
-            remindersProvider.getThingReminders(thing.id);
-            provider.setRemindersForThing(remindersProvider.thingReminders);
+            setReminders();
 
             //Open Thing Bottom Sheet
             showThingModalBottomSheet(
@@ -151,32 +171,21 @@ class ThingCard extends StatelessWidget {
                                 ? addNoteIcon
                                 : containsNoteIcon,
                           ),
-                          // Consumer2<ThingsProvider, RemindersProvider>(
-                          //   builder: (context, thingsProvider, reminderProvider,
-                          //       child) {
-                          //     return GestureDetector(
-                          //       onTap: () {
+                          Visibility(
+                            visible: thing.remindersExist,
+                            child: GestureDetector(
+                              onTap: () {
+                                //set thing reminders
+                                setReminders();
 
-                          //         //set active thing
-                          //         thingsProvider.setThingInEdit(thing);
+                                //Set thing in edit for bottom sheet
+                                provider.setThingInEdit(thing);
 
-                          //         //Stand up ThingsReminders provider with values
-                          //         var reminders = reminderProvider.getByThingId(thing.id);
-                          //         if(reminders.isNotEmpty){
-                          //           Provider.of<ThingReminderProvider>(context, listen: false).set(reminders, thing);
-                          //           Provider.of<ThingReminderProvider>(context, listen: false).setEditMode(true);
-                          //         }
-
-                          //         remindersThingsDialogBuilder(context: context, isReminder: true);
-                          //       },
-                          //       child: reminderProvider
-                          //               .getByThingId(thing.id)
-                          //               .isEmpty
-                          //           ? const Icon(emptyReminderIcon)
-                          //           : const Icon(containsRemindersIcon),
-                          //     );
-                          //   },
-                          // )
+                                remindersDialogBuilder(context: context);
+                              },
+                              child: containsRemindersIcon,
+                            ),
+                          )
                         ],
                       ),
                       IconButton(

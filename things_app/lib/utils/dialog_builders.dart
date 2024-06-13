@@ -9,7 +9,7 @@ Future<void> remindersThingsDialogBuilder(
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-          return isReminder ? const AddRemindersModal() : const AddThingModal();
+          return isReminder ? AddRemindersModal() : const AddThingModal();
         });
       });
 }

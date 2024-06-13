@@ -64,8 +64,8 @@ class AddThingNotesRow extends StatelessWidget {
                 ),
               ),
               icon: notesProvider.notesExist || (thing != null && thing!.notesExist)
-                  ? addNoteIcon
-                  : containsNoteIcon,
+                  ? containsNoteIcon
+                  : addNoteIcon,
             ),
           ],
         );

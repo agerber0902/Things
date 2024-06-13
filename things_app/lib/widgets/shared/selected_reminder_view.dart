@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:things_app/providers/reminders_provider.dart';
 import 'package:things_app/providers/things_provider.dart';
 
 class SelectedReminderView extends StatelessWidget {
@@ -37,6 +38,8 @@ class SelectedReminderView extends StatelessWidget {
                             icon: const Icon(Icons.close),
                             onPressed: () {
                               thingsProvider.deleteReminderForThing(tr);
+
+                              Provider.of<RemindersProvider>(context, listen: false).removeThingIdToReminders([tr], thingsProvider.thingInEdit!.id);
                             },
                           ),
                         ),

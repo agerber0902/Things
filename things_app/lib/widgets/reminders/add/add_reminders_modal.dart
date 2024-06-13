@@ -14,19 +14,31 @@ import 'package:things_app/providers/reminders_provider.dart';
 import 'package:things_app/providers/things_provider.dart';
 import 'package:things_app/widgets/shared/selected_reminder_view.dart';
 
+// ignore: must_be_immutable
 class AddRemindersModal extends StatelessWidget {
-   const AddRemindersModal({super.key});
+  AddRemindersModal({super.key, this.triggerUpdate});
 
-   @override
-   Widget build(BuildContext context) {
+  bool? triggerUpdate;
+
+  @override
+  Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-     void onSave() {
-       Navigator.of(context).pop();
-     }
+    void onSave() {
 
-     return LayoutBuilder(
+      if(triggerUpdate != null){
+        ThingsProvider provider = Provider.of<ThingsProvider>(context, listen: false);
+        provider.thingInEdit!.reminderIds = provider.remindersForThing.map((r) => r.id).toList();
+        provider.editThing(provider.thingInEdit!);
+        RemindersProvider remindersProvider = Provider.of<RemindersProvider>(context, listen: false);
+        remindersProvider.addThingIdToReminders(provider.remindersForThing, provider.thingInEdit!.id);
+      }
+
+      Navigator.of(context).pop();
+    }
+
+    return LayoutBuilder(
       builder: (context, constraints) {
         return AlertDialog(
           title: Text(
@@ -58,12 +70,15 @@ class AddRemindersModal extends StatelessWidget {
                             );
                           }).toList(),
                           onChanged: (value) {
-                            Reminder? reminder = reminderProvider.getById(value!);
+                            Reminder? reminder =
+                                reminderProvider.getById(value!);
                             if (reminder == null) {
                               return;
                             }
-                            Provider.of<ThingsProvider>(context,
-                                    listen: false).addReminderForThing(reminder);
+                            final thingProvider =  Provider.of<ThingsProvider>(context, listen: false);
+                            thingProvider.addReminderForThing(reminder);
+
+                            Provider.of<RemindersProvider>(context, listen: false).addThingIdToReminders([reminder], thingProvider.thingInEdit!.id);
                           },
                         );
                       },
@@ -111,5 +126,5 @@ class AddRemindersModal extends StatelessWidget {
         );
       },
     );
-   }
+  }
 }

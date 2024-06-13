@@ -31,8 +31,8 @@ class AddThingReminderRow extends StatelessWidget {
                   decoration: TextDecoration.underline,
                 ),
               ),
-              icon: Icon(
-                  hasReminders ? containsRemindersIcon : emptyReminderIcon),
+              icon: 
+                  hasReminders ? containsRemindersIcon : emptyReminderIcon,
             ),
           ],
         );
