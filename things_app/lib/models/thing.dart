@@ -18,6 +18,7 @@ class Thing {
   bool get categoriesContainsFavorite {
     return categories.contains('favorite');
   }
+  
   bool get remindersExist {
     return reminderIds != null && reminderIds!.isNotEmpty;
   }

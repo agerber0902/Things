@@ -30,6 +30,9 @@ class ThingsProvider extends ChangeNotifier {
     //Apply Search
     _things = _searchThings();
 
+    //Apply Sort
+    _things = _sortThings();
+
     notifyListeners();
   }
 
@@ -112,6 +115,36 @@ class ThingsProvider extends ChangeNotifier {
     }
 
     return searchedThings;
+  }
+
+  List<Thing> _sortThings() {
+    List<Thing> thingsToSort = _things;
+
+    thingsToSort.sort((a, b) {
+      bool aIsFavorite = a.categories.any((category) => category.toLowerCase() == 'favorite');
+      bool bIsFavorite = b.categories.any((category) => category.toLowerCase() == 'favorite');
+      if (aIsFavorite && !bIsFavorite) return -1;
+      if (!aIsFavorite && bIsFavorite) return 1;
+      return 0;
+    });
+
+    List<Thing> completedThings =
+        thingsToSort.where((thing) => thing.isMarkedComplete).toList();
+    //Remove completed things from list
+    thingsToSort =
+        thingsToSort.where((thing) => !thing.isMarkedComplete).toList();
+
+    List<Thing> favoriteThings = thingsToSort
+        .where((thing) => thing.categoriesContainsFavorite)
+        .toList();
+    
+    //Remove completed things from list - we know that this will be the rest of the things, so shove them in the middle
+    List<Thing> remainingThings =
+        thingsToSort.where((thing) => !thing.categoriesContainsFavorite).toList();
+    
+    List<Thing> sortedThings = [...favoriteThings, ...remainingThings, ...completedThings];
+
+    return sortedThings;
   }
 
 //Reminders
