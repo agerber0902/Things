@@ -150,7 +150,7 @@ class ThingCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   // Description
                   Text(
-                    thing.description ?? '',
+                    thing.description,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: textTheme.bodySmall,

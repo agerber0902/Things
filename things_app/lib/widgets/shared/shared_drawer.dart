@@ -17,14 +17,6 @@ class SharedDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
-              title: const Text('Categories'),
-              onTap: () {
-                Navigator.pop(context);
-              //   Navigator.of(context).push(MaterialPageRoute(
-              //       builder: (ctx) => const CategoriesScreen()));
-              },
-            ),
-            ListTile(
               title: const Text('Reminders'),
               onTap: () {
                 Navigator.pop(context);

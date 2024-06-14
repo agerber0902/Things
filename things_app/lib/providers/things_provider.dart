@@ -3,6 +3,7 @@ import 'package:things_app/helpers/file_manager.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/utils/icon_data.dart';
 
 final ThingFileManager _fileManager = ThingFileManager();
 
@@ -176,15 +177,52 @@ class ThingsProvider extends ChangeNotifier {
 
   void resetFilters() {
     _selectedFilters = [];
-    print(_selectedFilters);
+    setFilterImage();
 
     getThings();
   }
 
   void saveFilters() {
+    setFilterImage();
     //call get things
     //This will notifiy the listeners and use the _selectedFilters for filtering
     getThings();
+  }
+
+  Icon _filterIcon = filterListIcon;
+  Icon get filterIcon => _filterIcon;
+
+  void setFilterImage() {
+    int filterCount = selectedFilters.length;
+
+    switch (filterCount) {
+      case 0:
+        _filterIcon = filterListIcon;
+        break;
+      case 1:
+        _filterIcon = filter1Icon;
+        break;
+      case 2:
+        _filterIcon = filter2Icon;
+        break;
+      case 3:
+        _filterIcon = filter3Icon;
+        break;
+      case 4:
+        _filterIcon = filter4Icon;
+        break;
+      case 5:
+        _filterIcon = filter5Icon;
+        break;
+      case 6:
+        _filterIcon = filter6Icon;
+        break;
+      case 7:
+        _filterIcon = filter7Icon;
+        break;
+      default:
+        _filterIcon = filterAltIcon;
+    }
   }
 
 //Search

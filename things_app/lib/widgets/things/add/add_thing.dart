@@ -44,7 +44,7 @@ class _AddThingState extends State<AddThing> {
       final provider = Provider.of<ThingsProvider>(context, listen: false);
       if (provider.isEditMode) {
         _titleController.text = provider.thingInEdit!.title;
-        _descriptionController.text = provider.thingInEdit!.description ?? '';
+        _descriptionController.text = provider.thingInEdit!.description;
       }
     });
   }
