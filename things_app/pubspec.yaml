@@ -45,6 +45,7 @@ dependencies:
   awesome_notifications: ^0.9.3+1
   flutter_launcher_icons: ^0.13.1
   timezone: ^0.9.3
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
