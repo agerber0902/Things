@@ -3,8 +3,6 @@ import 'package:things_app/models/category.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/screens/things_screen.dart';
-import 'package:things_app/widgets/add_reminder.dart';
-import 'package:things_app/widgets/add_reminders_Modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 
 const String titleHintText = 'Enter a title';
@@ -91,24 +89,6 @@ class _AddThingState extends State<AddThing> {
     });
   }
 
-  Future<void> _remindersDialogBuilder(BuildContext context) {
-    return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return AddRemindersModal(
-              createReminderBottomSheet: AddReminder(
-                addReminder: (Reminder r){},
-                editReminder: (Reminder r){},
-                reminder: Reminder(title: 'title', message: 'message', date: DateTime.now()),
-                availableThings: []
-              ),
-            );
-          });
-        });
-  }
-
   Future<void> _notesDialogBuilder(BuildContext context, Thing? thing) {
     return showDialog<void>(
         context: context,
@@ -174,26 +154,6 @@ class _AddThingState extends State<AddThing> {
                           validationText: descriptionValidationText,
                           maxLength: 100,
                           maxLines: 1,
-                        ),
-                        const SizedBox(height: 16),
-
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () {
-                                _remindersDialogBuilder(context);
-                              },
-                              label: Text(
-                                'Add Reminders',
-                                style: TextStyle(
-                                  color: colorScheme.primary,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                              icon: const Icon(Icons.access_time),
-                            ),
-                          ],
                         ),
 
                         const SizedBox(height: 16),

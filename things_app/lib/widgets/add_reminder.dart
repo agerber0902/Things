@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:intl/intl.dart';
 import 'package:things_app/models/thing.dart';
-import 'package:things_app/screens/things_screen.dart';
 
 const String titleHintText = 'Enter a title';
 const String titleValidationText = 'Enter a valid title';
@@ -33,7 +32,6 @@ class _AddReminderState extends State<AddReminder> {
   final TextEditingController _titleTextController = TextEditingController();
   final TextEditingController _messageTextController = TextEditingController();
   DateTime? _selectedDateTime;
-  late Thing? _selectedThingDropdownValue;
   late List<Thing> _selectedThings = [];
 
   @override
@@ -45,7 +43,6 @@ class _AddReminderState extends State<AddReminder> {
     _messageTextController.text =
         widget.reminder != null ? widget.reminder!.message : '';
     _selectedDateTime = widget.reminder?.date;
-    _selectedThingDropdownValue = null;
     setSelectedThings();
   }
 
@@ -64,12 +61,10 @@ class _AddReminderState extends State<AddReminder> {
 
   void setSelectedThings() {
     List<String> ids = widget.reminder?.thingIds ?? [];
-    print(ids);
 
     List<Thing> things =
         widget.availableThings.where((t) => ids.contains(t.id)).toList();
 
-    print(things);
 
     setState(() {
       //add mode
@@ -161,57 +156,6 @@ class _AddReminderState extends State<AddReminder> {
                             validationText: messageValidationText,
                             maxLength: 35,
                             maxLines: 1,
-                          ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                margin:
-                                    const EdgeInsets.only(left: 10, right: 10),
-                                child: DropdownButton<String>(
-                                  hint: const Text('Link Things'),
-                                  value: _selectedThingDropdownValue?.title,
-                                  items: widget.availableThings
-                                      .where((t) => !t.isMarkedComplete)
-                                      .map((thing) {
-                                    return DropdownMenuItem<String>(
-                                      value: thing.id,
-                                      child: Row(
-                                        children: [
-                                          Text(thing.title),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      if (value != null) {
-                                        Thing? thing = widget.availableThings
-                                            .firstWhere((t) => t.id == value);
-
-                                        if (thing != null) {
-                                          _selectedThings.add(thing);
-                                          _selectedThingDropdownValue = null;
-                                        }
-                                      }
-                                    });
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          //Display selected things
-                          Visibility(
-                            visible: _selectedThings.isNotEmpty,
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: SelectedThings(
-                                  removeThing: removeThing,
-                                  selectedThings: _selectedThings,
-                                      ),
-                            ),
                           ),
 
                           ElevatedButton(
