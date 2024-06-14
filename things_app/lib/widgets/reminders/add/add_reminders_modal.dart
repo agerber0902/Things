@@ -78,7 +78,10 @@ class AddRemindersModal extends StatelessWidget {
                             final thingProvider =  Provider.of<ThingsProvider>(context, listen: false);
                             thingProvider.addReminderForThing(reminder);
 
-                            Provider.of<RemindersProvider>(context, listen: false).addThingIdToReminders([reminder], thingProvider.thingInEdit!.id);
+                            if(thingProvider.isEditMode){
+                              Provider.of<RemindersProvider>(context, listen: false).addThingIdToReminders([reminder], thingProvider.thingInEdit!.id);
+                            }
+                            
                           },
                         );
                       },
