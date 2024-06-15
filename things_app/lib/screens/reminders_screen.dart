@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:things_app/helpers/file_manager.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/utils/reminders_setup.dart';
 import 'package:things_app/widgets/add_reminder.dart';
 import 'package:things_app/widgets/reminders_list_view.dart';
-import 'package:things_app/widgets/search_bar.dart';
+import 'package:things_app/widgets/shared/appbar/search_bar.dart';
+import 'package:things_app/widgets/shared/appbar/shared_app_bar.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -26,7 +28,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
   //late IconData? _filterIconData;
   //late String _searchValue;
 
-  void getAvailableThings() async{
+  void getAvailableThings() async {
     var things = await thingFileManager.readThingList();
 
     setState(() {
@@ -53,7 +55,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
   }
 
   void _editReminderNotification(Reminder reminder) {
-    int notificationId = _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
+    int notificationId =
+        _remindersToDisplay.indexWhere((r) => r.id == reminder.id);
     _deleteReminderNotification(notificationId);
     _scheduleReminderNotification(reminder);
   }
@@ -107,9 +110,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
   void _deleteReminder(Reminder reminderToDelete) async {
     int id = _remindersToDisplay.indexWhere((r) => r.id == reminderToDelete.id);
-    
+
     await fileManager.deleteReminder(reminderToDelete);
-    
+
     _deleteReminderNotification(id);
 
     _getReminders();
@@ -128,44 +131,14 @@ class _RemindersScreenState extends State<RemindersScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    RemindersSetup setup = RemindersSetup();
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Reminders',
-          style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),
-        ),
+      appBar: SharedAppBar(
+        title: setup.title,
         actions: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                isSearching = isSearching == null ? false : !isSearching!;
-              });
-            },
-            child: CollapsableSearchBar(
-                expandedWidth: 250, searchThings: (value) {}),
-          ),
-          // IconButton(
-          //   onPressed: () {
-          //     //_openFilters();
-          //   },
-          //   icon: Icon(_filterIconData),
-          // ),
-          IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (ctx) {
-                      return AddReminder(
-                        addReminder: _addReminder,
-                        editReminder: _editReminder,
-                        availableThings: availableThings,
-                      );
-                    });
-              },
-              icon: Icon(
-                Icons.add,
-                color: colorScheme.primary,
-              )),
+          CollapsableSearchBar(isThingSearch: false, expandedWidth: setup.appBarSetup.searchActiveWidth),
+          ...setup.appBarActions
         ],
       ),
       body: _remindersToDisplay.isEmpty

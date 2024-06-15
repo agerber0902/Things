@@ -6,7 +6,7 @@ import 'package:things_app/screens/reminders_screen.dart';
 
 import 'package:things_app/widgets/add_thing.dart';
 import 'package:things_app/widgets/filter_modal.dart';
-import 'package:things_app/widgets/search_bar.dart';
+import 'package:things_app/widgets/shared/appbar/search_bar.dart';
 import 'package:things_app/widgets/things_list_view.dart';
 
 import 'package:things_app/helpers/file_manager.dart';
@@ -256,7 +256,8 @@ class _ThingsScreenState extends State<ThingsScreen> {
           style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),
         ),
         actions: [
-          CollapsableSearchBar(expandedWidth: 200, searchThings: _searchThings),
+          //TODO: add back in
+          //CollapsableSearchBar(expandedWidth: 200, searchThings: _searchThings),
           IconButton(
             onPressed: () {
               _openFilters();
