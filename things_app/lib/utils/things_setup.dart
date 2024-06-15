@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/utils/icon_data.dart';
+import 'package:things_app/widgets/filter_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
 import 'package:things_app/widgets/shared/appbar/search_bar.dart';
 import 'package:things_app/widgets/shared/appbar/shared_app_bar_button.dart';
 
-const double _seachActiveWidth = 250;
+const double _seachActiveWidth = 200;
 
 class ThingsSetup {
-
   //Title in the app bar at the top of the screen
   final String title = 'Things';
 
@@ -19,22 +19,27 @@ class ThingsSetup {
     searchActiveWidth: _seachActiveWidth,
     //Action buttons listed on the appbar
     appBarActions: [
-
       //Add Search
-      const CollapsableSearchBar(isThingSearch: true, expandedWidth: _seachActiveWidth),
+      const CollapsableSearchBar(
+          isThingSearch: true, expandedWidth: _seachActiveWidth),
 
-      //TODO: Add filters
+      //TODO: Add filters - remove params from filter dialog
+      SharedAppBarButton(
+        icon: AppBarIcons().filterIcons.defaultFilterIcon,
+        isModal: true,
+        displayWidget: const FilterDialog(),
+      ),
 
       //Add Button
       //TODO: remove add thing params
       SharedAppBarButton(
         icon: AppBarIcons().addIcon,
-        displayWidget: AddThing(addThing: (Thing t){}, editThing: (Thing t){}),
+        isBottomSheet: true,
+        displayWidget:
+            AddThing(addThing: (Thing t) {}, editThing: (Thing t) {}),
       )
     ],
   );
-  //Action buttons listed on the appbar
-  final List<Widget> appBarActions = [];
 }
 
 class AppBarSetup {

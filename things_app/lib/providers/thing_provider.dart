@@ -4,18 +4,26 @@ import 'package:things_app/models/thing.dart';
 
 ThingFileManager _fileManager = ThingFileManager();
 
-class ThingProvider extends ChangeNotifier{
-  
-
+class ThingProvider extends ChangeNotifier {
   //Search Value
   String _searchValue = '';
   String get searchValue => _searchValue;
-  void setSearchValue(String value){
+  void setSearchValue(String value) {
     _searchValue = value;
     getThings();
   }
 
-    //Things for Display
+  //Filter value
+  List<String> _filterValues = [];
+  List<String> get filterValues => _filterValues;
+
+  void setFilterValues(List<String> filters) {
+    _filterValues = filters;
+
+    getThings();
+  }
+
+  //Things for Display
   List<Thing> _things = [];
   List<Thing> get things => _things;
 
@@ -25,6 +33,9 @@ class ThingProvider extends ChangeNotifier{
 
     //Search the things
     _searchThings();
+
+    //Filter Things
+    _filterThings();
 
     notifyListeners();
   }
@@ -66,6 +77,29 @@ class ThingProvider extends ChangeNotifier{
     }
   }
 
+  //Filter Things
+  void _filterThings() {
+    if (filterValues.isNotEmpty) {
+      List<Thing> filteredThings = _things;
 
-  
+      //Filter by completed things - remove complete afterwards for special case
+      if (filterValues.contains('complete')) {
+        //remove complete from the filter values, then continue as usual
+        filterValues.remove('complete');
+
+        filteredThings =
+            filteredThings.where((thing) => thing.isMarkedComplete).toList();
+      }
+
+      //Filter the things
+      if (filterValues.isNotEmpty) {
+        filteredThings = filteredThings
+            .where((thing) => thing.categories
+                .any((category) => filterValues.contains(category)))
+            .toList();
+      }
+
+      _things = filteredThings;
+    }
+  }
 }

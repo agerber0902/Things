@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
+import 'package:things_app/providers/filter_provider.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/search_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
@@ -40,7 +41,8 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (context) => ThingProvider()),
       ChangeNotifierProvider(create: (context) => ReminderProvider()),
-      ChangeNotifierProvider(create: (context) => SearchProvider())
+      ChangeNotifierProvider(create: (context) => SearchProvider()),
+      ChangeNotifierProvider(create: (context) => FilterProvider())
     ],
     child: const MyApp(),
   ));

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/screens/categories_screen.dart';
 import 'package:things_app/screens/reminders_screen.dart';
+import 'package:things_app/utils/things_setup.dart';
+import 'package:things_app/widgets/shared/appbar/shared_app_bar.dart';
 
 import 'package:things_app/widgets/things/add_thing.dart';
 import 'package:things_app/widgets/filter_modal.dart';
@@ -134,59 +138,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
     });
   }
 
-  Future<void> _dialogBuilder(
-    BuildContext context,
-    List<Map<MapEntry<String, CategoryIcon>, bool>> availableFilters,
-    void Function(String categoryName, bool switchValue) updateFilters,
-    void Function() resetFilters,
-    void Function(List<Map<MapEntry<String, CategoryIcon>, bool>> filters)
-        saveFilters,
-  ) {
-    return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return FilterDialog(
-              availableFilters: availableFilters,
-              updateFilters: updateFilters,
-              resetFilters: resetFilters,
-              saveFilters: saveFilters,
-            );
-          });
-        });
-  }
 
-  void _updateFilters(String categoryName, bool switchValue) {
-    setState(() {
-      final filterMap = _availableFilters.firstWhere((filterMap) {
-        return filterMap.keys.any((entry) => entry.key == categoryName);
-      });
-
-      final entry =
-          filterMap.keys.firstWhere((entry) => entry.key == categoryName);
-
-      filterMap[entry] = switchValue;
-    });
-  }
-
-  void _resetFilters() {
-    setState(() {
-      _availableFilters = categoryIcons.entries.map((category) {
-        return {MapEntry(category.key, category.value): false};
-      }).toList();
-
-      //Update filter image
-      _setFilterImage(0);
-    });
-
-    _getThings();
-  }
-
-  void _openFilters() {
-    _dialogBuilder(context, _availableFilters, _updateFilters, _resetFilters,
-        _saveFilters);
-  }
 
   void _setFilterImage(int filterCount) {
     setState(() {
@@ -248,38 +200,12 @@ class _ThingsScreenState extends State<ThingsScreen> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
+    final ThingsSetup setup = ThingsSetup();
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Things',
-          style: textTheme.headlineLarge!.copyWith(color: colorScheme.primary),
-        ),
-        actions: [
-          //TODO: add back in
-          //CollapsableSearchBar(expandedWidth: 200, searchThings: _searchThings),
-          IconButton(
-            onPressed: () {
-              _openFilters();
-            },
-            icon: Icon(_filterIconData),
-          ),
-          IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (ctx) {
-                      return AddThing(
-                        addThing: _addThing,
-                        editThing: _editThing,
-                      );
-                    });
-              },
-              icon: Icon(
-                Icons.add,
-                color: colorScheme.primary,
-              )),
-        ],
+      appBar: SharedAppBar(
+        title: setup.title,
+        actions: setup.appBarSetup.appBarActions,
       ),
       drawer: Drawer(
         child: ListView(
@@ -318,14 +244,16 @@ class _ThingsScreenState extends State<ThingsScreen> {
           ],
         ),
       ),
-      body: _thingsToDisplay.isEmpty
+      body: Consumer<ThingProvider>(builder: (context, thingProvider, child) {
+        return thingProvider.things.isEmpty
           ? const NoThingsView()
           : ThingsListView(
-              things: _thingsToDisplay,
+              things: thingProvider.things,
               deleteThing: _deleteThing,
               addThing: _addThing,
               editThing: _editThing,
-            ),
+            );
+      },),  
     );
   }
 }
