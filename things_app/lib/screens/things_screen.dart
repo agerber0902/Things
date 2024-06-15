@@ -7,10 +7,6 @@ import 'package:things_app/screens/categories_screen.dart';
 import 'package:things_app/screens/reminders_screen.dart';
 import 'package:things_app/utils/things_setup.dart';
 import 'package:things_app/widgets/shared/appbar/shared_app_bar.dart';
-
-import 'package:things_app/widgets/things/add_thing.dart';
-import 'package:things_app/widgets/filter_modal.dart';
-import 'package:things_app/widgets/shared/appbar/search_bar.dart';
 import 'package:things_app/widgets/things/things_list_view.dart';
 
 import 'package:things_app/helpers/file_manager.dart';
@@ -199,6 +195,12 @@ class _ThingsScreenState extends State<ThingsScreen> {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     final ThingsSetup setup = ThingsSetup();
+
+    //If things is empty, get things
+    ThingProvider thingProvider = Provider.of<ThingProvider>(context, listen: false);
+    if(thingProvider.things.isEmpty){
+      thingProvider.getThings();
+    }
 
     return Scaffold(
       appBar: SharedAppBar(

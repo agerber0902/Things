@@ -37,6 +37,12 @@ class _RemindersScreenState extends State<RemindersScreen> {
   Widget build(BuildContext context) {
     final RemindersSetup setup = RemindersSetup();
 
+    //If reminders is empty, get reminders
+    ReminderProvider reminderProvider = Provider.of<ReminderProvider>(context, listen: false);
+    if(reminderProvider.reminders.isEmpty){
+      reminderProvider.getReminders();
+    }
+
     return Scaffold(
       appBar: SharedAppBar(
         title: setup.title,

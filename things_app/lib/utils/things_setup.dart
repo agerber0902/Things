@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:things_app/models/thing.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/filter_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
