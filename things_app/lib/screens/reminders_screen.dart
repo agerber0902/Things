@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:things_app/helpers/file_manager.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/utils/reminders_setup.dart';
-import 'package:things_app/widgets/reminders_list_view.dart';
+import 'package:things_app/widgets/reminders/reminders_list_view.dart';
 import 'package:things_app/widgets/shared/appbar/shared_app_bar.dart';
 
 final ReminderFileManager fileManager = ReminderFileManager();

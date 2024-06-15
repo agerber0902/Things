@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/thing.dart';
-import 'package:things_app/widgets/thing_view.dart';
+import 'package:things_app/widgets/things/thing_view.dart';
 
 class ThingsListView extends StatelessWidget {
   const ThingsListView({

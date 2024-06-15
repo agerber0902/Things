@@ -4,10 +4,10 @@ import 'package:things_app/models/thing.dart';
 import 'package:things_app/screens/categories_screen.dart';
 import 'package:things_app/screens/reminders_screen.dart';
 
-import 'package:things_app/widgets/add_thing.dart';
+import 'package:things_app/widgets/things/add_thing.dart';
 import 'package:things_app/widgets/filter_modal.dart';
 import 'package:things_app/widgets/shared/appbar/search_bar.dart';
-import 'package:things_app/widgets/things_list_view.dart';
+import 'package:things_app/widgets/things/things_list_view.dart';
 
 import 'package:things_app/helpers/file_manager.dart';
 
@@ -94,8 +94,7 @@ class _ThingsScreenState extends State<ThingsScreen> {
       thingsToReturn = thingsToReturn
           .where((thing) =>
               thing.title.toLowerCase().contains(_searchValue) ||
-              (thing.description != null &&
-                  thing.description!.toLowerCase().contains(_searchValue)) ||
+              (thing.description!.toLowerCase().contains(_searchValue)) ||
               thing.categories.any(
                   (category) => category.toLowerCase().contains(_searchValue)))
           .toList();

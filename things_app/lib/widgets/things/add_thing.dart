@@ -50,7 +50,7 @@ class _AddThingState extends State<AddThing> {
     _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
-        widget.thing != null ? widget.thing!.description ?? '' : '';
+        widget.thing != null ? widget.thing!.description  : '';
     _notesOnAdd = [];
     _remindersOnAdd = [];
   }

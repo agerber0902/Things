@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/providers/reminder_provider.dart';
-import 'package:things_app/widgets/reminder_view.dart';
+import 'package:things_app/widgets/reminders/reminder_view.dart';
 
 class RemindersListView extends StatelessWidget {
   const RemindersListView({

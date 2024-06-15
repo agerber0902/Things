@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
-import 'package:things_app/widgets/add_thing.dart';
+import 'package:things_app/widgets/things/add_thing.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 
 const double initHeight = 200;
@@ -237,7 +237,7 @@ class _ThingCardState extends State<ThingCard> {
                 children: [
                   Expanded(
                       child: Text(
-                    widget.widget.thing.description ?? '',
+                    widget.widget.thing.description,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: textTheme.bodySmall,

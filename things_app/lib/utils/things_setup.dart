@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/utils/icon_data.dart';
-import 'package:things_app/widgets/add_thing.dart';
+import 'package:things_app/widgets/things/add_thing.dart';
 import 'package:things_app/widgets/shared/appbar/search_bar.dart';
 import 'package:things_app/widgets/shared/appbar/shared_app_bar_button.dart';
 

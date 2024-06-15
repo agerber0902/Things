@@ -5,7 +5,7 @@ final uuid = const Uuid().v4();
 class Thing {
   final String id;
   final String title;
-  final String? description;
+  final String description;
   bool isMarkedComplete;
 
   final List<String> categories;
