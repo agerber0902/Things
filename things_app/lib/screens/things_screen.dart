@@ -138,8 +138,6 @@ class _ThingsScreenState extends State<ThingsScreen> {
     });
   }
 
-
-
   void _setFilterImage(int filterCount) {
     setState(() {
       switch (filterCount) {
@@ -244,16 +242,13 @@ class _ThingsScreenState extends State<ThingsScreen> {
           ],
         ),
       ),
-      body: Consumer<ThingProvider>(builder: (context, thingProvider, child) {
-        return thingProvider.things.isEmpty
-          ? const NoThingsView()
-          : ThingsListView(
-              things: thingProvider.things,
-              deleteThing: _deleteThing,
-              addThing: _addThing,
-              editThing: _editThing,
-            );
-      },),  
+      body: Consumer<ThingProvider>(
+        builder: (context, thingProvider, child) {
+          return thingProvider.things.isEmpty
+              ? const NoThingsView()
+              : ThingsListView();
+        },
+      ),
     );
   }
 }

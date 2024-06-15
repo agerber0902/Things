@@ -23,7 +23,6 @@ class ThingsSetup {
       const CollapsableSearchBar(
           isThingSearch: true, expandedWidth: _seachActiveWidth),
 
-      //TODO: Add filters - remove params from filter dialog
       SharedAppBarButton(
         icon: AppBarIcons().filterIcons.defaultFilterIcon,
         isModal: true,
@@ -31,12 +30,10 @@ class ThingsSetup {
       ),
 
       //Add Button
-      //TODO: remove add thing params
       SharedAppBarButton(
         icon: AppBarIcons().addIcon,
         isBottomSheet: true,
-        displayWidget:
-            AddThing(addThing: (Thing t) {}, editThing: (Thing t) {}),
+        displayWidget: const AddThing(),
       )
     ],
   );

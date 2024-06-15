@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:things_app/models/thing.dart';
+import 'package:provider/provider.dart';
+import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/widgets/things/thing_view.dart';
 
 class ThingsListView extends StatelessWidget {
   const ThingsListView({
     super.key,
-    required this.things, required this.deleteThing, required this.addThing, required this.editThing,
   });
 
-  final List<Thing> things;
-  final void Function(Thing thing) deleteThing;
-  final void Function(Thing thing) addThing;
-  final void Function(Thing thing) editThing;
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: things.length,
-        itemBuilder: (ctx, index) {
-          return ThingView(thing: things[index], deleteThing: deleteThing, addThing: addThing, editThing: editThing,);
-        });
+    return Consumer<ThingProvider>(
+      builder: (context, thingProvider, child) {
+        return ListView.builder(
+            itemCount: thingProvider.things.length,
+            itemBuilder: (ctx, index) {
+              return ThingView(
+                thing: thingProvider.things[index]
+              );
+            });
+      },
+    );
   }
 }

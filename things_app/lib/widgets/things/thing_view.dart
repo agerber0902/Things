@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 
@@ -10,15 +12,9 @@ class ThingView extends StatefulWidget {
   const ThingView({
     super.key,
     required this.thing,
-    required this.deleteThing,
-    required this.addThing,
-    required this.editThing,
   });
 
   final Thing thing;
-  final void Function(Thing thing) deleteThing;
-  final void Function(Thing thing) addThing;
-  final void Function(Thing thing) editThing;
 
   @override
   State<ThingView> createState() => _ThingViewState();
@@ -56,40 +52,45 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Opacity(
-          opacity: _animation.value,
-          child: Dismissible(
-            onDismissed: (direction) {
-              Thing thing = widget.thing;
-              widget.deleteThing(widget.thing);
+    return Consumer<ThingProvider>(
+      builder: (context, thingProvider, child) {
+        return AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return Opacity(
+              opacity: _animation.value,
+              child: Dismissible(
+                onDismissed: (direction) {
+                  Thing thing = widget.thing;
+                  thingProvider.deleteThing(widget.thing);
 
-              ScaffoldMessenger.of(context).clearSnackBars();
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
-                  "${thing.title} was deleted.",
-                  style: textTheme.bodyLarge!.copyWith(color: colorScheme.onPrimary),
+                  ScaffoldMessenger.of(context).clearSnackBars();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                      "${thing.title} was deleted.",
+                      style: textTheme.bodyLarge!
+                          .copyWith(color: colorScheme.onPrimary),
+                    ),
+                    action: SnackBarAction(
+                      label: "Undo",
+                      onPressed: () {
+                        thingProvider.addThing(thing);
+                      },
+                    ),
+                  ));
+                },
+                key: Key(widget.thing.id),
+                child: SizedBox(
+                  height: initHeight,
+                  width: double.infinity,
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    child: ThingCard(widget: widget),
+                  ),
                 ),
-                action: SnackBarAction(
-                  label: "Undo",
-                  onPressed: () {
-                    widget.addThing(thing);
-                  },
-                ),
-              ));
-            },
-            key: Key(widget.thing.id),
-            child: SizedBox(
-              height: initHeight,
-              width: double.infinity,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                child: ThingCard(widget: widget),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
@@ -120,165 +121,172 @@ class _ThingCardState extends State<ThingCard> {
     _isCompleted = widget.widget.thing.isMarkedComplete;
   }
 
-  Future<void> _notesDialogBuilder(BuildContext context, String text) {
-    return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-            return NotesModal(
-              title: widget.widget.thing.title,
-              notes: widget.widget.thing.notes,
-              onAdd: (notes) {
-                widget.widget.thing.notes = notes;
-                widget.widget.editThing(widget.widget.thing);
-              },
-              onEdit: (notes) {
-                widget.widget.thing.notes = notes;
-                widget.widget.editThing(widget.widget.thing);
-              },
-            );
-          });
-        });
-  }
+  // Future<void> _notesDialogBuilder(BuildContext context, String text) {
+  //   return showDialog<void>(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return StatefulBuilder(
+  //             builder: (BuildContext context, StateSetter setState) {
+  //           return NotesModal(
+  //             title: widget.widget.thing.title,
+  //             notes: widget.widget.thing.notes,
+  //             onAdd: (notes) {
+  //               widget.widget.thing.notes = notes;
+  //               widget.widget.editThing(widget.widget.thing);
+  //             },
+  //             onEdit: (notes) {
+  //               widget.widget.thing.notes = notes;
+  //               widget.widget.editThing(widget.widget.thing);
+  //             },
+  //           );
+  //         });
+  //       });
+  // }
 
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    return GestureDetector(
-      onTap: () {
-        showModalBottomSheet(
-            context: context,
-            builder: (ctx) {
-              return AddThing(
-                addThing: widget.widget.addThing,
-                editThing: widget.widget.editThing,
-                thing: widget.widget.thing,
-              );
-            });
-      },
-      child: Card(
-        color: colorScheme.primaryContainer,
-        margin: const EdgeInsets.only(left: 20, right: 20),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<ThingProvider>(
+      builder: (context, thingProvider, child) {
+        return GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+                context: context,
+                builder: (ctx) {
+                  return AddThing(
+                    thing: widget.widget.thing,
+                  );
+                });
+          },
+          child: Card(
+            color: colorScheme.primaryContainer,
+            margin: const EdgeInsets.only(left: 20, right: 20),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: Text(
-                      widget.widget.thing.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: textTheme.displaySmall!.copyWith(
-                          fontSize: textTheme.displaySmall!.fontSize! - 5.0),
-                    ),
-                  ),
-                  _isFavorite ?? false
-                      ? IconButton(
-                          onPressed: () {
-                            widget.widget.thing.categories.remove('favorite');
-                            widget.widget.editThing(widget.widget.thing);
-
-                            setState(() {
-                              _isFavorite = false;
-                            });
-                          },
-                          icon: Icon(
-                            categoryIcons['favorite']!.iconData,
-                            color: categoryIcons['favorite']!.iconColor,
-                          ),
-                        )
-                      : IconButton(
-                          onPressed: () {
-                            widget.widget.thing.categories.add('favorite');
-                            widget.widget.editThing(widget.widget.thing);
-
-                            setState(() {
-                              _isFavorite = true;
-                            });
-                          },
-                          icon: const Icon(
-                            Icons.favorite_outline,
-                          ),
-                        ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  //Display Categories
-                  Column(
-                    mainAxisSize: MainAxisSize.max,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: widget.widget.thing.categories
-                            .where((c) => c != 'favorite')
-                            .map((category) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 0, right: 8),
-                            child: Icon(
-                              categoryIcons[category]!.iconData,
-                              color: categoryIcons[category]!.iconColor,
+                      Expanded(
+                        child: Text(
+                          widget.widget.thing.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: textTheme.displaySmall!.copyWith(
+                              fontSize:
+                                  textTheme.displaySmall!.fontSize! - 5.0),
+                        ),
+                      ),
+                      _isFavorite ?? false
+                          ? IconButton(
+                              onPressed: () {
+                                widget.widget.thing.categories
+                                    .remove('favorite');
+                                thingProvider.editThing(widget.widget.thing);
+
+                                setState(() {
+                                  _isFavorite = false;
+                                });
+                              },
+                              icon: Icon(
+                                categoryIcons['favorite']!.iconData,
+                                color: categoryIcons['favorite']!.iconColor,
+                              ),
+                            )
+                          : IconButton(
+                              onPressed: () {
+                                widget.widget.thing.categories.add('favorite');
+                                thingProvider.editThing(widget.widget.thing);
+
+                                setState(() {
+                                  _isFavorite = true;
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.favorite_outline,
+                              ),
                             ),
-                          );
-                        }).toList(),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      //Display Categories
+                      Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          Row(
+                            children: widget.widget.thing.categories
+                                .where((c) => c != 'favorite')
+                                .map((category) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 0, right: 8),
+                                child: Icon(
+                                  categoryIcons[category]!.iconData,
+                                  color: categoryIcons[category]!.iconColor,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                      child: Text(
-                    widget.widget.thing.description,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodySmall,
-                  )),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      _notesDialogBuilder(context, 'test');
-                    },
-                    child: widget.widget.thing.notes == null ||
-                            widget.widget.thing.notes!.isEmpty
-                        ? const Icon(Icons.note_add_outlined)
-                        : const Icon(Icons.sticky_note_2),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                        widget.widget.thing.description,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodySmall,
+                      )),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.check_box,
-                      color:
-                          _isCompleted ? Colors.green : colorScheme.onPrimary,
-                    ),
-                    onPressed: () {
-                      //edit thing
-                      widget.widget.thing.isMarkedComplete = !_isCompleted;
-                      widget.widget.editThing(widget.widget.thing);
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          //TODO: make this work
+                          //_notesDialogBuilder(context, 'test');
+                        },
+                        child: widget.widget.thing.notes == null ||
+                                widget.widget.thing.notes!.isEmpty
+                            ? const Icon(Icons.note_add_outlined)
+                            : const Icon(Icons.sticky_note_2),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.check_box,
+                          color: _isCompleted
+                              ? Colors.green
+                              : colorScheme.onPrimary,
+                        ),
+                        onPressed: () {
+                          //edit thing
+                          widget.widget.thing.isMarkedComplete = !_isCompleted;
+                          thingProvider.editThing(widget.widget.thing);
 
-                      setState(() {
-                        _isCompleted = !_isCompleted;
-                      });
-                    },
-                  ),
+                          setState(() {
+                            _isCompleted = !_isCompleted;
+                          });
+                        },
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
