@@ -75,7 +75,6 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
                         _isSearching = false;
                         _searchBarWidth = 0;
                         //Add search value to the search bar to the provider and use that 
-                        //TODO: need to reset on screen change
                         searchProvider.setSearchValue(_searchController.text.toLowerCase());
                         search();
                         //_searchController.clear();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:things_app/providers/provider_helper.dart';
 
 class SharedAppBarButton extends StatelessWidget {
   const SharedAppBarButton(
@@ -11,12 +12,11 @@ class SharedAppBarButton extends StatelessWidget {
   final bool? isModal;
   final bool? isBottomSheet;
   final Widget displayWidget;
-  //TODO: make color colorscheme.primary
   final Icon icon;
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _dialogBuilder() {
+    Future<void> dialogBuilder() {
       return showDialog<void>(
           context: context,
           builder: (BuildContext context) {
@@ -28,7 +28,7 @@ class SharedAppBarButton extends StatelessWidget {
     }
 
     void onPressedModal() {
-      _dialogBuilder();
+      dialogBuilder();
     }
 
     void onPressedBottomSheet() {
@@ -42,10 +42,9 @@ class SharedAppBarButton extends StatelessWidget {
 
     return IconButton(
       onPressed: () {
-        //TODO: verify we need this
-        //set edit mode in trings provider
-        //ProviderHelper().setAddThingProviders(context);
-
+        //set add mode for reminder provider
+        ProviderHelper().setAddReminderProviders(context);
+        
         if(isModal ?? false){
           onPressedModal();
           return;

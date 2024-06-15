@@ -4,7 +4,7 @@ import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
-import 'package:things_app/widgets/add_reminder.dart';
+import 'package:things_app/widgets/reminders/add_reminder.dart';
 
 const double initHeight = 150;
 

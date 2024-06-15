@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:intl/intl.dart';
-import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 
 const String titleHintText = 'Enter a title';
@@ -219,62 +218,6 @@ class _AddReminderState extends State<AddReminder> {
           ),
         );
       },
-    );
-  }
-}
-
-class SelectedThings extends StatefulWidget {
-  const SelectedThings({
-    super.key,
-    required List<Thing> selectedThings,
-    required this.removeThing,
-  }) : _selectedThings = selectedThings;
-
-  final List<Thing> _selectedThings;
-  final void Function(Thing thing) removeThing;
-
-  @override
-  State<SelectedThings> createState() => _SelectedThingsState();
-}
-
-class _SelectedThingsState extends State<SelectedThings> {
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: widget._selectedThings.map((thing) {
-        return Padding(
-          padding: const EdgeInsets.all(10),
-          child: Card(
-            color: colorScheme.primaryContainer,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    thing.title,
-                    style: textTheme.displaySmall!.copyWith(fontSize: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  Opacity(
-                    opacity: 0.4,
-                    child: IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        widget.removeThing(thing);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
     );
   }
 }
