@@ -23,6 +23,18 @@ class ThingProvider extends ChangeNotifier {
     getThings();
   }
 
+  //Active Thing (typically in edit)
+  //This gets set when a thing is selected.
+  Thing? _activeThing;
+  Thing? get activeThing => _activeThing;
+  bool get activeThingHasCategories => _activeThing != null &&  _activeThing!.categories.isNotEmpty;
+  bool get activeThingHasNotes => _activeThing != null &&  _activeThing!.notesExist;
+
+  void setActiveThing(Thing thing){
+    _activeThing = thing;
+    notifyListeners();
+  }
+
   //Things for Display
   List<Thing> _things = [];
   List<Thing> get things => _things;
