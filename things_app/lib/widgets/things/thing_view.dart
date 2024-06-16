@@ -4,7 +4,6 @@ import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
-import 'package:things_app/widgets/notes_modal.dart';
 
 const double initHeight = 200;
 

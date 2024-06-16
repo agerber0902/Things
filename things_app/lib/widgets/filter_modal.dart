@@ -66,6 +66,7 @@ class _FilterDialogState extends State<FilterDialog> {
               child: const Text('Reset'),
               onPressed: () {
                 filterProvider.resetFilters();
+                thingProvider.setFilterValues([]);
                 Navigator.of(context).pop();
               },
             ),

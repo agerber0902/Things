@@ -37,6 +37,9 @@ class ThingProvider extends ChangeNotifier {
     //Filter Things
     _filterThings();
 
+    //Sort Things
+    _sortThings();
+
     notifyListeners();
   }
 
@@ -64,6 +67,40 @@ class ThingProvider extends ChangeNotifier {
 
     //This will notify listeners
     getThings();
+  }
+
+  //Sort Things
+  void _sortThings(){
+
+    //sort things by favorite
+     _things.sort((a, b) {
+      bool aIsFavorite = a.categories.any((category) => category.toLowerCase() == 'favorite');
+      bool bIsFavorite = b.categories.any((category) => category.toLowerCase() == 'favorite');
+      if (aIsFavorite && !bIsFavorite) return -1;
+      if (!aIsFavorite && bIsFavorite) return 1;
+      return 0;
+    });
+
+    //Start by filtering out marked as complete.
+    //Get list of things marked as complete, add them to the end of the list
+    List<Thing> completedThings = _things.where((thing) => thing.isMarkedComplete).toList();
+
+    _things = _things.where((thing) => !thing.isMarkedComplete).toList();
+
+    //Then filter out the favorites
+    //Get list of favorite things, add them to the beginning of the list
+    List<Thing> favoriteThings = _things
+        .where((thing) => thing.categories.contains('favorite'))
+        .toList();
+
+    //finally filter out the things
+    //Get list of things that are NOT favorites or complete, and those will go in the middle
+    List<Thing> remainingThings = _things
+        .where((thing) =>
+            !thing.isMarkedComplete && !thing.categories.contains('favorite'))
+        .toList();
+
+    _things = [...favoriteThings, ...remainingThings, ...completedThings];
   }
 
   //Search Things

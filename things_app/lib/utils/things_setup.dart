@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/utils/icon_data.dart';
-import 'package:things_app/widgets/filter_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
 import 'package:things_app/widgets/shared/appbar/search_bar.dart';
 import 'package:things_app/widgets/shared/appbar/shared_app_bar_button.dart';
@@ -22,11 +21,7 @@ class ThingsSetup {
       const CollapsableSearchBar(
           isThingSearch: true, expandedWidth: _seachActiveWidth),
 
-      SharedAppBarButton(
-        icon: AppBarIcons().filterIcons.defaultFilterIcon,
-        isModal: true,
-        displayWidget: const FilterDialog(),
-      ),
+      //Add Filters on thigns screen to use provider to set filter image
 
       //Add Button
       SharedAppBarButton(
