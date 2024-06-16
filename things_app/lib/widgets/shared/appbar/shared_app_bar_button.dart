@@ -44,6 +44,9 @@ class SharedAppBarButton extends StatelessWidget {
       onPressed: () {
         //set add mode for reminder provider
         ProviderHelper().setAddReminderProviders(context);
+
+        //set add mode for reminder provider
+        ProviderHelper().setAddThingProviders(context);
         
         if(isModal ?? false){
           onPressedModal();

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/widgets/notes_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
 
 const double initHeight = 200;
@@ -120,27 +121,19 @@ class _ThingCardState extends State<ThingCard> {
     _isCompleted = widget.widget.thing.isMarkedComplete;
   }
 
-  // Future<void> _notesDialogBuilder(BuildContext context, String text) {
-  //   return showDialog<void>(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return StatefulBuilder(
-  //             builder: (BuildContext context, StateSetter setState) {
-  //           return NotesModal(
-  //             title: widget.widget.thing.title,
-  //             notes: widget.widget.thing.notes,
-  //             onAdd: (notes) {
-  //               widget.widget.thing.notes = notes;
-  //               widget.widget.editThing(widget.widget.thing);
-  //             },
-  //             onEdit: (notes) {
-  //               widget.widget.thing.notes = notes;
-  //               widget.widget.editThing(widget.widget.thing);
-  //             },
-  //           );
-  //         });
-  //       });
-  // }
+  Future<void> _notesDialogBuilder(BuildContext context, String text) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return NotesModal(
+              title: widget.widget.thing.title,
+              notes: widget.widget.thing.notes,
+            );
+          });
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +247,7 @@ class _ThingCardState extends State<ThingCard> {
                       GestureDetector(
                         onTap: () {
                           //TODO: make this work
-                          //_notesDialogBuilder(context, 'test');
+                          _notesDialogBuilder(context, 'test');
                         },
                         child: widget.widget.thing.notes == null ||
                                 widget.widget.thing.notes!.isEmpty

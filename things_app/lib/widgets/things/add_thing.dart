@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
+import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 
 const String titleHintText = 'Enter a title';
@@ -35,22 +37,15 @@ class _AddThingState extends State<AddThing> {
       TextEditingController();
   late List<String> _selectedCategories = [];
   String? _selectedDropDownValue;
-  late List<String> _notesOnAdd;
-  late List<Reminder> _remindersOnAdd;
-  late List<Thing> availableThings;
 
   @override
   void initState() {
     super.initState();
 
-    getAvailableThings();
-
     _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
         widget.thing != null ? widget.thing!.description : '';
-    _notesOnAdd = [];
-    _remindersOnAdd = [];
   }
 
   @override
@@ -60,30 +55,9 @@ class _AddThingState extends State<AddThing> {
     super.dispose();
   }
 
-  void getAvailableThings() async {
-    var things = await fileManager.readThingList();
-
-    setState(() {
-      availableThings = things;
-    });
-    return;
-  }
-
   void removeCategory(String category) {
     setState(() {
       _selectedCategories.remove(category);
-    });
-  }
-
-  void handleNotes(List<String> notes) {
-    setState(() {
-      _notesOnAdd = [...notes];
-    });
-  }
-
-  void handleAddReminder(Reminder reminder) {
-    setState(() {
-      _remindersOnAdd = [reminder, ..._remindersOnAdd];
     });
   }
 
@@ -95,16 +69,7 @@ class _AddThingState extends State<AddThing> {
               builder: (BuildContext context, StateSetter setState) {
             return NotesModal(
               title: thing != null ? thing.title : '',
-              notes: thing != null ? thing.notes : _notesOnAdd,
-              onAdd: (notes) {
-                handleNotes(notes ?? []);
-              },
-              onEdit: (notes) {
-                handleNotes(notes ?? []);
-              },
-              onDelete: (notes) {
-                handleNotes(notes ?? []);
-              },
+              notes: thing != null ? thing.notes : [],
             );
           });
         });
@@ -158,27 +123,35 @@ class _AddThingState extends State<AddThing> {
 
                             const SizedBox(height: 16),
 
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextButton.icon(
-                                  onPressed: () {
-                                    _notesDialogBuilder(context, widget.thing);
-                                  },
-                                  label: Text(
-                                    _notesOnAdd.isEmpty
-                                        ? 'Add Notes'
-                                        : 'Edit Notes',
-                                    style: TextStyle(
-                                      color: colorScheme.primary,
-                                      decoration: TextDecoration.underline,
+                            //Notes
+                            Consumer2<NotesProvider, ThingProvider>(
+                              builder: (context, noteProvider, thingProvider, child) {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: () {
+                                        _notesDialogBuilder(
+                                            context, widget.thing);
+                                      },
+                                      label: Text(
+                                        //TODO: set this to thing in active
+                                        widget.thing != null && widget.thing!.notesExist
+                                            ? 'Edit Notes'
+                                            : 'Add Notes',
+                                        style: TextStyle(
+                                          color: colorScheme.primary,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                      //TODO: same here
+                                      icon: widget.thing != null && widget.thing!.notesExist
+                                          ? AppBarIcons().notesIcons.editNoteIcon
+                                          : AppBarIcons().notesIcons.addNoteIcon,
                                     ),
-                                  ),
-                                  icon: _notesOnAdd.isEmpty
-                                      ? const Icon(Icons.note_add_outlined)
-                                      : const Icon(Icons.sticky_note_2),
-                                ),
-                              ],
+                                  ],
+                                );
+                              },
                             ),
 
                             const SizedBox(height: 16),
@@ -271,13 +244,15 @@ class _AddThingState extends State<AddThing> {
                                             description:
                                                 _descriptionTextController.text,
                                             isMarkedComplete: false,
-                                            notes: _notesOnAdd,
+                                            notes: Provider.of<NotesProvider>(context, listen: false).notes,
                                             categories: _selectedCategories
                                                 .where((category) =>
                                                     category != '')
                                                 .toList());
 
                                     thingProvider.addThing(thingToAdd);
+                                    //Reset Notes
+                                    //Provider.of<NotesProvider>(context, listen: false).reset();
 
                                     Navigator.pop(context);
                                   }
@@ -290,12 +265,16 @@ class _AddThingState extends State<AddThing> {
                                             _descriptionTextController.text,
                                         isMarkedComplete:
                                             widget.thing!.isMarkedComplete,
-                                        notes: _notesOnAdd,
+                                            //TODO: test this
+                                        notes: Provider.of<NotesProvider>(context, listen: false).notes,
                                         categories: _selectedCategories
                                             .where((category) => category != '')
                                             .toList());
 
                                     thingProvider.editThing(thingToEdit);
+
+                                    //Reset Notes
+                                    //Provider.of<NotesProvider>(context, listen: false).reset();
 
                                     Navigator.pop(context);
                                   }

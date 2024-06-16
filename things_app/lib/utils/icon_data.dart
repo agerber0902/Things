@@ -4,6 +4,7 @@ import 'package:things_app/main.dart';
 class AppBarIcons{
 
   FilterIcons filterIcons = FilterIcons();
+  NotesIcons notesIcons = NotesIcons();
   Icon addIcon = Icon(Icons.add, color: kColorScheme.primary,);
 
 }
@@ -11,4 +12,9 @@ class AppBarIcons{
 class FilterIcons{
   final Icon defaultFilterIcon = const Icon(Icons.filter_alt_outlined);
   final Icon filterInUseIcon = const Icon(Icons.filter_alt);
+}
+
+class NotesIcons{
+  final Icon addNoteIcon = const Icon(Icons.note_add_outlined);
+  final Icon editNoteIcon = const Icon(Icons.sticky_note_2);
 }
