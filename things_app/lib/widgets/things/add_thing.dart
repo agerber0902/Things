@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
@@ -35,14 +36,12 @@ class _AddThingState extends State<AddThing> {
   final TextEditingController _titleTextController = TextEditingController();
   final TextEditingController _descriptionTextController =
       TextEditingController();
-  late List<String> _selectedCategories = [];
   String? _selectedDropDownValue;
 
   @override
   void initState() {
     super.initState();
 
-    _selectedCategories = widget.thing != null ? widget.thing!.categories : [];
     _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
     _descriptionTextController.text =
         widget.thing != null ? widget.thing!.description : '';
@@ -53,12 +52,6 @@ class _AddThingState extends State<AddThing> {
     _titleTextController.dispose();
     _descriptionTextController.dispose();
     super.dispose();
-  }
-
-  void removeCategory(String category) {
-    setState(() {
-      _selectedCategories.remove(category);
-    });
   }
 
   Future<void> _notesDialogBuilder(BuildContext context, Thing? thing) {
@@ -125,18 +118,19 @@ class _AddThingState extends State<AddThing> {
 
                             //Notes
                             Consumer2<NotesProvider, ThingProvider>(
-                              builder: (context, noteProvider, thingProvider, child) {
+                              builder: (context, noteProvider, thingProvider,
+                                  child) {
                                 return Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     TextButton.icon(
                                       onPressed: () {
-                                        _notesDialogBuilder(
-                                            context, widget.thing);
+                                        _notesDialogBuilder(context, widget.thing);
                                       },
                                       label: Text(
                                         //TODO: set this to thing in active
-                                        widget.thing != null && widget.thing!.notesExist
+                                        widget.thing != null &&
+                                                widget.thing!.notesExist
                                             ? 'Edit Notes'
                                             : 'Add Notes',
                                         style: TextStyle(
@@ -145,9 +139,14 @@ class _AddThingState extends State<AddThing> {
                                         ),
                                       ),
                                       //TODO: same here
-                                      icon: widget.thing != null && widget.thing!.notesExist
-                                          ? AppBarIcons().notesIcons.editNoteIcon
-                                          : AppBarIcons().notesIcons.addNoteIcon,
+                                      icon: widget.thing != null &&
+                                              widget.thing!.notesExist
+                                          ? AppBarIcons()
+                                              .notesIcons
+                                              .editNoteIcon
+                                          : AppBarIcons()
+                                              .notesIcons
+                                              .addNoteIcon,
                                     ),
                                   ],
                                 );
@@ -157,7 +156,8 @@ class _AddThingState extends State<AddThing> {
                             const SizedBox(height: 16),
 
                             //Display selected categories
-                            _selectedCategories.isEmpty
+                            Consumer<CategoryProvider>(builder:(context, categoryProvider, child) {
+                              return categoryProvider.categories.isEmpty
                                 ? Text(
                                     categoriesValidationText,
                                     style: textTheme.bodySmall!
@@ -166,37 +166,16 @@ class _AddThingState extends State<AddThing> {
                                 : SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: SelectedCategories(
-                                        removeCategory: removeCategory,
-                                        selectedCategories: _selectedCategories
+                                        removeCategory: categoryProvider.deletecategory,
+                                        selectedCategories: categoryProvider.categories
                                             .where((c) =>
                                                 c != 'favorite' &&
                                                 c != 'complete')
                                             .toList()),
-                                  ),
+                                  );
+                            },), 
                             const SizedBox(height: 16),
-                            // DropdownMenu(
-                            //   //initialSelection: categoryIcons.entries.first.key,
-                            //   initialSelection: _selectedDropDownValue,
-                            //   helperText: 'Select Categories',
-                            //   hintText: 'Select Categories',
-                            //   onSelected: (value) {
-                            //     setState(() {
-                            //       _selectedCategories.add(value ?? '');
-                            //       _selectedDropDownValue = null;
-                            //     });
-                            //   },
-                            //   dropdownMenuEntries:
-                            //       categoryIcons.entries.map((icon) {
-                            //     return DropdownMenuEntry(
-                            //       value: icon.key,
-                            //       label: icon.key,
-                            //       leadingIcon: Icon(
-                            //         icon.value.iconData,
-                            //         color: icon.value.iconColor,
-                            //       ),
-                            //     );
-                            //   }).toList(),
-                            // ),
+
                             DropdownButton<String>(
                               hint: const Text('Select Categories'),
                               value: _selectedDropDownValue,
@@ -220,7 +199,10 @@ class _AddThingState extends State<AddThing> {
                               }).toList(),
                               onChanged: (value) {
                                 setState(() {
-                                  _selectedCategories.add(value ?? '');
+                                  Provider.of<CategoryProvider>(context,
+                                          listen: false)
+                                      .addcategory(value ?? '');
+                                  //TODO: remove _selectedDropDownValue
                                   _selectedDropDownValue = null;
                                 });
                               },
@@ -232,9 +214,10 @@ class _AddThingState extends State<AddThing> {
                                       colorScheme.onPrimaryContainer),
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  if (_selectedCategories.isEmpty) {
-                                    return;
-                                  }
+                                  //TODO: move this to add and edit
+                                  // if (_selectedCategories.isEmpty) {
+                                  //   return;
+                                  // }
 
                                   //Add
                                   if (widget.thing == null) {
@@ -244,11 +227,18 @@ class _AddThingState extends State<AddThing> {
                                             description:
                                                 _descriptionTextController.text,
                                             isMarkedComplete: false,
-                                            notes: Provider.of<NotesProvider>(context, listen: false).notes,
-                                            categories: _selectedCategories
-                                                .where((category) =>
-                                                    category != '')
-                                                .toList());
+                                            notes: Provider.of<NotesProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .notes,
+                                            categories:
+                                                Provider.of<CategoryProvider>(
+                                                        context,
+                                                        listen: false)
+                                                    .categories
+                                                    .where((category) =>
+                                                        category != '')
+                                                    .toList());
 
                                     thingProvider.addThing(thingToAdd);
                                     //Reset Notes
@@ -265,11 +255,16 @@ class _AddThingState extends State<AddThing> {
                                             _descriptionTextController.text,
                                         isMarkedComplete:
                                             widget.thing!.isMarkedComplete,
-                                            //TODO: test this
-                                        notes: Provider.of<NotesProvider>(context, listen: false).notes,
-                                        categories: _selectedCategories
+                                        //TODO: test this
+                                        notes: Provider.of<NotesProvider>(
+                                                context,
+                                                listen: false)
+                                            .notes,
+                                        //TODO:
+                                        categories: Provider.of<CategoryProvider>(context, listen: false).categories
                                             .where((category) => category != '')
-                                            .toList());
+                                            .toList()
+                                        );
 
                                     thingProvider.editThing(thingToEdit);
 

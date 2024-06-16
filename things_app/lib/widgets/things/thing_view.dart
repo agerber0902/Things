@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
@@ -144,6 +145,12 @@ class _ThingCardState extends State<ThingCard> {
       builder: (context, thingProvider, child) {
         return GestureDetector(
           onTap: () {
+
+            //Set the categories
+            Provider.of<CategoryProvider>(context, listen: false).setCategoriesForEdit(widget.widget.thing.categories);
+
+            //TODO: Set the Notes
+
             showModalBottomSheet(
                 context: context,
                 builder: (ctx) {
