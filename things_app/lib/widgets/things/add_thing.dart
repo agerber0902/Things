@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
-import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
-import 'package:things_app/screens/things_screen.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 
@@ -34,9 +32,7 @@ class _AddThingState extends State<AddThing> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _titleTextController = TextEditingController();
-  final TextEditingController _descriptionTextController =
-      TextEditingController();
-  String? _selectedDropDownValue;
+  final TextEditingController _descriptionTextController = TextEditingController();
 
   @override
   void initState() {
@@ -178,7 +174,7 @@ class _AddThingState extends State<AddThing> {
 
                             DropdownButton<String>(
                               hint: const Text('Select Categories'),
-                              value: _selectedDropDownValue,
+                              value: null,
                               items: categoryIcons.entries
                                   .where((c) =>
                                       c.key != 'favorite' &&
@@ -202,8 +198,6 @@ class _AddThingState extends State<AddThing> {
                                   Provider.of<CategoryProvider>(context,
                                           listen: false)
                                       .addcategory(value ?? '');
-                                  //TODO: remove _selectedDropDownValue
-                                  _selectedDropDownValue = null;
                                 });
                               },
                             ),
@@ -214,10 +208,9 @@ class _AddThingState extends State<AddThing> {
                                       colorScheme.onPrimaryContainer),
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  //TODO: move this to add and edit
-                                  // if (_selectedCategories.isEmpty) {
-                                  //   return;
-                                  // }
+                                  if (Provider.of<CategoryProvider>(context, listen: false).categories.isEmpty) {
+                                    return;
+                                  }
 
                                   //Add
                                   if (widget.thing == null) {
@@ -255,12 +248,10 @@ class _AddThingState extends State<AddThing> {
                                             _descriptionTextController.text,
                                         isMarkedComplete:
                                             widget.thing!.isMarkedComplete,
-                                        //TODO: test this
                                         notes: Provider.of<NotesProvider>(
                                                 context,
                                                 listen: false)
                                             .notes,
-                                        //TODO:
                                         categories: Provider.of<CategoryProvider>(context, listen: false).categories
                                             .where((category) => category != '')
                                             .toList()

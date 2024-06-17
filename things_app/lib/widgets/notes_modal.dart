@@ -13,7 +13,6 @@ class NotesModal extends StatefulWidget {
 
   final String title;
   List<String>? notes;
-  //TODO: remove notes and use activeThing
 
   @override
   State<NotesModal> createState() => _NotesModalState();

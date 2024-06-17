@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
-import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/reminder_provider.dart';
-import 'package:things_app/screens/things_screen.dart';
 import 'package:things_app/widgets/reminders/add_reminder.dart';
 
 const double initHeight = 150;
@@ -120,10 +118,12 @@ class _ReminderCardState extends State<ReminderCard> {
 
     return GestureDetector(
       onTap: () {
+        Provider.of<ReminderProvider>(context, listen: false).setActiveReminder(widget.widget.reminder);
+
         showModalBottomSheet(
             context: context,
             builder: (ctx) {
-              return AddReminder(reminder: widget.widget.reminder);
+              return const AddReminder();
             });
       },
       child: Card(

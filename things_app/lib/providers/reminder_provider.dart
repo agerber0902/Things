@@ -23,8 +23,9 @@ class ReminderProvider extends ChangeNotifier {
   Reminder? _activeReminder;
   Reminder? get activeReminder => _activeReminder;
 
-  void setActiveReminder(Reminder Reminder) {
-    _activeReminder = Reminder;
+  void setActiveReminder(Reminder reminder) {
+    _activeReminder = reminder;
+    print(_activeReminder);
     notifyListeners();
   }
 

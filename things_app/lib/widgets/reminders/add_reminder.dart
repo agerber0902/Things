@@ -13,10 +13,7 @@ const String messageValidationText = 'Enter a valid message';
 class AddReminder extends StatefulWidget {
   const AddReminder({
     super.key,
-    this.reminder,
   });
-
-  final Reminder? reminder;
 
   @override
   State<AddReminder> createState() => _AddReminderState();
@@ -33,11 +30,20 @@ class _AddReminderState extends State<AddReminder> {
   void initState() {
     super.initState();
 
-    _titleTextController.text =
-        widget.reminder != null ? widget.reminder!.title : '';
-    _messageTextController.text =
-        widget.reminder != null ? widget.reminder!.message : '';
-    _selectedDateTime = widget.reminder?.date;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Reminder? activeReminder =
+          Provider.of<ReminderProvider>(context, listen: false).activeReminder;
+
+      if (activeReminder != null) {
+        setState(() {
+          _titleTextController.text =
+              activeReminder.title;
+          _messageTextController.text =
+              activeReminder.message;
+          _selectedDateTime = activeReminder.date;
+        });
+      }
+    });
   }
 
   @override
@@ -174,7 +180,8 @@ class _AddReminderState extends State<AddReminder> {
                                     }
 
                                     //add
-                                    if (widget.reminder == null) {
+                                    if (reminderProvider.activeReminder ==
+                                        null) {
                                       final reminderToAdd = Reminder(
                                         title: _titleTextController.text,
                                         message: _messageTextController.text,
@@ -182,26 +189,30 @@ class _AddReminderState extends State<AddReminder> {
                                             _selectedDateTime ?? DateTime.now(),
                                       );
 
-                                      reminderProvider.addReminder(reminderToAdd);
+                                      reminderProvider
+                                          .addReminder(reminderToAdd);
                                     }
                                     //edit
                                     else {
                                       final reminderToEdit = Reminder.forEdit(
-                                        id: widget.reminder!.id,
+                                        id: reminderProvider.activeReminder!.id,
                                         title: _titleTextController.text,
                                         message: _messageTextController.text,
                                         date:
                                             _selectedDateTime ?? DateTime.now(),
                                       );
 
-                                      reminderProvider.editReminder(reminderToEdit);
+                                      reminderProvider
+                                          .editReminder(reminderToEdit);
                                     }
 
                                     Navigator.pop(context);
                                   }
                                 },
                                 child: Text(
-                                  widget.reminder == null ? 'Add' : 'Save',
+                                  reminderProvider.activeReminder == null
+                                      ? 'Add'
+                                      : 'Save',
                                   style: textTheme.bodyLarge!
                                       .copyWith(color: Colors.white),
                                 ),
