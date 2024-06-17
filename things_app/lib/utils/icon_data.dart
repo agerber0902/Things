@@ -5,6 +5,7 @@ class AppBarIcons{
 
   FilterIcons filterIcons = FilterIcons();
   NotesIcons notesIcons = NotesIcons();
+  LocationIcons locationIcons = LocationIcons();
   Icon addIcon = Icon(Icons.add, color: kColorScheme.primary,);
 
 }
@@ -17,4 +18,9 @@ class FilterIcons{
 class NotesIcons{
   final Icon addNoteIcon = const Icon(Icons.note_add_outlined);
   final Icon editNoteIcon = const Icon(Icons.sticky_note_2);
+}
+
+class LocationIcons{
+  final Icon addLocationIcon = const Icon(Icons.location_on_outlined);
+  final Icon containsLocationIcon = const Icon(Icons.location_on, color: Colors.red);
 }
