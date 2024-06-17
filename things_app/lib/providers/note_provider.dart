@@ -4,8 +4,8 @@ class NotesProvider extends ChangeNotifier {
   List<String>? _notes;
   List<String>? get notes => _notes;
   bool get notesExist => _notes != null && _notes!.isNotEmpty;
-  
-  void addNotesForEdit(List<String>? notesToAdd){
+
+  void setNotesForEdit(List<String>? notesToAdd){
     _notes = notesToAdd;
     notifyListeners();
   }
