@@ -30,7 +30,7 @@ class ThingProvider extends ChangeNotifier {
   bool get activeThingHasCategories => _activeThing != null &&  _activeThing!.categories.isNotEmpty;
   bool get activeThingHasNotes => _activeThing != null &&  _activeThing!.notesExist;
 
-  void setActiveThing(Thing thing){
+  void setActiveThing(Thing? thing){
     _activeThing = thing;
     notifyListeners();
   }

@@ -19,10 +19,7 @@ const String categoriesValidationText = 'Select at least one category.';
 class AddThing extends StatefulWidget {
   const AddThing({
     super.key,
-    this.thing,
   });
-
-  final Thing? thing;
 
   @override
   State<AddThing> createState() => _AddThingState();
@@ -32,15 +29,24 @@ class _AddThingState extends State<AddThing> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _titleTextController = TextEditingController();
-  final TextEditingController _descriptionTextController = TextEditingController();
+  final TextEditingController _descriptionTextController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
-    _titleTextController.text = widget.thing != null ? widget.thing!.title : '';
-    _descriptionTextController.text =
-        widget.thing != null ? widget.thing!.description : '';
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Thing? activeThing =
+          Provider.of<ThingProvider>(context, listen: false).activeThing;
+
+      if (activeThing != null) {
+        setState(() {
+          _titleTextController.text = activeThing.title;
+          _descriptionTextController.text = activeThing.description;
+        });
+      }
+    });
   }
 
   @override
@@ -121,12 +127,12 @@ class _AddThingState extends State<AddThing> {
                                   children: [
                                     TextButton.icon(
                                       onPressed: () {
-                                        _notesDialogBuilder(context, widget.thing);
+                                        _notesDialogBuilder(
+                                            context, thingProvider.activeThing);
                                       },
                                       label: Text(
-                                        //TODO: set this to thing in active
-                                        widget.thing != null &&
-                                                widget.thing!.notesExist
+                                        thingProvider.activeThing != null &&
+                                                thingProvider.activeThing!.notesExist
                                             ? 'Edit Notes'
                                             : 'Add Notes',
                                         style: TextStyle(
@@ -134,9 +140,8 @@ class _AddThingState extends State<AddThing> {
                                           decoration: TextDecoration.underline,
                                         ),
                                       ),
-                                      //TODO: same here
-                                      icon: widget.thing != null &&
-                                              widget.thing!.notesExist
+                                      icon: thingProvider.activeThing != null &&
+                                              thingProvider.activeThing!.notesExist
                                           ? AppBarIcons()
                                               .notesIcons
                                               .editNoteIcon
@@ -152,24 +157,28 @@ class _AddThingState extends State<AddThing> {
                             const SizedBox(height: 16),
 
                             //Display selected categories
-                            Consumer<CategoryProvider>(builder:(context, categoryProvider, child) {
-                              return categoryProvider.categories.isEmpty
-                                ? Text(
-                                    categoriesValidationText,
-                                    style: textTheme.bodySmall!
-                                        .copyWith(color: colorScheme.error),
-                                  )
-                                : SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: SelectedCategories(
-                                        removeCategory: categoryProvider.deletecategory,
-                                        selectedCategories: categoryProvider.categories
-                                            .where((c) =>
-                                                c != 'favorite' &&
-                                                c != 'complete')
-                                            .toList()),
-                                  );
-                            },), 
+                            Consumer<CategoryProvider>(
+                              builder: (context, categoryProvider, child) {
+                                return categoryProvider.categories.isEmpty
+                                    ? Text(
+                                        categoriesValidationText,
+                                        style: textTheme.bodySmall!
+                                            .copyWith(color: colorScheme.error),
+                                      )
+                                    : SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: SelectedCategories(
+                                            removeCategory:
+                                                categoryProvider.deletecategory,
+                                            selectedCategories: categoryProvider
+                                                .categories
+                                                .where((c) =>
+                                                    c != 'favorite' &&
+                                                    c != 'complete')
+                                                .toList()),
+                                      );
+                              },
+                            ),
                             const SizedBox(height: 16),
 
                             DropdownButton<String>(
@@ -208,12 +217,15 @@ class _AddThingState extends State<AddThing> {
                                       colorScheme.onPrimaryContainer),
                               onPressed: () {
                                 if (_formKey.currentState!.validate()) {
-                                  if (Provider.of<CategoryProvider>(context, listen: false).categories.isEmpty) {
+                                  if (Provider.of<CategoryProvider>(context,
+                                          listen: false)
+                                      .categories
+                                      .isEmpty) {
                                     return;
                                   }
 
                                   //Add
-                                  if (widget.thing == null) {
+                                  if (thingProvider.activeThing == null) {
                                     final thingToAdd =
                                         Thing.createWithTitleAndDescription(
                                             title: _titleTextController.text,
@@ -242,20 +254,22 @@ class _AddThingState extends State<AddThing> {
                                   //edit
                                   else {
                                     final thingToEdit = Thing(
-                                        id: widget.thing!.id,
+                                        id: thingProvider.activeThing!.id,
                                         title: _titleTextController.text,
                                         description:
                                             _descriptionTextController.text,
                                         isMarkedComplete:
-                                            widget.thing!.isMarkedComplete,
+                                            thingProvider.activeThing!.isMarkedComplete,
                                         notes: Provider.of<NotesProvider>(
                                                 context,
                                                 listen: false)
                                             .notes,
-                                        categories: Provider.of<CategoryProvider>(context, listen: false).categories
+                                        categories: Provider.of<
+                                                    CategoryProvider>(context,
+                                                listen: false)
+                                            .categories
                                             .where((category) => category != '')
-                                            .toList()
-                                        );
+                                            .toList());
 
                                     thingProvider.editThing(thingToEdit);
 
@@ -267,7 +281,7 @@ class _AddThingState extends State<AddThing> {
                                 }
                               },
                               child: Text(
-                                widget.thing == null ? 'Add' : 'Save',
+                                thingProvider.activeThing == null ? 'Add' : 'Save',
                                 style: textTheme.bodyLarge!
                                     .copyWith(color: Colors.white),
                               ),

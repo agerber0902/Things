@@ -147,18 +147,19 @@ class _ThingCardState extends State<ThingCard> {
         return GestureDetector(
           onTap: () {
 
+            //Set active thing
+            thingProvider.setActiveThing(widget.widget.thing);
+
             //Set the categories
-            Provider.of<CategoryProvider>(context, listen: false).setCategoriesForEdit(widget.widget.thing.categories);
+            Provider.of<CategoryProvider>(context, listen: false).setCategoriesForEdit(thingProvider.activeThing!.categories);
 
             //Set the Notes
-            Provider.of<NotesProvider>(context, listen: false).setNotesForEdit(widget.widget.thing.notes);
+            Provider.of<NotesProvider>(context, listen: false).setNotesForEdit(thingProvider.activeThing!.notes);
 
             showModalBottomSheet(
                 context: context,
                 builder: (ctx) {
-                  return AddThing(
-                    thing: widget.widget.thing,
-                  );
+                  return const AddThing();
                 });
           },
           child: Card(
