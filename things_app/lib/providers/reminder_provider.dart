@@ -18,6 +18,16 @@ class ReminderProvider extends ChangeNotifier {
     getReminders();
   }
 
+  //Active Reminder (typically in edit)
+  //This gets set when a Reminder is selected.
+  Reminder? _activeReminder;
+  Reminder? get activeReminder => _activeReminder;
+
+  void setActiveReminder(Reminder Reminder) {
+    _activeReminder = Reminder;
+    notifyListeners();
+  }
+
   //Reminders for Display
   List<Reminder> _reminders = [];
   List<Reminder> get reminders => _reminders;

@@ -123,7 +123,7 @@ class _ThingCardState extends State<ThingCard> {
     _isCompleted = widget.widget.thing.isMarkedComplete;
   }
 
-  Future<void> _notesDialogBuilder(BuildContext context, String text) {
+  Future<void> _notesDialogBuilder(BuildContext context) {
     return showDialog<void>(
         context: context,
         builder: (BuildContext context) {
@@ -255,8 +255,7 @@ class _ThingCardState extends State<ThingCard> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          //TODO: make this work
-                          _notesDialogBuilder(context, 'test');
+                          _notesDialogBuilder(context);
                         },
                         child: widget.widget.thing.notes == null ||
                                 widget.widget.thing.notes!.isEmpty

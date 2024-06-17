@@ -25,8 +25,6 @@ class _ReminderViewState extends State<ReminderView>
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
-  List<Thing> availableThings = [];
-
   @override
   void dispose() {
     _controller.dispose();
@@ -36,8 +34,6 @@ class _ReminderViewState extends State<ReminderView>
   @override
   void initState() {
     super.initState();
-
-    getAvailableThings();
 
     _controller = AnimationController(
       vsync: this,
@@ -50,15 +46,6 @@ class _ReminderViewState extends State<ReminderView>
     ).animate(_controller);
 
     _controller.forward();
-  }
-
-  void getAvailableThings() async {
-    var things = await fileManager.readThingList();
-
-    setState(() {
-      availableThings = things;
-    });
-    return;
   }
 
   @override
@@ -101,7 +88,6 @@ class _ReminderViewState extends State<ReminderView>
                     padding: const EdgeInsets.all(10),
                     child: ReminderCard(
                       widget: widget,
-                      availableThings: availableThings,
                     ),
                   ),
                 ),
@@ -118,11 +104,9 @@ class ReminderCard extends StatefulWidget {
   const ReminderCard({
     super.key,
     required this.widget,
-    required this.availableThings,
   });
 
   final ReminderView widget;
-  final List<Thing> availableThings;
 
   @override
   State<ReminderCard> createState() => _ReminderCardState();
