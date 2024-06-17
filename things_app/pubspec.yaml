@@ -46,6 +46,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   timezone: ^0.9.3
   provider: ^6.1.2
+  location: ^6.0.2
 
 dev_dependencies:
   flutter_test:

@@ -6,6 +6,7 @@ import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
+import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 
 const String titleHintText = 'Enter a title';
@@ -66,6 +67,17 @@ class _AddThingState extends State<AddThing> {
               title: thing != null ? thing.title : '',
               notes: thing != null ? thing.notes : [],
             );
+          });
+        });
+  }
+
+  Future<void> _locationDialogBuilder(BuildContext context) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return LocationModal();
           });
         });
   }
@@ -152,6 +164,38 @@ class _AddThingState extends State<AddThing> {
                                   ],
                                 );
                               },
+                            ),
+
+                            const SizedBox(height: 16),
+
+                            //Location
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                TextButton.icon(
+                                      onPressed: () {
+                                        _locationDialogBuilder(context);
+                                      },
+                                      label: Text(
+                                        //TODO:
+                                        // thingProvider.activeThing != null &&
+                                        //         thingProvider.activeThing!.notesExist
+                                        //     ? 'Edit Notes'
+                                             'Add Location',
+                                        style: TextStyle(
+                                          color: colorScheme.primary,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                      icon:
+                                      // TODO: thingProvider.activeThing != null &&
+                                      //         thingProvider.activeThing!.notesExist
+                                      //     ? AppBarIcons()
+                                      //         .notesIcons
+                                      //         .editNoteIcon
+                                           AppBarIcons().locationIcons.addLocationIcon,
+                                    ),
+                              ],
                             ),
 
                             const SizedBox(height: 16),

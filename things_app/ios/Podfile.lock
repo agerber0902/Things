@@ -4,6 +4,8 @@ PODS:
     - IosAwnCore (~> 0.9.3)
   - Flutter (1.0.0)
   - IosAwnCore (0.9.3)
+  - location (0.0.1):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -14,6 +16,7 @@ PODS:
 DEPENDENCIES:
   - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
   - Flutter (from `Flutter`)
+  - location (from `.symlinks/plugins/location/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - sqflite (from `.symlinks/plugins/sqflite/darwin`)
 
@@ -26,6 +29,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/awesome_notifications/ios"
   Flutter:
     :path: Flutter
+  location:
+    :path: ".symlinks/plugins/location/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   sqflite:
@@ -35,6 +40,7 @@ SPEC CHECKSUMS:
   awesome_notifications: 66d28ab7174ca2823b04d275cb043e0a4a3eb9cf
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   IosAwnCore: b8601fbb37f7b3560f31b84ebf55a72f65812e05
+  location: d5cf8598915965547c3f36761ae9cc4f4e87d22e
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   sqflite: 673a0e54cc04b7d6dba8d24fb8095b31c3a99eec
 
