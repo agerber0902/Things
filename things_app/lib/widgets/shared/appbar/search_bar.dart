@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:things_app/providers/reminder_provider.dart';
+import 'package:things_app/providers/search_provider.dart';
+import 'package:things_app/providers/thing_provider.dart';
 
 class CollapsableSearchBar extends StatefulWidget{
-  const CollapsableSearchBar({super.key, required this.searchThings, required this.expandedWidth});
+  const CollapsableSearchBar({super.key, required this.expandedWidth, required this.isThingSearch});
 
-  final void Function(String searchValue) searchThings;
+  final bool isThingSearch;
+
   final double expandedWidth; 
   @override
   State<CollapsableSearchBar> createState() => _CollapsableSearchBarState();
@@ -30,7 +35,19 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedCrossFade(
+    return Consumer3<SearchProvider, ReminderProvider, ThingProvider>(builder:(context, searchProvider, reminderProvider, thingProvider, child) {
+
+      void search(){
+        if(widget.isThingSearch){
+          thingProvider.setSearchValue(_searchController.text.toLowerCase());
+        }
+        else{
+          //Reminder Search
+          reminderProvider.setSearchValue(_searchController.text.toLowerCase());
+        }
+      }
+
+      return AnimatedCrossFade(
             duration: const Duration(milliseconds: 300),
             firstChild: IconButton(
               icon: const Icon(Icons.search),
@@ -57,8 +74,9 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
                       setState(() {
                         _isSearching = false;
                         _searchBarWidth = 0;
-
-                        widget.searchThings(_searchController.text.toLowerCase());
+                        //Add search value to the search bar to the provider and use that 
+                        searchProvider.setSearchValue(_searchController.text.toLowerCase());
+                        search();
                         //_searchController.clear();
                       });
                     },
@@ -71,7 +89,8 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
                       _isSearching = false;
                       _searchController.clear();
                       _searchBarWidth = 0;
-                      widget.searchThings(_searchController.text.toLowerCase());
+                      searchProvider.setSearchValue(_searchController.text.toLowerCase());
+                      search();
                     });
                   },
                 ),
@@ -79,5 +98,6 @@ class _CollapsableSearchBarState extends State<CollapsableSearchBar> {
             ),
             crossFadeState: _isSearching ? CrossFadeState.showSecond : CrossFadeState.showFirst,
           );
+    },);
   }
 }
