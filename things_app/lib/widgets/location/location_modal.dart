@@ -7,6 +7,7 @@ import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:things_app/models/thing_location.dart';
+import 'package:things_app/utils/icon_data.dart';
 
 class LocationModal extends StatefulWidget {
   const LocationModal({super.key});
@@ -18,9 +19,17 @@ class LocationModal extends StatefulWidget {
 class _LocationModalState extends State<LocationModal> {
   TextEditingController _controller = TextEditingController();
   late GooglePlace googlePlace;
+  DetailsResult? _detailsResult;
+
   List<AutocompletePrediction> predictions = [];
   ThingLocation? _selectedLocation;
   bool isGettingLocation = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -30,74 +39,15 @@ class _LocationModalState extends State<LocationModal> {
     googlePlace = GooglePlace('AIzaSyBbJiOdFcwZoGuTc7L9B2pMlFpGaTBnoF0');
   }
 
-  autoCompleteSearch(String value) async{
+  autoCompleteSearch(String value) async {
     var result = await googlePlace.autocomplete.get(value);
 
-    if(result != null && result.predictions != null){
+    if (result != null && result.predictions != null) {
       print(result.predictions!.first.description);
       setState(() {
         predictions = result.predictions!;
       });
     }
-  }
-
-  void getCurrentLocation() async {
-    // Location location = new Location();
-
-    // bool serviceEnabled;
-    // PermissionStatus permissionGranted;
-    // LocationData _locationData;
-
-    // serviceEnabled = await location.serviceEnabled();
-    // if (!serviceEnabled) {
-    //   serviceEnabled = await location.requestService();
-    //   if (!serviceEnabled) {
-    //     return;
-    //   }
-    // }
-
-    // //set loading
-    // setState(() {
-    //   isGettingLocation = true;
-    // });
-
-    // permissionGranted = await location.hasPermission();
-    // if (permissionGranted == PermissionStatus.denied) {
-    //   permissionGranted = await location.requestPermission();
-    //   if (permissionGranted != PermissionStatus.granted) {
-    //     return;
-    //   }
-    // }
-
-    // _locationData = await location.getLocation();
-    // print(_locationData.latitude);
-
-    // //set loading
-    // setState(() {
-    //   isGettingLocation = false;
-    // });
-
-    // if (_locationData.latitude == null || _locationData.longitude == null) {
-    //   return;
-    // }
-
-    // final url = Uri.parse(
-    //     'https://maps.googleapis.com/maps/api/geocode/json?latlng=${_locationData.latitude},${_locationData.longitude}&key=AIzaSyBbJiOdFcwZoGuTc7L9B2pMlFpGaTBnoF0');
-
-    // //get location
-    // final response = await http.get(url);
-
-    // //decode
-    // final data = json.decode(response.body);
-
-    // final address = data['results'][0]['formatted_address'];
-
-    // setState(() {
-    //   _selectedLocation = ThingLocation(
-    //       latitude: _locationData.latitude!,
-    //       longitude: _locationData.longitude!,
-    //       address: address);
-    // });
   }
 
   String get locationImage {
@@ -108,6 +58,9 @@ class _LocationModalState extends State<LocationModal> {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     Widget previewContent = Text('No Location Choosen.');
 
     if (_selectedLocation != null) {
@@ -122,55 +75,126 @@ class _LocationModalState extends State<LocationModal> {
     }
 
     return AlertDialog(
-      content: Column(
-        children: [
-          Container(
-            alignment: Alignment.center,
-            width: 300,
-            height: 400,
-            //TODO: style this
-            child: previewContent,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextButton.icon(
-                onPressed: getCurrentLocation,
-                //TODO: remove current location
-                label: const Text('Current Location'),
-                icon: const Icon(Icons.location_on),
-              ),
-              TextButton.icon(
-                onPressed: () {},
-                //TODO:
-                label: const Text('Select on Map'),
-                icon: const Icon(Icons.map),
-              ),
-            ],
-          ),
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(hintText: 'Enter address'),
-              controller: _controller,
-              onChanged: (value){
-                if(value.isNotEmpty){
-                  autoCompleteSearch(value);
-                }
-              },
+      title: Text(
+        'Add Location',
+        style: textTheme.displaySmall!.copyWith(
+            fontSize: textTheme.displaySmall!.fontSize! - 15.0,
+            color: colorScheme.primary),
+      ),
+      content: Container(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              alignment: Alignment.center,
+              width: 300,
+              height: 200,
+              child: previewContent,
             ),
-            
-          ),
-          SingleChildScrollView(
-            child: ListView.builder(
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //   children: [
+            //     TextButton.icon(
+            //       onPressed: getCurrentLocation,
+            //       label: const Text('Current Location'),
+            //       icon: const Icon(Icons.location_on),
+            //     ),
+            //     TextButton.icon(
+            //       onPressed: () {},
+            //       label: const Text('Select on Map'),
+            //       icon: const Icon(Icons.map),
+            //     ),
+            //   ],
+            // ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Enter address',
+                      suffixIcon: Opacity(
+                        opacity: 0.4,
+                        child: IconButton(
+                          icon: Icon(Icons.clear),
+                          onPressed: () {
+                            _controller.clear();
+                            _controller.text = '';
+                            predictions = [];
+                            setState(() {
+                              _selectedLocation = null;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    controller: _controller,
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        autoCompleteSearch(value);
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+            Flexible(
+              child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: predictions.length, 
-                itemBuilder: (context, index){
+                itemCount: predictions.length,
+                itemBuilder: (context, index) {
                   return ListTile(
-                    title: Text(predictions[index].description.toString(),),
+                    title: Text(predictions[index].description.toString()),
+                    onTap: () async {
+                      final placeId = predictions[index].placeId;
+                      //Get details
+                      if (placeId != null) {
+                        final details = await googlePlace.details.get(placeId);
+
+                        if (details != null && details.result != null) {
+                          setState(() {
+                            _detailsResult = details.result;
+                            _controller.text =
+                                _detailsResult!.formattedAddress ?? '';
+
+                            _selectedLocation = ThingLocation(
+                                latitude:
+                                    _detailsResult!.geometry!.location!.lat ??
+                                        0,
+                                longitude:
+                                    _detailsResult!.geometry!.location!.lng ??
+                                        0,
+                                address:
+                                    _detailsResult!.formattedAddress ?? '');
+
+                            //clear predictions
+                            predictions = [];
+                          });
+                        }
+                      }
+                    },
                   );
-              }),
-          ),
-        ],
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: colorScheme.onPrimaryContainer),
+                  onPressed: () {},
+                  child: Text(
+                    'Add',
+                    style: textTheme.bodyLarge!.copyWith(color: Colors.white),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

@@ -119,7 +119,7 @@ class _NotesModalState extends State<NotesModal> {
             overflow: TextOverflow.ellipsis,
             style: textTheme.displaySmall!.copyWith(
                 fontSize: textTheme.displaySmall!.fontSize! - 15.0,
-                color: colorScheme.onPrimaryContainer),
+                color: colorScheme.primary),
           ),
           content: SingleChildScrollView(
             scrollDirection: Axis.vertical,
