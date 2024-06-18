@@ -15,6 +15,8 @@ class Thing {
 
   ThingLocation? location;
 
+  List<String>? reminderIds;
+
   bool get notesExist {
     return notes != null && notes!.isNotEmpty;
   }
@@ -38,12 +40,12 @@ class Thing {
       required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes, this.location});
+      required this.isMarkedComplete, this.notes, this.location, this.reminderIds});
   Thing.createWithTitleAndDescription(
       {required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes, this.location})
+      required this.isMarkedComplete, this.notes, this.location, this.reminderIds})
       : id = const Uuid().v4();
 
   factory Thing.fromJson(Map<String, dynamic> json) {
@@ -55,6 +57,7 @@ class Thing {
       categories: List<String>.from(json['categories']),
       notes: json['notes'] != null ? List<String>.from(json['notes']) : null,
       location: json['location'] != null ? ThingLocation.fromJson(json['location']) : null,
+      reminderIds: json['reminderIds'] != null ? List<String>.from(json['reminderIds']) : null,
     );
   }
   Map<String, dynamic> toJson() {
@@ -66,6 +69,7 @@ class Thing {
       'isMarkedComplete': isMarkedComplete,
       'notes': notes,
       'location': location?.toJson(),
+      'reminderIds': reminderIds,
     };
   }
 

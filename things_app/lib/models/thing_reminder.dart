@@ -16,8 +16,8 @@ class ThingReminder{
 
   Map<String, dynamic> toJson() {
     return {
-      'thing': thing,
-      'reminder': reminder,
+      'thing': thing.toJson(),
+      'reminder': reminder.toJson(),
     };
   }
 }

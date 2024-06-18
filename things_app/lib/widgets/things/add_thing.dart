@@ -6,6 +6,7 @@ import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
@@ -130,6 +131,17 @@ class _AddThingState extends State<AddThing> {
                               maxLines: 1,
                             ),
 
+                            const SizedBox(height: 16),
+
+                            //Reminders
+                            Consumer2<ThingReminderProvider, ThingProvider>(builder:(context, value, value2, child) {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  //TextButton.icon(onPressed: (){}, label: Text(thingProvider.activeThing != null && thingProvider.activeThing!.reminder))
+                                ],
+                              )
+                            },),
                             const SizedBox(height: 16),
 
                             //Notes
