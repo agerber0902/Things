@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
+import 'package:things_app/models/thing_location.dart';
+
+final String API_KEY = 'AIzaSyBbJiOdFcwZoGuTc7L9B2pMlFpGaTBnoF0';
 
 class LocationProvider extends ChangeNotifier{
-  
-  // LocationData _locationData;
-  // LocationData get locationData => _locationData;
 
-  Location _location = new Location();
-  Location get location => _location;
+  ThingLocation? _location;
+  ThingLocation? get location => _location;
+
   
 }
