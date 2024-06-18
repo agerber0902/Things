@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
+import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
@@ -66,6 +67,7 @@ class _AddThingState extends State<AddThing> {
             return NotesModal(
               title: thing != null ? thing.title : '',
               notes: thing != null ? thing.notes : [],
+              isTriggerAdd: false,
             );
           });
         });
@@ -77,7 +79,7 @@ class _AddThingState extends State<AddThing> {
         builder: (BuildContext context) {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
-            return LocationModal();
+            return const LocationModal();
           });
         });
   }
@@ -144,7 +146,7 @@ class _AddThingState extends State<AddThing> {
                                       },
                                       label: Text(
                                         thingProvider.activeThing != null &&
-                                                thingProvider.activeThing!.notesExist
+                                                thingProvider.activeThing!.notesExist || (noteProvider.notesExist)
                                             ? 'Edit Notes'
                                             : 'Add Notes',
                                         style: TextStyle(
@@ -153,7 +155,7 @@ class _AddThingState extends State<AddThing> {
                                         ),
                                       ),
                                       icon: thingProvider.activeThing != null &&
-                                              thingProvider.activeThing!.notesExist
+                                              thingProvider.activeThing!.notesExist || (noteProvider.notesExist)
                                           ? AppBarIcons()
                                               .notesIcons
                                               .editNoteIcon
@@ -169,7 +171,8 @@ class _AddThingState extends State<AddThing> {
                             const SizedBox(height: 16),
 
                             //Location
-                            Row(
+                            Consumer2<LocationProvider, ThingProvider>(builder:(context, locationProvider, thingProvider, child) {
+                              return Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 TextButton.icon(
@@ -177,27 +180,26 @@ class _AddThingState extends State<AddThing> {
                                         _locationDialogBuilder(context);
                                       },
                                       label: Text(
-                                        //TODO:
-                                        // thingProvider.activeThing != null &&
-                                        //         thingProvider.activeThing!.notesExist
-                                        //     ? 'Edit Notes'
-                                             'Add Location',
+                                        thingProvider.activeThing != null &&
+                                                thingProvider.activeThing!.location != null || (locationProvider.location != null)
+                                            ? 'Edit Location'
+                                            : 'Add Location',
                                         style: TextStyle(
                                           color: colorScheme.primary,
                                           decoration: TextDecoration.underline,
                                         ),
                                       ),
                                       icon:
-                                      // TODO: thingProvider.activeThing != null &&
-                                      //         thingProvider.activeThing!.notesExist
-                                      //     ? AppBarIcons()
-                                      //         .notesIcons
-                                      //         .editNoteIcon
-                                           AppBarIcons().locationIcons.addLocationIcon,
+                                      thingProvider.activeThing != null &&
+                                              thingProvider.activeThing!.location != null || (locationProvider.location != null)
+                                          ? AppBarIcons()
+                                              .locationIcons.containsLocationIcon
+                                           : AppBarIcons().locationIcons.addLocationIcon,
                                     ),
                               ],
-                            ),
+                            );
 
+                            },), 
                             const SizedBox(height: 16),
 
                             //Display selected categories
@@ -280,6 +282,7 @@ class _AddThingState extends State<AddThing> {
                                                     context,
                                                     listen: false)
                                                 .notes,
+                                            location: Provider.of<LocationProvider>(context, listen: false).location,
                                             categories:
                                                 Provider.of<CategoryProvider>(
                                                         context,
@@ -308,6 +311,7 @@ class _AddThingState extends State<AddThing> {
                                                 context,
                                                 listen: false)
                                             .notes,
+                                        location: Provider.of<LocationProvider>(context, listen: false).location,
                                         categories: Provider.of<
                                                     CategoryProvider>(context,
                                                 listen: false)

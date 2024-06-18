@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:things_app/helpers/file_manager.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/models/thing_location.dart';
 
 ThingFileManager _fileManager = ThingFileManager();
 
@@ -21,6 +22,28 @@ class ThingProvider extends ChangeNotifier {
     _filterValues = filters;
 
     getThings();
+  }
+
+  //Notes functions
+  void setActiveThingNotes(List<String>? notes){
+    _activeThing!.notes = notes;
+
+    editThing(_activeThing!);
+
+    notifyListeners();
+  }
+
+  //Location
+  ThingLocation? _thingLocation;
+  ThingLocation? get thingLocation => _thingLocation;
+  void setThingLocation(ThingLocation? location){
+    _thingLocation = location;
+    notifyListeners();
+  }
+
+  void setActiveThingLocation(ThingLocation? location){
+    _activeThing!.location = location;
+    notifyListeners();
   }
 
   //Active Thing (typically in edit)

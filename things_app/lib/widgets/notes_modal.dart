@@ -9,10 +9,12 @@ class NotesModal extends StatefulWidget {
     super.key,
     required this.title,
     required this.notes,
+    required this.isTriggerAdd,
   });
 
   final String title;
   List<String>? notes;
+  bool isTriggerAdd;
 
   @override
   State<NotesModal> createState() => _NotesModalState();
@@ -79,6 +81,10 @@ class _NotesModalState extends State<NotesModal> {
           });
 
           noteProvider.editNotes(note, index);
+
+          if(thingProvider.activeThing != null){
+            thingProvider.setActiveThingNotes(noteProvider.notes);
+          }
         }
 
         void delete(String note) {
@@ -95,6 +101,10 @@ class _NotesModalState extends State<NotesModal> {
           });
 
           noteProvider.deleteNote(note);
+
+          if(thingProvider.activeThing != null){
+            thingProvider.setActiveThingNotes(noteProvider.notes);
+          }
         }
 
         void add(String note) {
@@ -110,6 +120,10 @@ class _NotesModalState extends State<NotesModal> {
           });
 
           noteProvider.addNote(note);
+
+          if(thingProvider.activeThing != null){
+            thingProvider.setActiveThingNotes(noteProvider.notes);
+          }
         }
 
         return AlertDialog(

@@ -1,13 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_place/google_place.dart';
-import 'package:location/location.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:things_app/models/thing.dart';
 import 'package:things_app/models/thing_location.dart';
-import 'package:things_app/utils/icon_data.dart';
+import 'package:things_app/providers/location_provider.dart';
+import 'package:things_app/providers/thing_provider.dart';
 
 class LocationModal extends StatefulWidget {
   const LocationModal({super.key});
@@ -17,7 +14,7 @@ class LocationModal extends StatefulWidget {
 }
 
 class _LocationModalState extends State<LocationModal> {
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   late GooglePlace googlePlace;
   DetailsResult? _detailsResult;
 
@@ -33,17 +30,27 @@ class _LocationModalState extends State<LocationModal> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     googlePlace = GooglePlace('AIzaSyBbJiOdFcwZoGuTc7L9B2pMlFpGaTBnoF0');
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Thing? activeThing =
+          Provider.of<ThingProvider>(context, listen: false).activeThing;
+
+      if (activeThing != null) {
+        setState(() {
+          _controller.text = activeThing.locationForDisplay;
+          _selectedLocation = activeThing.location;
+        });
+      }
+    });
   }
 
   autoCompleteSearch(String value) async {
     var result = await googlePlace.autocomplete.get(value);
 
     if (result != null && result.predictions != null) {
-      print(result.predictions!.first.description);
       setState(() {
         predictions = result.predictions!;
       });
@@ -61,7 +68,7 @@ class _LocationModalState extends State<LocationModal> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    Widget previewContent = Text('No Location Choosen.');
+    Widget previewContent = const Text('No Location Choosen.');
 
     if (_selectedLocation != null) {
       previewContent = Image.network(
@@ -71,131 +78,166 @@ class _LocationModalState extends State<LocationModal> {
     }
 
     if (isGettingLocation) {
-      previewContent = CircularProgressIndicator();
+      previewContent = const CircularProgressIndicator();
     }
 
-    return AlertDialog(
-      title: Text(
-        'Add Location',
-        style: textTheme.displaySmall!.copyWith(
-            fontSize: textTheme.displaySmall!.fontSize! - 15.0,
-            color: colorScheme.primary),
-      ),
-      content: Container(
-        width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              alignment: Alignment.center,
-              width: 300,
-              height: 200,
-              child: previewContent,
-            ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //   children: [
-            //     TextButton.icon(
-            //       onPressed: getCurrentLocation,
-            //       label: const Text('Current Location'),
-            //       icon: const Icon(Icons.location_on),
-            //     ),
-            //     TextButton.icon(
-            //       onPressed: () {},
-            //       label: const Text('Select on Map'),
-            //       icon: const Icon(Icons.map),
-            //     ),
-            //   ],
-            // ),
-            Row(
+    return Consumer<ThingProvider>(
+      builder: (context, thingProvider, child) {
+        return AlertDialog(
+          title: Text(
+            thingProvider.activeThing != null &&
+                    thingProvider.activeThing!.location != null
+                ? 'Edit Location'
+                : 'Add Location',
+            style: textTheme.displaySmall!.copyWith(
+                fontSize: textTheme.displaySmall!.fontSize! - 15.0,
+                color: colorScheme.primary),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Enter address',
-                      suffixIcon: Opacity(
-                        opacity: 0.4,
-                        child: IconButton(
-                          icon: Icon(Icons.clear),
-                          onPressed: () {
-                            _controller.clear();
-                            _controller.text = '';
-                            predictions = [];
-                            setState(() {
-                              _selectedLocation = null;
-                            });
-                          },
+                Container(
+                  alignment: Alignment.center,
+                  width: 300,
+                  height: 200,
+                  child: previewContent,
+                ),
+                // Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //   children: [
+                //     TextButton.icon(
+                //       onPressed: getCurrentLocation,
+                //       label: const Text('Current Location'),
+                //       icon: const Icon(Icons.location_on),
+                //     ),
+                //     TextButton.icon(
+                //       onPressed: () {},
+                //       label: const Text('Select on Map'),
+                //       icon: const Icon(Icons.map),
+                //     ),
+                //   ],
+                // ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Enter address',
+                          suffixIcon: Opacity(
+                            opacity: 0.4,
+                            child: IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: () {
+                                _controller.clear();
+                                _controller.text = '';
+                                predictions = [];
+                                setState(() {
+                                  _selectedLocation = null;
+                                });
+                              },
+                            ),
+                          ),
                         ),
+                        controller: _controller,
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            autoCompleteSearch(value);
+                          }
+                        },
                       ),
                     ),
-                    controller: _controller,
-                    onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        autoCompleteSearch(value);
-                      }
+                  ],
+                ),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: predictions.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(predictions[index].description.toString()),
+                        onTap: () async {
+                          final placeId = predictions[index].placeId;
+                          //Get details
+                          if (placeId != null) {
+                            final details =
+                                await googlePlace.details.get(placeId);
+
+                            if (details != null && details.result != null) {
+                              setState(() {
+                                _detailsResult = details.result;
+                                _controller.text =
+                                    _detailsResult!.formattedAddress ?? '';
+
+                                _selectedLocation = ThingLocation(
+                                    name: _detailsResult!.name,
+                                    latitude: _detailsResult!
+                                            .geometry!.location!.lat ??
+                                        0,
+                                    longitude: _detailsResult!
+                                            .geometry!.location!.lng ??
+                                        0,
+                                    address:
+                                        _detailsResult!.formattedAddress ?? '');
+
+                                Provider.of<LocationProvider>(context,
+                                        listen: false)
+                                    .setLocation(_detailsResult);
+
+                                //clear predictions
+                                predictions = [];
+                              });
+                            }
+                          }
+                        },
+                      );
                     },
                   ),
                 ),
-              ],
-            ),
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: predictions.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(predictions[index].description.toString()),
-                    onTap: () async {
-                      final placeId = predictions[index].placeId;
-                      //Get details
-                      if (placeId != null) {
-                        final details = await googlePlace.details.get(placeId);
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: colorScheme.onPrimaryContainer),
+                      onPressed: () {
+                        LocationProvider locationProvider =
+                            Provider.of<LocationProvider>(context,
+                                listen: false);
+                        ThingProvider thingProvider =
+                            Provider.of<ThingProvider>(context, listen: false);
 
-                        if (details != null && details.result != null) {
-                          setState(() {
-                            _detailsResult = details.result;
-                            _controller.text =
-                                _detailsResult!.formattedAddress ?? '';
+                        thingProvider
+                            .setThingLocation(locationProvider.location);
 
-                            _selectedLocation = ThingLocation(
-                                latitude:
-                                    _detailsResult!.geometry!.location!.lat ??
-                                        0,
-                                longitude:
-                                    _detailsResult!.geometry!.location!.lng ??
-                                        0,
-                                address:
-                                    _detailsResult!.formattedAddress ?? '');
-
-                            //clear predictions
-                            predictions = [];
-                          });
+                        if (thingProvider.activeThing != null) {
+                          //Save thing
+                          thingProvider
+                              .setActiveThingLocation(_selectedLocation);
                         }
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.onPrimaryContainer),
-                  onPressed: () {},
-                  child: Text(
-                    'Add',
-                    style: textTheme.bodyLarge!.copyWith(color: Colors.white),
-                  ),
-                ),
+
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        thingProvider.activeThing != null &&
+                                thingProvider.activeThing!.location != null
+                            ? 'Edit'
+                            : 'Add',
+                        style:
+                            textTheme.bodyLarge!.copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                )
               ],
-            )
-          ],
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
