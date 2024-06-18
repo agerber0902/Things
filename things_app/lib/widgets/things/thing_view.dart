@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
+import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/utils/icon_data.dart';
+import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
 
@@ -132,7 +135,19 @@ class _ThingCardState extends State<ThingCard> {
             return NotesModal(
               title: widget.widget.thing.title,
               notes: widget.widget.thing.notes,
+              isTriggerAdd: true,
             );
+          });
+        });
+  }
+
+  Future<void> _locationDialogBuilder(BuildContext context) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return const LocationModal();
           });
         });
   }
@@ -146,15 +161,20 @@ class _ThingCardState extends State<ThingCard> {
       builder: (context, thingProvider, child) {
         return GestureDetector(
           onTap: () {
-
             //Set active thing
             thingProvider.setActiveThing(widget.widget.thing);
 
             //Set the categories
-            Provider.of<CategoryProvider>(context, listen: false).setCategoriesForEdit(thingProvider.activeThing!.categories);
+            Provider.of<CategoryProvider>(context, listen: false)
+                .setCategoriesForEdit(thingProvider.activeThing!.categories);
 
             //Set the Notes
-            Provider.of<NotesProvider>(context, listen: false).setNotesForEdit(thingProvider.activeThing!.notes);
+            Provider.of<NotesProvider>(context, listen: false)
+                .setNotesForEdit(thingProvider.activeThing!.notes);
+
+            //Set the location
+            Provider.of<LocationProvider>(context, listen: false)
+                .setLocationForEdit(thingProvider.activeThing!.location);
 
             showModalBottomSheet(
                 context: context,
@@ -254,14 +274,31 @@ class _ThingCardState extends State<ThingCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          _notesDialogBuilder(context);
-                        },
-                        child: widget.widget.thing.notes == null ||
-                                widget.widget.thing.notes!.isEmpty
-                            ? const Icon(Icons.note_add_outlined)
-                            : const Icon(Icons.sticky_note_2),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              //Set active thing
+                              thingProvider.setActiveThing(widget.widget.thing);
+                              _notesDialogBuilder(context);
+                            },
+                            child: widget.widget.thing.notes == null ||
+                                    widget.widget.thing.notes!.isEmpty
+                                ? AppBarIcons().notesIcons.addNoteIcon
+                                : AppBarIcons().notesIcons.editNoteIcon,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              thingProvider.setActiveThing(widget.widget.thing);
+                              _locationDialogBuilder(context);
+                            },
+                            child: widget.widget.thing.location == null
+                                ? AppBarIcons().locationIcons.addLocationIcon
+                                : AppBarIcons()
+                                    .locationIcons
+                                    .containsLocationIcon,
+                          ),
+                        ],
                       ),
                       IconButton(
                         icon: Icon(

@@ -1,3 +1,4 @@
+import 'package:things_app/models/thing_location.dart';
 import 'package:uuid/uuid.dart';
 
 final uuid = const Uuid().v4();
@@ -12,6 +13,8 @@ class Thing {
 
   List<String>? notes;
 
+  ThingLocation? location;
+
   bool get notesExist {
     return notes != null && notes!.isNotEmpty;
   }
@@ -20,17 +23,27 @@ class Thing {
     return categories.contains('favorite');
   }
 
+  String get locationForDisplay {
+    String locationDisplay = '';
+
+    if(location != null){
+      locationDisplay = (location!.name ?? location!.address);
+    }
+
+    return locationDisplay;
+  }
+
   Thing(
       {required this.id,
       required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes});
+      required this.isMarkedComplete, this.notes, this.location});
   Thing.createWithTitleAndDescription(
       {required this.title,
       required this.description,
       required this.categories,
-      required this.isMarkedComplete, this.notes})
+      required this.isMarkedComplete, this.notes, this.location})
       : id = const Uuid().v4();
 
   factory Thing.fromJson(Map<String, dynamic> json) {
@@ -41,6 +54,7 @@ class Thing {
       isMarkedComplete: json['isMarkedComplete'] ?? false,
       categories: List<String>.from(json['categories']),
       notes: json['notes'] != null ? List<String>.from(json['notes']) : null,
+      location: json['location'] != null ? ThingLocation.fromJson(json['location']) : null,
     );
   }
   Map<String, dynamic> toJson() {
@@ -51,6 +65,7 @@ class Thing {
       'categories': categories,
       'isMarkedComplete': isMarkedComplete,
       'notes': notes,
+      'location': location?.toJson(),
     };
   }
 

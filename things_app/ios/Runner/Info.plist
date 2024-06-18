@@ -9,6 +9,10 @@
 		<string>remote-notification</string>
 	</array>
 
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>Your location is required for adding location to things.</string>
+
+
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

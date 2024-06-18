@@ -1,10 +1,10 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/filter_provider.dart';
+import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/search_provider.dart';
@@ -45,7 +45,8 @@ void main() async {
       ChangeNotifierProvider(create: (context) => SearchProvider()),
       ChangeNotifierProvider(create: (context) => FilterProvider()),
       ChangeNotifierProvider(create: (context) => NotesProvider()),
-      ChangeNotifierProvider(create: (context) => CategoryProvider())
+      ChangeNotifierProvider(create: (context) => CategoryProvider()),
+      ChangeNotifierProvider(create: (context) => LocationProvider())
     ],
     child: const MyApp(),
   ));
@@ -83,7 +84,7 @@ class _MyAppState extends State<MyApp> {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: kColorScheme,
-        textTheme: GoogleFonts.robotoCondensedTextTheme(),
+        //textTheme: GoogleFonts.robotoCondensedTextTheme(),
         scaffoldBackgroundColor: kColorScheme.onPrimaryContainer,
       ),
       darkTheme: ThemeData.dark(),
