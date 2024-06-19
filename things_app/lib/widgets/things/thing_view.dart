@@ -12,6 +12,7 @@ import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
+import 'package:things_app/widgets/reminders_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
 
 const double initHeight = 200;
@@ -155,6 +156,17 @@ class _ThingCardState extends State<ThingCard> {
         });
   }
 
+  Future<void> _remindersDialogBuilder(BuildContext context) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return const RemindersModal();
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -180,15 +192,18 @@ class _ThingCardState extends State<ThingCard> {
                 .setLocationForEdit(thingProvider.activeThing!.location);
 
             //Set the reminders
-            ReminderProvider reminderProvider = Provider.of<ReminderProvider>(context, listen: false);
-            ThingReminderProvider thingReminderProvider = Provider.of<ThingReminderProvider>(context, listen: false);
+            ReminderProvider reminderProvider =
+                Provider.of<ReminderProvider>(context, listen: false);
+            ThingReminderProvider thingReminderProvider =
+                Provider.of<ThingReminderProvider>(context, listen: false);
             //Clear thing reminders before set
             thingReminderProvider.setThingReminders(null);
 
-            for(String id in thingProvider.activeThing!.reminderIds ?? []){
-              thingReminderProvider.setThingRemindersByObjects(thingProvider.activeThing!, reminderProvider.getReminderById(id));
+            for (String id in thingProvider.activeThing!.reminderIds ?? []) {
+              thingReminderProvider.setThingRemindersByObjects(
+                  thingProvider.activeThing!,
+                  reminderProvider.getReminderById(id));
             }
-            
 
             showModalBottomSheet(
                 context: context,
@@ -313,6 +328,37 @@ class _ThingCardState extends State<ThingCard> {
                                     .containsLocationIcon,
                           ),
                           //TODO: add reminders
+                          GestureDetector(
+                            onTap: () {
+                              thingProvider.setActiveThing(widget.widget.thing);
+
+                              //set reminders
+                              ReminderProvider reminderProvider =
+                                  Provider.of<ReminderProvider>(context,
+                                      listen: false);
+                              ThingReminderProvider thingReminderProvider =
+                                  Provider.of<ThingReminderProvider>(context,
+                                      listen: false);
+                              //Clear thing reminders before set
+                              thingReminderProvider.setThingReminders(null);
+
+                              for (String id
+                                  in thingProvider.activeThing!.reminderIds ??
+                                      []) {
+                                thingReminderProvider
+                                    .setThingRemindersByObjects(
+                                        thingProvider.activeThing!,
+                                        reminderProvider.getReminderById(id));
+                              }
+
+                              _remindersDialogBuilder(context);
+                            },
+                            child: widget.widget.thing.reminderIdsExist
+                                ? AppBarIcons()
+                                    .remindersIcons
+                                    .containsRemindersIcon
+                                : AppBarIcons().remindersIcons.addRemindersIcon,
+                          ),
                         ],
                       ),
                       IconButton(

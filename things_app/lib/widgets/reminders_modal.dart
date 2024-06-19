@@ -82,27 +82,27 @@ class RemindersModal extends StatelessWidget {
 
                       if (thingProvider.activeThing != null) {
                         //TODO: Save thing with new reminders
-                        // thingProvider.setActiveThingReminders(
-                        //     thingReminderProvider.getReminderIdsForThing(
-                        //         thingProvider.activeThing!.id));
+                        thingProvider.setActiveThingReminders(
+                            thingReminderProvider.getReminderIdsForThing(
+                                thingProvider.activeThing!.id));
 
                         // //Save reminders
-                        // List<Reminder> remindersToEdit = Provider.of<
-                        //         ThingReminderProvider>(context, listen: false)
-                        //     .setRemindersForEdit(thingProvider.activeThing!.id);
-                        // ReminderProvider reminderProvider =
-                        //     Provider.of<ReminderProvider>(context,
-                        //         listen: false);
-                        // for (Reminder reminder in remindersToEdit) {
-                        //   reminderProvider.editReminder(reminder);
-                        // }
+                        List<Reminder> remindersToEdit = Provider.of<
+                                ThingReminderProvider>(context, listen: false)
+                            .setRemindersForEdit(thingProvider.activeThing!.id);
+                        ReminderProvider reminderProvider =
+                            Provider.of<ReminderProvider>(context,
+                                listen: false);
+                        for (Reminder reminder in remindersToEdit) {
+                          reminderProvider.editReminder(reminder);
+                        }
                       }
 
                       Navigator.of(context).pop();
                     },
                     child: Text(
                       thingProvider.activeThing != null &&
-                              thingProvider.activeThing!.location != null
+                              thingProvider.activeThing!.reminderIdsExist
                           ? 'Edit'
                           : 'Add',
                       style: textTheme.bodyLarge!.copyWith(color: Colors.white),

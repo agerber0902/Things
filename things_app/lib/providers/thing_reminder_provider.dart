@@ -42,15 +42,15 @@ class ThingReminderProvider extends ChangeNotifier{
   }
 
   // //Get the list of reminders linked to the thing and use this list to update the reminders from thing screen
-  // List<Reminder>? getRemindersFromThing(String thingId){
-  //   return _thingReminders?.where((thingReminder) => thingReminder.thing != null && thingReminder.reminder != null && thingReminder.thing!.id == thingId).map((r) => r.reminder!).toList();
-  // }
+  List<Reminder>? getRemindersFromThing(String thingId){
+    return _thingReminders?.where((thingReminder) => thingReminder.thing != null && thingReminder.reminder != null && thingReminder.thing!.id == thingId).map((r) => r.reminder!).toList();
+  }
 
   // //Set list of reminders to edit
-  // List<Reminder> setRemindersForEdit(String thingId){
-  //   List<Reminder> remindersToEdit = getRemindersFromThing(thingId) ?? [];
+  List<Reminder> setRemindersForEdit(String thingId){
+    List<Reminder> remindersToEdit = getRemindersFromThing(thingId) ?? [];
 
-  //   return remindersToEdit;
-  // }
+    return remindersToEdit;
+  }
 
 }
