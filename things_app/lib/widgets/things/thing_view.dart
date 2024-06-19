@@ -270,6 +270,7 @@ class _ThingCardState extends State<ThingCard> {
                       )),
                     ],
                   ),
+                  const Spacer(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     mainAxisSize: MainAxisSize.max,

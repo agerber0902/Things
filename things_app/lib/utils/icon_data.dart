@@ -17,7 +17,7 @@ class FilterIcons{
 
 class NotesIcons{
   final Icon addNoteIcon = const Icon(Icons.note_add_outlined);
-  final Icon editNoteIcon = const Icon(Icons.sticky_note_2);
+  final Icon editNoteIcon = const Icon(Icons.sticky_note_2, color: Colors.blue,);
 }
 
 class LocationIcons{

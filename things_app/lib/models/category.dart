@@ -18,7 +18,7 @@ const Map<String, CategoryIcon> categoryIcons = {
   'drinks' : CategoryIcon('drinks', Icons.local_drink, Colors.deepOrange),
   'recipes' : CategoryIcon('recipes', Icons.dining, Colors.amber),
   'chores' : CategoryIcon('chores', Icons.agriculture_sharp, Color.fromARGB(255, 3, 76, 41)),
-  'vacation' : CategoryIcon('vacation', Icons.beach_access, Colors.pink),
+  'vacation' : CategoryIcon('vacation', Icons.beach_access, Color.fromARGB(255, 244, 3, 83)),
   'work' : CategoryIcon('work', Icons.work, Colors.blueGrey),
   'complete' : CategoryIcon('complete', Icons.check_box, Colors.green),
   'other' : CategoryIcon('other', Icons.auto_awesome_mosaic, Colors.black),
