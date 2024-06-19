@@ -24,6 +24,15 @@ class ThingProvider extends ChangeNotifier {
     getThings();
   }
 
+  //Reminders
+  void setActiveThingReminders(List<String>? reminderIds){
+    _activeThing!.reminderIds = reminderIds;
+
+    editThing(_activeThing!);
+
+    notifyListeners();
+  }
+
   //Notes functions
   void setActiveThingNotes(List<String>? notes){
     _activeThing!.notes = notes;

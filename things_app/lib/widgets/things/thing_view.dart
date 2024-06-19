@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/models/thing_reminder.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
+import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
@@ -176,6 +179,17 @@ class _ThingCardState extends State<ThingCard> {
             Provider.of<LocationProvider>(context, listen: false)
                 .setLocationForEdit(thingProvider.activeThing!.location);
 
+            //Set the reminders
+            ReminderProvider reminderProvider = Provider.of<ReminderProvider>(context, listen: false);
+            ThingReminderProvider thingReminderProvider = Provider.of<ThingReminderProvider>(context, listen: false);
+            //Clear thing reminders before set
+            thingReminderProvider.setThingReminders(null);
+
+            for(String id in thingProvider.activeThing!.reminderIds ?? []){
+              thingReminderProvider.setThingRemindersByObjects(thingProvider.activeThing!, reminderProvider.getReminderById(id));
+            }
+            
+
             showModalBottomSheet(
                 context: context,
                 builder: (ctx) {
@@ -298,6 +312,7 @@ class _ThingCardState extends State<ThingCard> {
                                     .locationIcons
                                     .containsLocationIcon,
                           ),
+                          //TODO: add reminders
                         ],
                       ),
                       IconButton(

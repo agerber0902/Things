@@ -5,7 +5,7 @@ final uuid = const Uuid().v4();
 
 class Reminder {
   final String id;
-  final List<String>? thingIds;
+  List<String>? thingIds;
   final String title;
   final String message;
   final DateTime date;

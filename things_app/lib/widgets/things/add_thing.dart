@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
+import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
+import 'package:things_app/models/thing_reminder.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
+import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
+import 'package:things_app/widgets/reminders_modal.dart';
 
 const String titleHintText = 'Enter a title';
 const String titleValidationText = 'Enter a valid title';
@@ -85,6 +89,17 @@ class _AddThingState extends State<AddThing> {
         });
   }
 
+  Future<void> _remindersDialogBuilder(BuildContext context) {
+    return showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return const RemindersModal();
+          });
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -134,14 +149,40 @@ class _AddThingState extends State<AddThing> {
                             const SizedBox(height: 16),
 
                             //Reminders
-                            Consumer2<ThingReminderProvider, ThingProvider>(builder:(context, value, value2, child) {
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  //TextButton.icon(onPressed: (){}, label: Text(thingProvider.activeThing != null && thingProvider.activeThing!.reminder))
-                                ],
-                              )
-                            },),
+                            Consumer2<ThingReminderProvider, ThingProvider>(
+                              builder: (context, thingReminderProvider, thingProvider, child) {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: () {
+                                        _remindersDialogBuilder(context);
+                                      },
+                                      label: Text(
+                                        thingProvider.activeThing != null &&
+                                                thingProvider.activeThing!
+                                                    .reminderIdsExist || (thingReminderProvider.thingRemindersExist)
+                                            ? 'Edit Reminders'
+                                            : 'Add Reminders',
+                                        style: TextStyle(
+                                          color: colorScheme.primary,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                      icon: thingProvider.activeThing != null &&
+                                              thingProvider
+                                                  .activeThing!.reminderIdsExist  || (thingReminderProvider.thingRemindersExist)
+                                          ? AppBarIcons()
+                                              .remindersIcons
+                                              .containsRemindersIcon
+                                          : AppBarIcons()
+                                              .remindersIcons
+                                              .addRemindersIcon,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                             const SizedBox(height: 16),
 
                             //Notes
@@ -158,7 +199,9 @@ class _AddThingState extends State<AddThing> {
                                       },
                                       label: Text(
                                         thingProvider.activeThing != null &&
-                                                thingProvider.activeThing!.notesExist || (noteProvider.notesExist)
+                                                    thingProvider.activeThing!
+                                                        .notesExist ||
+                                                (noteProvider.notesExist)
                                             ? 'Edit Notes'
                                             : 'Add Notes',
                                         style: TextStyle(
@@ -167,7 +210,9 @@ class _AddThingState extends State<AddThing> {
                                         ),
                                       ),
                                       icon: thingProvider.activeThing != null &&
-                                              thingProvider.activeThing!.notesExist || (noteProvider.notesExist)
+                                                  thingProvider.activeThing!
+                                                      .notesExist ||
+                                              (noteProvider.notesExist)
                                           ? AppBarIcons()
                                               .notesIcons
                                               .editNoteIcon
@@ -183,17 +228,23 @@ class _AddThingState extends State<AddThing> {
                             const SizedBox(height: 16),
 
                             //Location
-                            Consumer2<LocationProvider, ThingProvider>(builder:(context, locationProvider, thingProvider, child) {
-                              return Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextButton.icon(
+                            Consumer2<LocationProvider, ThingProvider>(
+                              builder: (context, locationProvider,
+                                  thingProvider, child) {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    TextButton.icon(
                                       onPressed: () {
                                         _locationDialogBuilder(context);
                                       },
                                       label: Text(
                                         thingProvider.activeThing != null &&
-                                                thingProvider.activeThing!.location != null || (locationProvider.location != null)
+                                                    thingProvider.activeThing!
+                                                            .location !=
+                                                        null ||
+                                                (locationProvider.location !=
+                                                    null)
                                             ? 'Edit Location'
                                             : 'Add Location',
                                         style: TextStyle(
@@ -201,17 +252,23 @@ class _AddThingState extends State<AddThing> {
                                           decoration: TextDecoration.underline,
                                         ),
                                       ),
-                                      icon:
-                                      thingProvider.activeThing != null &&
-                                              thingProvider.activeThing!.location != null || (locationProvider.location != null)
+                                      icon: thingProvider.activeThing != null &&
+                                                  thingProvider.activeThing!
+                                                          .location !=
+                                                      null ||
+                                              (locationProvider.location !=
+                                                  null)
                                           ? AppBarIcons()
-                                              .locationIcons.containsLocationIcon
-                                           : AppBarIcons().locationIcons.addLocationIcon,
+                                              .locationIcons
+                                              .containsLocationIcon
+                                          : AppBarIcons()
+                                              .locationIcons
+                                              .addLocationIcon,
                                     ),
-                              ],
-                            );
-
-                            },), 
+                                  ],
+                                );
+                              },
+                            ),
                             const SizedBox(height: 16),
 
                             //Display selected categories
@@ -284,29 +341,50 @@ class _AddThingState extends State<AddThing> {
 
                                   //Add
                                   if (thingProvider.activeThing == null) {
-                                    final thingToAdd =
-                                        Thing.createWithTitleAndDescription(
-                                            title: _titleTextController.text,
-                                            description:
-                                                _descriptionTextController.text,
-                                            isMarkedComplete: false,
-                                            notes: Provider.of<NotesProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .notes,
-                                            location: Provider.of<LocationProvider>(context, listen: false).location,
-                                            categories:
-                                                Provider.of<CategoryProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .categories
-                                                    .where((category) =>
-                                                        category != '')
-                                                    .toList());
+                                    final thingToAdd = Thing.createWithTitleAndDescription(
+                                        title: _titleTextController.text,
+                                        description:
+                                            _descriptionTextController.text,
+                                        isMarkedComplete: false,
+                                        notes: Provider.of<NotesProvider>(context, listen: false)
+                                            .notes,
+                                        location: Provider.of<LocationProvider>(context, listen: false)
+                                            .location,
+                                        reminderIds: Provider.of<ThingReminderProvider>(context, listen: false)
+                                            .thingReminders
+                                            ?.where((thingReminder) =>
+                                                thingReminder.reminder != null)
+                                            .map((thingReminder) =>
+                                                thingReminder.reminder!.id)
+                                            .toList(),
+                                        categories: Provider.of<CategoryProvider>(
+                                                context,
+                                                listen: false)
+                                            .categories
+                                            .where((category) => category != '')
+                                            .toList());
 
                                     thingProvider.addThing(thingToAdd);
                                     //Reset Notes
                                     //Provider.of<NotesProvider>(context, listen: false).reset();
+
+                                    //Save reminders
+                                    List<ThingReminder> thingReminders = Provider.of<ThingReminderProvider>(context,listen: false).thingReminders ?? [];
+                                    if (thingReminders.isNotEmpty){
+                                      List<Reminder> remindersToEdit = thingReminders
+                                              .where(
+                                                  (tr) => tr.reminder != null)
+                                              .map((r) => r.reminder!)
+                                              .toList();
+
+                                      ReminderProvider reminderProvider = Provider.of<ReminderProvider>(context,listen: false);
+                                      for (Reminder reminder in remindersToEdit) {
+                                        //set the thing id
+                                        reminder.thingIds = [thingToAdd.id, ...?reminder.thingIds];
+                                        reminderProvider.editReminder(reminder);
+                                      }
+                                    }
+                                      
 
                                     Navigator.pop(context);
                                   }
@@ -317,15 +395,17 @@ class _AddThingState extends State<AddThing> {
                                         title: _titleTextController.text,
                                         description:
                                             _descriptionTextController.text,
-                                        isMarkedComplete:
-                                            thingProvider.activeThing!.isMarkedComplete,
-                                        notes: Provider.of<NotesProvider>(
-                                                context,
-                                                listen: false)
+                                        isMarkedComplete: thingProvider
+                                            .activeThing!.isMarkedComplete,
+                                        notes: Provider.of<NotesProvider>(context, listen: false)
                                             .notes,
-                                        location: Provider.of<LocationProvider>(context, listen: false).location,
-                                        categories: Provider.of<
-                                                    CategoryProvider>(context,
+                                        location: Provider.of<LocationProvider>(context, listen: false)
+                                            .location,
+                                        reminderIds: Provider.of<ThingReminderProvider>(context,
+                                                listen: false)
+                                            .getReminderIdsForThing(
+                                                thingProvider.activeThing!.id),
+                                        categories: Provider.of<CategoryProvider>(context,
                                                 listen: false)
                                             .categories
                                             .where((category) => category != '')
@@ -336,12 +416,16 @@ class _AddThingState extends State<AddThing> {
                                     //Reset Notes
                                     //Provider.of<NotesProvider>(context, listen: false).reset();
 
+                                    
+
                                     Navigator.pop(context);
                                   }
                                 }
                               },
                               child: Text(
-                                thingProvider.activeThing == null ? 'Add' : 'Save',
+                                thingProvider.activeThing == null
+                                    ? 'Add'
+                                    : 'Save',
                                 style: textTheme.bodyLarge!
                                     .copyWith(color: Colors.white),
                               ),

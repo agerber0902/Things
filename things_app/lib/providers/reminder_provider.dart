@@ -118,4 +118,9 @@ class ReminderProvider extends ChangeNotifier {
       ),
     );
   }
+
+
+  Reminder getReminderById(String id){
+    return reminders.firstWhere((r) => r.id == id);
+  }
 }

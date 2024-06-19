@@ -25,6 +25,8 @@ class Thing {
     return categories.contains('favorite');
   }
 
+  bool get reminderIdsExist => reminderIds != null && reminderIds!.isNotEmpty;
+
   String get locationForDisplay {
     String locationDisplay = '';
 
