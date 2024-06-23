@@ -13,8 +13,14 @@ class LocationProvider extends ChangeNotifier {
     //   return;
     // }
 
+    if(detailResult == null){
+      _location = null;
+      notifyListeners();
+      return;
+    }
+
     _location = ThingLocation(
-        name: detailResult!.name,
+        name: detailResult.name,
         latitude: detailResult.geometry!.location!.lat ?? 0,
         longitude: detailResult.geometry!.location!.lng ?? 0,
         address: detailResult.formattedAddress ?? '');
