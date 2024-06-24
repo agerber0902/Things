@@ -9,6 +9,7 @@ import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/search_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
 
 void main() async {
@@ -46,7 +47,8 @@ void main() async {
       ChangeNotifierProvider(create: (context) => FilterProvider()),
       ChangeNotifierProvider(create: (context) => NotesProvider()),
       ChangeNotifierProvider(create: (context) => CategoryProvider()),
-      ChangeNotifierProvider(create: (context) => LocationProvider())
+      ChangeNotifierProvider(create: (context) => LocationProvider()),
+      ChangeNotifierProvider(create: (context) => ThingReminderProvider())
     ],
     child: const MyApp(),
   ));
