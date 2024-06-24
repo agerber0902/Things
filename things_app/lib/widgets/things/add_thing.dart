@@ -6,6 +6,7 @@ import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
@@ -26,13 +27,15 @@ class AddThing extends StatefulWidget {
 class _AddThingState extends State<AddThing> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _titleTextController = TextEditingController();
-  final TextEditingController _descriptionTextController = TextEditingController();
+  final TextEditingController _descriptionTextController =
+      TextEditingController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final activeThing = Provider.of<ThingProvider>(context, listen: false).activeThing;
+      final activeThing =
+          Provider.of<ThingProvider>(context, listen: false).activeThing;
       if (activeThing != null) {
         _titleTextController.text = activeThing.title;
         _descriptionTextController.text = activeThing.description;
@@ -111,27 +114,46 @@ class _AddThingState extends State<AddThing> {
                         ),
                         const SizedBox(height: 16),
                         Consumer2<NotesProvider, ThingProvider>(
-                          builder: (context, notesProvider, thingProvider, child) {
-                            return _buildNotesButton(context, colorScheme, textTheme, notesProvider, thingProvider);
+                          builder:
+                              (context, notesProvider, thingProvider, child) {
+                            return _buildNotesButton(context, colorScheme,
+                                textTheme, notesProvider, thingProvider);
                           },
                         ),
                         const SizedBox(height: 16),
                         Consumer2<LocationProvider, ThingProvider>(
-                          builder: (context, locationProvider, thingProvider, child) {
-                            return _buildLocationButton(context, colorScheme, textTheme, locationProvider, thingProvider);
+                          builder: (context, locationProvider, thingProvider,
+                              child) {
+                            return _buildLocationButton(context, colorScheme,
+                                textTheme, locationProvider, thingProvider);
                           },
                         ),
                         const SizedBox(height: 16),
-                        _buildCategoriesSection(context, textTheme, colorScheme),
+                        Consumer2<ThingReminderProvider, ThingProvider>(
+                          builder: (context, thingReminderProvider,
+                              thingProvider, child) {
+                            return _buildThingReminderSection(
+                                context,
+                                textTheme,
+                                colorScheme,
+                                thingReminderProvider,
+                                thingProvider);
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildCategoriesSection(
+                            context, textTheme, colorScheme),
                         const SizedBox(height: 16),
                         _buildCategoryDropdown(context),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: colorScheme.onPrimaryContainer),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.onPrimaryContainer),
                           onPressed: () => _onSubmit(context, thingProvider),
                           child: Text(
                             thingProvider.activeThing == null ? 'Add' : 'Save',
-                            style: textTheme.bodyLarge!.copyWith(color: Colors.white),
+                            style: textTheme.bodyLarge!
+                                .copyWith(color: Colors.white),
                           ),
                         ),
                       ],
@@ -146,33 +168,79 @@ class _AddThingState extends State<AddThing> {
     );
   }
 
-  Widget _buildNotesButton(BuildContext context, ColorScheme colorScheme, TextTheme textTheme, NotesProvider notesProvider, ThingProvider thingProvider) {
+  Widget _buildThingReminderSection(
+      BuildContext context,
+      TextTheme textTheme,
+      ColorScheme colorScheme,
+      ThingReminderProvider thingReminderProvider,
+      ThingProvider thingProvider) {
     return Row(
       children: [
         TextButton.icon(
-          onPressed: () => _showNotesDialog(context, thingProvider.activeThing),
+          onPressed: () {
+            //TODO
+          },
+          //TODO: add thingProvider.activeThing?.reminders != null) to check
           label: Text(
-            thingProvider.activeThing?.notesExist ?? notesProvider.notesExist ? 'Edit Notes' : 'Add Notes',
-            style: TextStyle(color: colorScheme.primary, decoration: TextDecoration.underline),
+            'Add Reminders',
+            style: TextStyle(
+                color: colorScheme.primary,
+                decoration: TextDecoration.underline),
           ),
-          icon: thingProvider.activeThing?.notesExist ?? notesProvider.notesExist
-              ? AppBarIcons().notesIcons.editNoteIcon
-              : AppBarIcons().notesIcons.addNoteIcon,
+          icon: AppBarIcons().thingReminderIcons.addThingReminderIcon,
         ),
       ],
     );
   }
 
-  Widget _buildLocationButton(BuildContext context, ColorScheme colorScheme, TextTheme textTheme, LocationProvider locationProvider, ThingProvider thingProvider) {
+  Widget _buildNotesButton(
+      BuildContext context,
+      ColorScheme colorScheme,
+      TextTheme textTheme,
+      NotesProvider notesProvider,
+      ThingProvider thingProvider) {
+    return Row(
+      children: [
+        TextButton.icon(
+          onPressed: () => _showNotesDialog(context, thingProvider.activeThing),
+          label: Text(
+            thingProvider.activeThing?.notesExist ?? notesProvider.notesExist
+                ? 'Edit Notes'
+                : 'Add Notes',
+            style: TextStyle(
+                color: colorScheme.primary,
+                decoration: TextDecoration.underline),
+          ),
+          icon:
+              thingProvider.activeThing?.notesExist ?? notesProvider.notesExist
+                  ? AppBarIcons().notesIcons.editNoteIcon
+                  : AppBarIcons().notesIcons.addNoteIcon,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationButton(
+      BuildContext context,
+      ColorScheme colorScheme,
+      TextTheme textTheme,
+      LocationProvider locationProvider,
+      ThingProvider thingProvider) {
     return Row(
       children: [
         TextButton.icon(
           onPressed: () => _showLocationDialog(context),
           label: Text(
-            thingProvider.activeThing?.location != null || locationProvider.location != null ? 'Edit Location' : 'Add Location',
-            style: TextStyle(color: colorScheme.primary, decoration: TextDecoration.underline),
+            thingProvider.activeThing?.location != null ||
+                    locationProvider.location != null
+                ? 'Edit Location'
+                : 'Add Location',
+            style: TextStyle(
+                color: colorScheme.primary,
+                decoration: TextDecoration.underline),
           ),
-          icon: thingProvider.activeThing?.location != null || locationProvider.location != null
+          icon: thingProvider.activeThing?.location != null ||
+                  locationProvider.location != null
               ? AppBarIcons().locationIcons.containsLocationIcon
               : AppBarIcons().locationIcons.addLocationIcon,
         ),
@@ -180,17 +248,21 @@ class _AddThingState extends State<AddThing> {
     );
   }
 
-  Widget _buildCategoriesSection(BuildContext context, TextTheme textTheme, ColorScheme colorScheme) {
+  Widget _buildCategoriesSection(
+      BuildContext context, TextTheme textTheme, ColorScheme colorScheme) {
     return Consumer<CategoryProvider>(
       builder: (context, categoryProvider, child) {
         if (categoryProvider.categories.isEmpty) {
-          return Text(categoriesValidationText, style: textTheme.bodySmall!.copyWith(color: colorScheme.error));
+          return Text(categoriesValidationText,
+              style: textTheme.bodySmall!.copyWith(color: colorScheme.error));
         }
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SelectedCategories(
             removeCategory: categoryProvider.deletecategory,
-            selectedCategories: categoryProvider.categories.where((c) => c != 'favorite' && c != 'complete').toList(),
+            selectedCategories: categoryProvider.categories
+                .where((c) => c != 'favorite' && c != 'complete')
+                .toList(),
           ),
         );
       },
@@ -201,7 +273,9 @@ class _AddThingState extends State<AddThing> {
     return DropdownButton<String>(
       hint: const Text('Select Categories'),
       value: null,
-      items: categoryIcons.entries.where((c) => c.key != 'favorite' && c.key != 'complete').map((icon) {
+      items: categoryIcons.entries
+          .where((c) => c.key != 'favorite' && c.key != 'complete')
+          .map((icon) {
         return DropdownMenuItem<String>(
           value: icon.key,
           child: Row(
@@ -214,7 +288,8 @@ class _AddThingState extends State<AddThing> {
       }).toList(),
       onChanged: (value) {
         if (value != null) {
-          Provider.of<CategoryProvider>(context, listen: false).addcategory(value);
+          Provider.of<CategoryProvider>(context, listen: false)
+              .addcategory(value);
         }
       },
     );
@@ -222,9 +297,11 @@ class _AddThingState extends State<AddThing> {
 
   void _onSubmit(BuildContext context, ThingProvider thingProvider) {
     if (_formKey.currentState?.validate() ?? false) {
-      final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+      final categoryProvider =
+          Provider.of<CategoryProvider>(context, listen: false);
       final notesProvider = Provider.of<NotesProvider>(context, listen: false);
-      final locationProvider = Provider.of<LocationProvider>(context, listen: false);
+      final locationProvider =
+          Provider.of<LocationProvider>(context, listen: false);
 
       if (categoryProvider.categories.isEmpty) {
         return;
@@ -237,7 +314,9 @@ class _AddThingState extends State<AddThing> {
           isMarkedComplete: false,
           notes: notesProvider.notes,
           location: locationProvider.location,
-          categories: categoryProvider.categories.where((category) => category.isNotEmpty).toList(),
+          categories: categoryProvider.categories
+              .where((category) => category.isNotEmpty)
+              .toList(),
         );
         thingProvider.addThing(newThing);
       } else {
@@ -248,7 +327,9 @@ class _AddThingState extends State<AddThing> {
           isMarkedComplete: thingProvider.activeThing!.isMarkedComplete,
           notes: notesProvider.notes,
           location: locationProvider.location,
-          categories: categoryProvider.categories.where((category) => category.isNotEmpty).toList(),
+          categories: categoryProvider.categories
+              .where((category) => category.isNotEmpty)
+              .toList(),
         );
         thingProvider.editThing(editedThing);
       }
@@ -284,9 +365,11 @@ class SelectedCategories extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text(category, style: textTheme.displaySmall!.copyWith(fontSize: 18)),
+                  Text(category,
+                      style: textTheme.displaySmall!.copyWith(fontSize: 18)),
                   const SizedBox(width: 10),
-                  Icon(categoryIcons[category]!.iconData, color: categoryIcons[category]!.iconColor),
+                  Icon(categoryIcons[category]!.iconData,
+                      color: categoryIcons[category]!.iconColor),
                   const SizedBox(width: 5),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -346,3 +429,5 @@ class AddThingTextFormField extends StatelessWidget {
     );
   }
 }
+
+//TODO: make the bottom sheet bigger
