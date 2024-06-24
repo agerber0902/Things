@@ -10,6 +10,7 @@ import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
+import 'package:things_app/widgets/thingReminders/add_thing_reminder_modal.dart';
 
 const String titleHintText = 'Enter a title';
 const String titleValidationText = 'Enter a valid title';
@@ -70,6 +71,12 @@ class _AddThingState extends State<AddThing> {
         return const LocationModal();
       },
     );
+  }
+
+  Future<void> _showThingReminderDialog(BuildContext context){
+    return showDialog<void>(context: context, builder:(context) {
+      return const AddThingReminderModal();
+    },);
   }
 
   @override
@@ -178,7 +185,7 @@ class _AddThingState extends State<AddThing> {
       children: [
         TextButton.icon(
           onPressed: () {
-            //TODO
+            _showThingReminderDialog(context);
           },
           //TODO: add thingProvider.activeThing?.reminders != null) to check
           label: Text(
