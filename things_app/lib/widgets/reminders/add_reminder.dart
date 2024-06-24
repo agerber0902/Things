@@ -11,9 +11,7 @@ const String messageHintText = 'Enter a message';
 const String messageValidationText = 'Enter a valid message';
 
 class AddReminder extends StatefulWidget {
-  const AddReminder({
-    super.key,
-  });
+  const AddReminder({super.key});
 
   @override
   State<AddReminder> createState() => _AddReminderState();
@@ -29,17 +27,12 @@ class _AddReminderState extends State<AddReminder> {
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Reminder? activeReminder =
-          Provider.of<ReminderProvider>(context, listen: false).activeReminder;
-
+      final activeReminder = Provider.of<ReminderProvider>(context, listen: false).activeReminder;
       if (activeReminder != null) {
         setState(() {
-          _titleTextController.text =
-              activeReminder.title;
-          _messageTextController.text =
-              activeReminder.message;
+          _titleTextController.text = activeReminder.title;
+          _messageTextController.text = activeReminder.message;
           _selectedDateTime = activeReminder.date;
         });
       }
@@ -54,20 +47,20 @@ class _AddReminderState extends State<AddReminder> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? pickedDate = await showDatePicker(
+    final pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDateTime ?? DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
+
     if (pickedDate != null) {
-      final TimeOfDay? pickedTime = await showTimePicker(
-        // ignore: use_build_context_synchronously
+      final pickedTime = await showTimePicker(
         context: context,
         initialEntryMode: TimePickerEntryMode.input,
-        initialTime:
-            TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),
+        initialTime: TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),
       );
+
       if (pickedTime != null) {
         setState(() {
           _selectedDateTime = DateTime(
@@ -82,10 +75,35 @@ class _AddReminderState extends State<AddReminder> {
     }
   }
 
+  void _onSave(ReminderProvider reminderProvider) {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedDateTime == null) return;
+
+      if (reminderProvider.activeReminder == null) {
+        final reminderToAdd = Reminder(
+          title: _titleTextController.text,
+          message: _messageTextController.text,
+          date: _selectedDateTime ?? DateTime.now(),
+        );
+        reminderProvider.addReminder(reminderToAdd);
+      } else {
+        final reminderToEdit = Reminder.forEdit(
+          id: reminderProvider.activeReminder!.id,
+          title: _titleTextController.text,
+          message: _messageTextController.text,
+          date: _selectedDateTime ?? DateTime.now(),
+        );
+        reminderProvider.editReminder(reminderToEdit);
+      }
+
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Consumer<ReminderProvider>(
       builder: (context, reminderProvider, child) {
@@ -108,120 +126,66 @@ class _AddReminderState extends State<AddReminder> {
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Row(
-                    children: [
-                      Form(
-                        key: _formKey,
-                        child: Expanded(
-                          child: Column(
-                            children: [
-                              AddReminderTextFormField(
-                                controller: _titleTextController,
-                                hintText: titleHintText,
-                                validationText: titleValidationText,
-                                maxLength: 25,
-                                maxLines: 1,
-                              ),
-                              AddReminderTextFormField(
-                                controller: _messageTextController,
-                                hintText: messageHintText,
-                                validationText: messageValidationText,
-                                maxLength: 35,
-                                maxLines: 1,
-                              ),
-                              ElevatedButton(
-                                onPressed: () => _selectDate(context),
-                                child: const Text(
-                                  'Select date',
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    style: _selectedDateTime == null
-                                        ? textTheme.bodySmall!
-                                            .copyWith(color: colorScheme.error)
-                                        : textTheme.bodyMedium!.copyWith(
-                                            color: colorScheme.primary),
-                                    _selectedDateTime == null
-                                        ? 'Select date and time'
-                                        : DateFormat.yMEd()
-                                            .add_jms()
-                                            .format(
-                                                _selectedDateTime!.toLocal())
-                                            .split('.')[0],
-                                  ),
-                                  Visibility(
-                                    visible: _selectedDateTime != null,
-                                    child: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _selectedDateTime = null;
-                                        });
-                                      },
-                                      icon: const Icon(Icons.close),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      colorScheme.onPrimaryContainer,
-                                ),
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    //validate date
-                                    if (_selectedDateTime == null) {
-                                      return;
-                                    }
-
-                                    //add
-                                    if (reminderProvider.activeReminder ==
-                                        null) {
-                                      final reminderToAdd = Reminder(
-                                        title: _titleTextController.text,
-                                        message: _messageTextController.text,
-                                        date:
-                                            _selectedDateTime ?? DateTime.now(),
-                                      );
-
-                                      reminderProvider
-                                          .addReminder(reminderToAdd);
-                                    }
-                                    //edit
-                                    else {
-                                      final reminderToEdit = Reminder.forEdit(
-                                        id: reminderProvider.activeReminder!.id,
-                                        title: _titleTextController.text,
-                                        message: _messageTextController.text,
-                                        date:
-                                            _selectedDateTime ?? DateTime.now(),
-                                      );
-
-                                      reminderProvider
-                                          .editReminder(reminderToEdit);
-                                    }
-
-                                    Navigator.pop(context);
-                                  }
-                                },
-                                child: Text(
-                                  reminderProvider.activeReminder == null
-                                      ? 'Add'
-                                      : 'Save',
-                                  style: textTheme.bodyLarge!
-                                      .copyWith(color: Colors.white),
-                                ),
-                              ),
-                            ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          AddReminderTextFormField(
+                            controller: _titleTextController,
+                            hintText: titleHintText,
+                            validationText: titleValidationText,
+                            maxLength: 25,
+                            maxLines: 1,
                           ),
-                        ),
-                      )
-                    ],
+                          AddReminderTextFormField(
+                            controller: _messageTextController,
+                            hintText: messageHintText,
+                            validationText: messageValidationText,
+                            maxLength: 35,
+                            maxLines: 1,
+                          ),
+                          ElevatedButton(
+                            onPressed: () => _selectDate(context),
+                            child: const Text('Select date'),
+                          ),
+                          const SizedBox(height: 10),
+                          if (_selectedDateTime == null)
+                            Text(
+                              'Select date and time',
+                              style: textTheme.bodySmall!.copyWith(color: colorScheme.error),
+                            )
+                          else
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  DateFormat.yMEd().add_jms().format(_selectedDateTime!.toLocal()).split('.')[0],
+                                  style: textTheme.bodyMedium!.copyWith(color: colorScheme.primary),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedDateTime = null;
+                                    });
+                                  },
+                                  icon: const Icon(Icons.close),
+                                ),
+                              ],
+                            ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(backgroundColor: colorScheme.onPrimaryContainer),
+                            onPressed: () => _onSave(reminderProvider),
+                            child: Text(
+                              reminderProvider.activeReminder == null ? 'Add' : 'Save',
+                              style: textTheme.bodyLarge!.copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -251,13 +215,11 @@ class AddReminderTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.only(left: 10, right: 10),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: TextFormField(
         maxLength: maxLength,
         maxLines: maxLines,
@@ -265,7 +227,6 @@ class AddReminderTextFormField extends StatelessWidget {
         style: textTheme.bodyLarge!.copyWith(color: colorScheme.primary),
         decoration: InputDecoration(
           hintText: hintText,
-          labelStyle: TextStyle(color: colorScheme.primary),
           hintStyle: TextStyle(color: colorScheme.primary),
         ),
         validator: (value) {
