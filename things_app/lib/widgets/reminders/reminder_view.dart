@@ -7,10 +7,7 @@ import 'package:things_app/widgets/reminders/add_reminder.dart';
 const double initHeight = 150;
 
 class ReminderView extends StatefulWidget {
-  const ReminderView({
-    super.key,
-    required this.reminder,
-  });
+  const ReminderView({super.key, required this.reminder});
 
   final Reminder reminder;
 
@@ -18,10 +15,20 @@ class ReminderView extends StatefulWidget {
   State<ReminderView> createState() => _ReminderViewState();
 }
 
-class _ReminderViewState extends State<ReminderView>
-    with TickerProviderStateMixin {
+class _ReminderViewState extends State<ReminderView> with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+    _controller.forward();
+  }
 
   @override
   void dispose() {
@@ -30,26 +37,9 @@ class _ReminderViewState extends State<ReminderView>
   }
 
   @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    );
-
-    _animation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(_controller);
-
-    _controller.forward();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Consumer<ReminderProvider>(
       builder: (context, reminderProvider, child) {
@@ -59,34 +49,34 @@ class _ReminderViewState extends State<ReminderView>
             return Opacity(
               opacity: _animation.value,
               child: Dismissible(
+                key: Key(widget.reminder.id),
                 onDismissed: (direction) {
                   Reminder reminder = widget.reminder;
-                  reminderProvider.deleteReminder(widget.reminder);
+                  reminderProvider.deleteReminder(reminder);
 
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                      "${reminder.title} was deleted.",
-                      style: textTheme.bodyLarge!
-                          .copyWith(color: colorScheme.onPrimary),
-                    ),
-                    action: SnackBarAction(
-                      label: "Undo",
-                      onPressed: () {
-                        reminderProvider.addReminder(reminder);
-                      },
-                    ),
-                  ));
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "${reminder.title} was deleted.",
+                          style: textTheme.bodyLarge!.copyWith(color: colorScheme.onPrimary),
+                        ),
+                        action: SnackBarAction(
+                          label: "Undo",
+                          onPressed: () {
+                            reminderProvider.addReminder(reminder);
+                          },
+                        ),
+                      ),
+                    );
                 },
-                key: Key(widget.reminder.id),
                 child: SizedBox(
                   height: initHeight,
                   width: double.infinity,
-                  child: Container(
+                  child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: ReminderCard(
-                      widget: widget,
-                    ),
+                    child: ReminderCard(reminder: widget.reminder),
                   ),
                 ),
               ),
@@ -98,69 +88,47 @@ class _ReminderViewState extends State<ReminderView>
   }
 }
 
-class ReminderCard extends StatefulWidget {
-  const ReminderCard({
-    super.key,
-    required this.widget,
-  });
+class ReminderCard extends StatelessWidget {
+  const ReminderCard({super.key, required this.reminder});
 
-  final ReminderView widget;
+  final Reminder reminder;
 
-  @override
-  State<ReminderCard> createState() => _ReminderCardState();
-}
-
-class _ReminderCardState extends State<ReminderCard> {
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () {
-        Provider.of<ReminderProvider>(context, listen: false).setActiveReminder(widget.widget.reminder);
+        Provider.of<ReminderProvider>(context, listen: false).setActiveReminder(reminder);
 
         showModalBottomSheet(
-            context: context,
-            builder: (ctx) {
-              return const AddReminder();
-            });
+          context: context,
+          builder: (ctx) => const AddReminder(),
+        );
       },
       child: Card(
         color: colorScheme.primaryContainer,
-        margin: const EdgeInsets.only(left: 20, right: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 20),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                      child: Text(
-                    widget.widget.reminder.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.displaySmall!.copyWith(
-                        fontSize: textTheme.displaySmall!.fontSize! - 5.0),
-                  )),
-                ],
+              Text(
+                reminder.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.displaySmall!.copyWith(fontSize: textTheme.displaySmall!.fontSize! - 5.0),
               ),
               const SizedBox(height: 10),
-              Row(
-                children: [Text(widget.widget.reminder.reminderDateToDisplay)],
-              ),
+              Text(reminder.reminderDateToDisplay),
               const SizedBox(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                      child: Text(
-                    widget.widget.reminder.message,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium,
-                  )),
-                ],
+              Text(
+                reminder.message,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: textTheme.bodyMedium,
               ),
             ],
           ),
