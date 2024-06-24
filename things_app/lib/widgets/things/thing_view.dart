@@ -14,10 +14,7 @@ import 'package:things_app/widgets/things/add_thing.dart';
 const double initHeight = 200;
 
 class ThingView extends StatefulWidget {
-  const ThingView({
-    super.key,
-    required this.thing,
-  });
+  const ThingView({super.key, required this.thing});
 
   final Thing thing;
 
@@ -30,12 +27,6 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
   late final Animation<double> _animation;
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   void initState() {
     super.initState();
 
@@ -44,18 +35,20 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
       duration: const Duration(seconds: 2),
     );
 
-    _animation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(_controller);
-
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
     _controller.forward();
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Consumer<ThingProvider>(
       builder: (context, thingProvider, child) {
@@ -65,32 +58,32 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
             return Opacity(
               opacity: _animation.value,
               child: Dismissible(
+                key: Key(widget.thing.id),
                 onDismissed: (direction) {
-                  Thing thing = widget.thing;
+                  final thing = widget.thing;
                   thingProvider.deleteThing(widget.thing);
 
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                      "${thing.title} was deleted.",
-                      style: textTheme.bodyLarge!
-                          .copyWith(color: colorScheme.onPrimary),
-                    ),
-                    action: SnackBarAction(
-                      label: "Undo",
-                      onPressed: () {
-                        thingProvider.addThing(thing);
-                      },
-                    ),
-                  ));
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(SnackBar(
+                      content: Text(
+                        "${thing.title} was deleted.",
+                        style: textTheme.bodyLarge!.copyWith(color: colorScheme.onPrimary),
+                      ),
+                      action: SnackBarAction(
+                        label: "Undo",
+                        onPressed: () {
+                          thingProvider.addThing(thing);
+                        },
+                      ),
+                    ));
                 },
-                key: Key(widget.thing.id),
                 child: SizedBox(
                   height: initHeight,
                   width: double.infinity,
-                  child: Container(
+                  child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: ThingCard(widget: widget),
+                    child: ThingCard(thing: widget.thing),
                   ),
                 ),
               ),
@@ -103,12 +96,9 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
 }
 
 class ThingCard extends StatefulWidget {
-  const ThingCard({
-    super.key,
-    required this.widget,
-  });
+  const ThingCard({super.key, required this.thing});
 
-  final ThingView widget;
+  final Thing thing;
 
   @override
   State<ThingCard> createState() => _ThingCardState();
@@ -121,205 +111,76 @@ class _ThingCardState extends State<ThingCard> {
   @override
   void initState() {
     super.initState();
-
-    _isFavorite = widget.widget.thing.categoriesContainsFavorite;
-    _isCompleted = widget.widget.thing.isMarkedComplete;
+    _isFavorite = widget.thing.categoriesContainsFavorite;
+    _isCompleted = widget.thing.isMarkedComplete;
   }
 
-  Future<void> _notesDialogBuilder(BuildContext context) {
+  Future<void> _showNotesDialog(BuildContext context) {
     return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
             return NotesModal(
-              title: widget.widget.thing.title,
-              notes: widget.widget.thing.notes,
+              title: widget.thing.title,
+              notes: widget.thing.notes,
               isTriggerAdd: true,
             );
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
-  Future<void> _locationDialogBuilder(BuildContext context) {
+  Future<void> _showLocationDialog(BuildContext context) {
     return showDialog<void>(
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
             return const LocationModal();
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Consumer<ThingProvider>(
       builder: (context, thingProvider, child) {
         return GestureDetector(
           onTap: () {
-            //Set active thing
-            thingProvider.setActiveThing(widget.widget.thing);
-
-            //Set the categories
+            thingProvider.setActiveThing(widget.thing);
             Provider.of<CategoryProvider>(context, listen: false)
                 .setCategoriesForEdit(thingProvider.activeThing!.categories);
-
-            //Set the Notes
             Provider.of<NotesProvider>(context, listen: false)
                 .setNotesForEdit(thingProvider.activeThing!.notes);
-
-            //Set the location
             Provider.of<LocationProvider>(context, listen: false)
                 .setLocationForEdit(thingProvider.activeThing!.location);
 
             showModalBottomSheet(
-                context: context,
-                builder: (ctx) {
-                  return const AddThing();
-                });
+              context: context,
+              builder: (ctx) => const AddThing(),
+            );
           },
           child: Card(
             color: colorScheme.primaryContainer,
-            margin: const EdgeInsets.only(left: 20, right: 20),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          widget.widget.thing.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: textTheme.displaySmall!.copyWith(
-                              fontSize:
-                                  textTheme.displaySmall!.fontSize! - 5.0),
-                        ),
-                      ),
-                      _isFavorite ?? false
-                          ? IconButton(
-                              onPressed: () {
-                                widget.widget.thing.categories
-                                    .remove('favorite');
-                                thingProvider.editThing(widget.widget.thing);
-
-                                setState(() {
-                                  _isFavorite = false;
-                                });
-                              },
-                              icon: Icon(
-                                categoryIcons['favorite']!.iconData,
-                                color: categoryIcons['favorite']!.iconColor,
-                              ),
-                            )
-                          : IconButton(
-                              onPressed: () {
-                                widget.widget.thing.categories.add('favorite');
-                                thingProvider.editThing(widget.widget.thing);
-
-                                setState(() {
-                                  _isFavorite = true;
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.favorite_outline,
-                              ),
-                            ),
-                    ],
-                  ),
+                  _buildTitleRow(context, textTheme),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      //Display Categories
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Row(
-                            children: widget.widget.thing.categories
-                                .where((c) => c != 'favorite')
-                                .map((category) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 0, right: 8),
-                                child: Icon(
-                                  categoryIcons[category]!.iconData,
-                                  color: categoryIcons[category]!.iconColor,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                  _buildCategoryIconsRow(),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: Text(
-                        widget.widget.thing.description,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall,
-                      )),
-                    ],
-                  ),
+                  _buildDescriptionRow(textTheme),
                   const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              //Set active thing
-                              thingProvider.setActiveThing(widget.widget.thing);
-                              _notesDialogBuilder(context);
-                            },
-                            child: widget.widget.thing.notes == null ||
-                                    widget.widget.thing.notes!.isEmpty
-                                ? AppBarIcons().notesIcons.addNoteIcon
-                                : AppBarIcons().notesIcons.editNoteIcon,
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              thingProvider.setActiveThing(widget.widget.thing);
-                              _locationDialogBuilder(context);
-                            },
-                            child: widget.widget.thing.location == null
-                                ? AppBarIcons().locationIcons.addLocationIcon
-                                : AppBarIcons()
-                                    .locationIcons
-                                    .containsLocationIcon,
-                          ),
-                        ],
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.check_box,
-                          color: _isCompleted
-                              ? Colors.green
-                              : colorScheme.onPrimary,
-                        ),
-                        onPressed: () {
-                          //edit thing
-                          widget.widget.thing.isMarkedComplete = !_isCompleted;
-                          thingProvider.editThing(widget.widget.thing);
-
-                          setState(() {
-                            _isCompleted = !_isCompleted;
-                          });
-                        },
-                      ),
-                    ],
-                  )
+                  _buildActionRow(context, textTheme, colorScheme),
                 ],
               ),
             ),
@@ -327,5 +188,115 @@ class _ThingCardState extends State<ThingCard> {
         );
       },
     );
+  }
+
+  Row _buildTitleRow(BuildContext context, TextTheme textTheme) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Text(
+            widget.thing.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.displaySmall!.copyWith(fontSize: textTheme.displaySmall!.fontSize! - 5.0),
+          ),
+        ),
+        IconButton(
+          onPressed: _toggleFavorite,
+          icon: Icon(
+            _isFavorite ?? false ? categoryIcons['favorite']!.iconData : Icons.favorite_outline,
+            color: _isFavorite ?? false ? categoryIcons['favorite']!.iconColor : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _toggleFavorite() {
+    setState(() {
+      _isFavorite = _isFavorite != null && !_isFavorite!;
+      if (_isFavorite!) {
+        widget.thing.categories.add('favorite');
+      } else {
+        widget.thing.categories.remove('favorite');
+      }
+      Provider.of<ThingProvider>(context, listen: false).editThing(widget.thing);
+    });
+  }
+
+  Row _buildCategoryIconsRow() {
+    return Row(
+      children: widget.thing.categories
+          .where((category) => category != 'favorite')
+          .map((category) => Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Icon(
+                  categoryIcons[category]!.iconData,
+                  color: categoryIcons[category]!.iconColor,
+                ),
+              ))
+          .toList(),
+    );
+  }
+
+  Row _buildDescriptionRow(TextTheme textTheme) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            widget.thing.description,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: textTheme.bodySmall,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Row _buildActionRow(BuildContext context, TextTheme textTheme, ColorScheme colorScheme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Provider.of<ThingProvider>(context, listen: false).setActiveThing(widget.thing);
+                _showNotesDialog(context);
+              },
+              child: widget.thing.notes == null || widget.thing.notes!.isEmpty
+                  ? AppBarIcons().notesIcons.addNoteIcon
+                  : AppBarIcons().notesIcons.editNoteIcon,
+            ),
+            GestureDetector(
+              onTap: () {
+                Provider.of<ThingProvider>(context, listen: false).setActiveThing(widget.thing);
+                _showLocationDialog(context);
+              },
+              child: widget.thing.location == null
+                  ? AppBarIcons().locationIcons.addLocationIcon
+                  : AppBarIcons().locationIcons.containsLocationIcon,
+            ),
+          ],
+        ),
+        IconButton(
+          icon: Icon(
+            Icons.check_box,
+            color: _isCompleted ? Colors.green : colorScheme.onPrimary,
+          ),
+          onPressed: _toggleComplete,
+        ),
+      ],
+    );
+  }
+
+  void _toggleComplete() {
+    setState(() {
+      _isCompleted = !_isCompleted;
+      widget.thing.isMarkedComplete = _isCompleted;
+      Provider.of<ThingProvider>(context, listen: false).editThing(widget.thing);
+    });
   }
 }
