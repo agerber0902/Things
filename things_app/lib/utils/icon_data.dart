@@ -27,6 +27,6 @@ class LocationIcons{
 }
 
 class ThingReminderIcons{
-  final Icon addThingReminderIcon = const Icon(Icons.note_add_outlined);
-  final Icon containsThingRemindersIcon = const Icon(Icons.note_sharp);
+  final Icon addThingReminderIcon = const Icon(Icons.access_time);
+  final Icon containsThingRemindersIcon = const Icon(Icons.access_time_filled, color: Colors.deepPurple);
 }

@@ -229,18 +229,24 @@ class _ThingCardState extends State<ThingCard> {
     });
   }
 
-  Row _buildCategoryIconsRow() {
-    return Row(
-      children: widget.thing.categories
-          .where((category) => category != 'favorite')
-          .map((category) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Icon(
-                  categoryIcons[category]!.iconData,
-                  color: categoryIcons[category]!.iconColor,
-                ),
-              ))
-          .toList(),
+  Widget _buildCategoryIconsRow() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: widget.thing.categories
+              .where((category) => category != 'favorite')
+              .map((category) => Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      categoryIcons[category]!.iconData,
+                      color: categoryIcons[category]!.iconColor,
+                    ),
+                  ))
+              .toList(),
+        ),
+      ),
     );
   }
 
@@ -282,6 +288,12 @@ class _ThingCardState extends State<ThingCard> {
               child: widget.thing.location == null
                   ? AppBarIcons().locationIcons.addLocationIcon
                   : AppBarIcons().locationIcons.containsLocationIcon,
+            ),
+            GestureDetector(
+              onTap: (){
+
+              },
+              child: widget.thing.remindersExist ? AppBarIcons().thingReminderIcons.containsThingRemindersIcon : AppBarIcons().thingReminderIcons.addThingReminderIcon,
             ),
           ],
         ),
