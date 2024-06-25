@@ -54,8 +54,9 @@ class _AddReminderState extends State<AddReminder> {
       lastDate: DateTime(2101),
     );
 
-    if (pickedDate != null) {
+    if (pickedDate != null && mounted) {
       final pickedTime = await showTimePicker(
+        // ignore: use_build_context_synchronously
         context: context,
         initialEntryMode: TimePickerEntryMode.input,
         initialTime: TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),

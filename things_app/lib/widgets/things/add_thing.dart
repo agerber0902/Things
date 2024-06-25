@@ -186,7 +186,6 @@ class _AddThingState extends State<AddThing> {
           onPressed: () {
             _showThingReminderDialog(context);
           },
-          //TODO: add thingProvider.activeThing?.reminders != null) to check
           label: Text(
             thingProvider.activeThing != null && thingProvider.activeThing!.remindersExist || thingReminderProvider.thingReminders.isNotEmpty ? 'Edit Reminders' : 'Add Reminders',
             style: TextStyle(
@@ -329,7 +328,6 @@ class _AddThingState extends State<AddThing> {
               .toList(),
         );
         thingProvider.addThing(newThing);
-        print('reminderIDs: ${newThing.reminderIds}');
       } else {
         final editedThing = Thing(
           id: thingProvider.activeThing!.id,
@@ -344,7 +342,6 @@ class _AddThingState extends State<AddThing> {
               .toList(),
         );
         thingProvider.editThing(editedThing);
-        print('reminderIDs: ${editedThing.reminderIds}');
       }
 
       Navigator.pop(context);

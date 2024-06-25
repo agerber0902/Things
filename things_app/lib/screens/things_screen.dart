@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
-import 'package:things_app/screens/categories_screen.dart';
 import 'package:things_app/screens/reminders_screen.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/utils/things_setup.dart';
