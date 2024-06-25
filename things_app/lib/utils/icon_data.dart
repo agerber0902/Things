@@ -6,6 +6,7 @@ class AppBarIcons{
   FilterIcons filterIcons = FilterIcons();
   NotesIcons notesIcons = NotesIcons();
   LocationIcons locationIcons = LocationIcons();
+  ThingReminderIcons thingReminderIcons = ThingReminderIcons();
   Icon addIcon = Icon(Icons.add, color: kColorScheme.primary,);
 
 }
@@ -23,4 +24,9 @@ class NotesIcons{
 class LocationIcons{
   final Icon addLocationIcon = const Icon(Icons.location_on_outlined);
   final Icon containsLocationIcon = const Icon(Icons.location_on, color: Colors.red);
+}
+
+class ThingReminderIcons{
+  final Icon addThingReminderIcon = const Icon(Icons.access_time);
+  final Icon containsThingRemindersIcon = const Icon(Icons.access_time_filled, color: Colors.deepPurple);
 }

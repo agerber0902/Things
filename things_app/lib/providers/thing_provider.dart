@@ -33,6 +33,30 @@ class ThingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  //Thing Reminders
+  //List of things that had ids recently deleted
+  List<Thing> _thingsWithRemindersDeleted = [];
+
+  void deleteReminderIdFromThings(String reminderId){
+    List<Thing> thingsToEdit = _things.where((t) => t.remindersExist && t.reminderIds!.contains(reminderId)).toList();
+
+    _thingsWithRemindersDeleted = thingsToEdit;
+
+    for(Thing thingToEdit in thingsToEdit){
+      thingToEdit.reminderIds!.remove(reminderId);
+      editThing(thingToEdit);
+    }
+    notifyListeners();
+  }
+
+  void addReminderIdToThings(String reminderId){
+    for(Thing thing in _thingsWithRemindersDeleted){
+      thing.reminderIds!.add(thing.id);
+      editThing(thing);
+    }
+    notifyListeners();
+  }
+
   //Location
   ThingLocation? _thingLocation;
   ThingLocation? get thingLocation => _thingLocation;

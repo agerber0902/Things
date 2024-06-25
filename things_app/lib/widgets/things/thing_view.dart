@@ -5,10 +5,13 @@ import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
+import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
+import 'package:things_app/widgets/thingReminders/add_thing_reminder_modal.dart';
 import 'package:things_app/widgets/things/add_thing.dart';
 
 const double initHeight = 200;
@@ -68,7 +71,8 @@ class _ThingViewState extends State<ThingView> with TickerProviderStateMixin {
                     ..showSnackBar(SnackBar(
                       content: Text(
                         "${thing.title} was deleted.",
-                        style: textTheme.bodyLarge!.copyWith(color: colorScheme.onPrimary),
+                        style: textTheme.bodyLarge!
+                            .copyWith(color: colorScheme.onPrimary),
                       ),
                       action: SnackBarAction(
                         label: "Undo",
@@ -145,6 +149,15 @@ class _ThingCardState extends State<ThingCard> {
     );
   }
 
+  Future<void> _showThingReminderDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (context) {
+        return const AddThingReminderModal();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -161,6 +174,11 @@ class _ThingCardState extends State<ThingCard> {
                 .setNotesForEdit(thingProvider.activeThing!.notes);
             Provider.of<LocationProvider>(context, listen: false)
                 .setLocationForEdit(thingProvider.activeThing!.location);
+            final ReminderProvider reminderProvider =
+                Provider.of(context, listen: false);
+            Provider.of<ThingReminderProvider>(context, listen: false)
+                .setThingRemindersForActiveThing(
+                    thingProvider.activeThing!, reminderProvider.reminders);
 
             showModalBottomSheet(
               context: context,
@@ -199,14 +217,19 @@ class _ThingCardState extends State<ThingCard> {
             widget.thing.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: textTheme.displaySmall!.copyWith(fontSize: textTheme.displaySmall!.fontSize! - 5.0),
+            style: textTheme.displaySmall!
+                .copyWith(fontSize: textTheme.displaySmall!.fontSize! - 5.0),
           ),
         ),
         IconButton(
           onPressed: _toggleFavorite,
           icon: Icon(
-            _isFavorite ?? false ? categoryIcons['favorite']!.iconData : Icons.favorite_outline,
-            color: _isFavorite ?? false ? categoryIcons['favorite']!.iconColor : null,
+            _isFavorite ?? false
+                ? categoryIcons['favorite']!.iconData
+                : Icons.favorite_outline,
+            color: _isFavorite ?? false
+                ? categoryIcons['favorite']!.iconColor
+                : null,
           ),
         ),
       ],
@@ -221,22 +244,29 @@ class _ThingCardState extends State<ThingCard> {
       } else {
         widget.thing.categories.remove('favorite');
       }
-      Provider.of<ThingProvider>(context, listen: false).editThing(widget.thing);
+      Provider.of<ThingProvider>(context, listen: false)
+          .editThing(widget.thing);
     });
   }
 
-  Row _buildCategoryIconsRow() {
-    return Row(
-      children: widget.thing.categories
-          .where((category) => category != 'favorite')
-          .map((category) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Icon(
-                  categoryIcons[category]!.iconData,
-                  color: categoryIcons[category]!.iconColor,
-                ),
-              ))
-          .toList(),
+  Widget _buildCategoryIconsRow() {
+    return Align(
+      alignment: Alignment.topLeft,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: widget.thing.categories
+              .where((category) => category != 'favorite')
+              .map((category) => Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      categoryIcons[category]!.iconData,
+                      color: categoryIcons[category]!.iconColor,
+                    ),
+                  ))
+              .toList(),
+        ),
+      ),
     );
   }
 
@@ -255,7 +285,8 @@ class _ThingCardState extends State<ThingCard> {
     );
   }
 
-  Row _buildActionRow(BuildContext context, TextTheme textTheme, ColorScheme colorScheme) {
+  Row _buildActionRow(
+      BuildContext context, TextTheme textTheme, ColorScheme colorScheme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -263,7 +294,8 @@ class _ThingCardState extends State<ThingCard> {
           children: [
             GestureDetector(
               onTap: () {
-                Provider.of<ThingProvider>(context, listen: false).setActiveThing(widget.thing);
+                Provider.of<ThingProvider>(context, listen: false)
+                    .setActiveThing(widget.thing);
                 _showNotesDialog(context);
               },
               child: widget.thing.notes == null || widget.thing.notes!.isEmpty
@@ -272,12 +304,27 @@ class _ThingCardState extends State<ThingCard> {
             ),
             GestureDetector(
               onTap: () {
-                Provider.of<ThingProvider>(context, listen: false).setActiveThing(widget.thing);
+                Provider.of<ThingProvider>(context, listen: false)
+                    .setActiveThing(widget.thing);
                 _showLocationDialog(context);
               },
               child: widget.thing.location == null
                   ? AppBarIcons().locationIcons.addLocationIcon
                   : AppBarIcons().locationIcons.containsLocationIcon,
+            ),
+            GestureDetector(
+              onTap: () {
+                Provider.of<ThingProvider>(context, listen: false)
+                    .setActiveThing(widget.thing);
+                final ReminderProvider reminderProvider =
+                    Provider.of(context, listen: false);
+                Provider.of<ThingReminderProvider>(context, listen: false)
+                    .setThingRemindersForActiveThing(widget.thing, reminderProvider.reminders);
+                _showThingReminderDialog(context);
+              },
+              child: widget.thing.remindersExist
+                  ? AppBarIcons().thingReminderIcons.containsThingRemindersIcon
+                  : AppBarIcons().thingReminderIcons.addThingReminderIcon,
             ),
           ],
         ),
@@ -296,7 +343,8 @@ class _ThingCardState extends State<ThingCard> {
     setState(() {
       _isCompleted = !_isCompleted;
       widget.thing.isMarkedComplete = _isCompleted;
-      Provider.of<ThingProvider>(context, listen: false).editThing(widget.thing);
+      Provider.of<ThingProvider>(context, listen: false)
+          .editThing(widget.thing);
     });
   }
 }

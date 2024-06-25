@@ -5,6 +5,7 @@ import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 
 class ProviderHelper {
 
@@ -17,5 +18,6 @@ class ProviderHelper {
     Provider.of<NotesProvider>(context, listen: false).reset();
     Provider.of<CategoryProvider>(context, listen: false).reset();
     Provider.of<LocationProvider>(context, listen: false).setLocationForEdit(null);
+    Provider.of<ThingReminderProvider>(context, listen: false).setThingReminders([]);
   }
 }
