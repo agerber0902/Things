@@ -66,14 +66,14 @@ class _ThingsScreenState extends State<ThingsScreen> {
                 child: Image.asset('assets/images/logo.png'),
               ),
             ),
-            ListTile(
-              title: const Text('Categories'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (ctx) => const CategoriesScreen()));
-              },
-            ),
+            // ListTile(
+            //   title: const Text('Categories'),
+            //   onTap: () {
+            //     Navigator.pop(context);
+            //     Navigator.of(context).push(MaterialPageRoute(
+            //         builder: (ctx) => const CategoriesScreen()));
+            //   },
+            // ),
             ListTile(
               title: const Text('Reminders'),
               onTap: () {

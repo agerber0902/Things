@@ -165,11 +165,23 @@ class ThingProvider extends ChangeNotifier {
   //Search Things
   void _searchThings() {
     if (_searchValue != '') {
-      _things = _things
+      List<Thing> searchedThings = _things
           .where((thing) =>
               thing.title.toLowerCase().contains(_searchValue) ||
               thing.description.toLowerCase().contains(_searchValue))
           .toList();
+
+      //Search on notes
+      List<Thing> thingsWithNotes = _things
+          .where((thing) => thing.notes != null)
+          .where((t) =>
+              t.notes!.any((note) => note.toLowerCase().contains(_searchValue)))
+          .toList();
+
+      // Combine the results and remove duplicates
+      searchedThings = (searchedThings + thingsWithNotes).toSet().toList();
+    
+      _things = searchedThings;
     }
   }
 

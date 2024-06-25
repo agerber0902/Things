@@ -182,6 +182,7 @@ class _ThingCardState extends State<ThingCard> {
 
             showModalBottomSheet(
               context: context,
+              isScrollControlled: true,
               builder: (ctx) => const AddThing(),
             );
           },
