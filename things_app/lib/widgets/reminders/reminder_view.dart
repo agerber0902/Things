@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/providers/reminder_provider.dart';
+import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/widgets/reminders/add_reminder.dart';
 
 const double initHeight = 150;
@@ -15,9 +16,11 @@ class ReminderView extends StatefulWidget {
   State<ReminderView> createState() => _ReminderViewState();
 }
 
-class _ReminderViewState extends State<ReminderView> with TickerProviderStateMixin {
+class _ReminderViewState extends State<ReminderView>
+    with TickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
+  late List<String> thingIdsToDelete;
 
   @override
   void initState() {
@@ -28,6 +31,7 @@ class _ReminderViewState extends State<ReminderView> with TickerProviderStateMix
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
     _controller.forward();
+    thingIdsToDelete = [];
   }
 
   @override
@@ -53,6 +57,12 @@ class _ReminderViewState extends State<ReminderView> with TickerProviderStateMix
                 onDismissed: (direction) {
                   Reminder reminder = widget.reminder;
                   reminderProvider.deleteReminder(reminder);
+                  
+                  //Delete reminder from thing prior to delete
+                  final thingProvider =
+                      Provider.of<ThingProvider>(context, listen: false);
+
+                  thingProvider.deleteReminderIdFromThings(reminder.id);
 
                   ScaffoldMessenger.of(context)
                     ..clearSnackBars()
@@ -60,12 +70,14 @@ class _ReminderViewState extends State<ReminderView> with TickerProviderStateMix
                       SnackBar(
                         content: Text(
                           "${reminder.title} was deleted.",
-                          style: textTheme.bodyLarge!.copyWith(color: colorScheme.onPrimary),
+                          style: textTheme.bodyLarge!
+                              .copyWith(color: colorScheme.onPrimary),
                         ),
                         action: SnackBarAction(
                           label: "Undo",
                           onPressed: () {
                             reminderProvider.addReminder(reminder);
+
                           },
                         ),
                       ),
@@ -100,7 +112,8 @@ class ReminderCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        Provider.of<ReminderProvider>(context, listen: false).setActiveReminder(reminder);
+        Provider.of<ReminderProvider>(context, listen: false)
+            .setActiveReminder(reminder);
 
         showModalBottomSheet(
           context: context,
@@ -119,7 +132,8 @@ class ReminderCard extends StatelessWidget {
                 reminder.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: textTheme.displaySmall!.copyWith(fontSize: textTheme.displaySmall!.fontSize! - 5.0),
+                style: textTheme.displaySmall!.copyWith(
+                    fontSize: textTheme.displaySmall!.fontSize! - 5.0),
               ),
               const SizedBox(height: 10),
               Text(reminder.reminderDateToDisplay),
