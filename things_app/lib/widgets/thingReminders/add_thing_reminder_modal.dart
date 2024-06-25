@@ -64,34 +64,37 @@ class AddThingReminderModal extends StatelessWidget {
                   //Display Selected Reminders
                   Consumer<ThingReminderProvider>(
                     builder: (context, thingReminderProvider, child) {
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: thingReminderProvider.thingRemindersWithReminders
-                            .map((thingReminder) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Card(
-                              color: colorScheme.primaryContainer,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Text(thingReminder.reminder!.title,
-                                        style: textTheme.displaySmall!
-                                            .copyWith(fontSize: 18)),
-                                    const SizedBox(width: 10),
-                                    IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: () => thingReminderProvider.deleteThingReminder(thingReminder),
-                                      color: colorScheme.onPrimaryContainer
-                                          .withOpacity(0.4),
-                                    ),
-                                  ],
+                      return SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: thingReminderProvider.thingRemindersWithReminders
+                              .map((thingReminder) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Card(
+                                color: colorScheme.primaryContainer,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Text(thingReminder.reminder!.title,
+                                          style: textTheme.displaySmall!
+                                              .copyWith(fontSize: 18)),
+                                      const SizedBox(width: 10),
+                                      IconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: () => thingReminderProvider.deleteThingReminder(thingReminder),
+                                        color: colorScheme.onPrimaryContainer
+                                            .withOpacity(0.4),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }).toList(),
+                            );
+                          }).toList(),
+                        ),
                       );
                     },
                   ),
