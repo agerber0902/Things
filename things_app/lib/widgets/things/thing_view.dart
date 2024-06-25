@@ -5,7 +5,9 @@ import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
 import 'package:things_app/providers/note_provider.dart';
+import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/utils/icon_data.dart';
 import 'package:things_app/widgets/location/location_modal.dart';
 import 'package:things_app/widgets/notes_modal.dart';
@@ -161,6 +163,8 @@ class _ThingCardState extends State<ThingCard> {
                 .setNotesForEdit(thingProvider.activeThing!.notes);
             Provider.of<LocationProvider>(context, listen: false)
                 .setLocationForEdit(thingProvider.activeThing!.location);
+            final ReminderProvider reminderProvider = Provider.of(context, listen: false);
+            Provider.of<ThingReminderProvider>(context, listen: false).setThingRemindersForActiveThing(thingProvider.activeThing!, reminderProvider.reminders);
 
             showModalBottomSheet(
               context: context,

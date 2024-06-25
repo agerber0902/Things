@@ -18,7 +18,7 @@ class AddThingReminderModal extends StatelessWidget {
       builder: (context, thingReminderProvider, thingProvider, child) {
         return AlertDialog(
           title: Text(
-            thingProvider.activeThing?.location != null
+            thingProvider.activeThing?.reminderIds != null
                 ? 'Edit Reminders'
                 : 'Add Reminders',
             style: textTheme.displaySmall!.copyWith(
@@ -36,6 +36,8 @@ class AddThingReminderModal extends StatelessWidget {
                 children: [
                   Consumer<ReminderProvider>(
                     builder: (context, reminderProvider, child) {
+                      reminderProvider.getReminders();
+                      
                       return DropdownButton(
                           //TODO: style the text
                           hint: const Text('Select Reminders'),
@@ -99,10 +101,15 @@ class AddThingReminderModal extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.onPrimaryContainer),
                     onPressed: () {
-                      //TODO: add thing reminders
-                      thingReminderProvider
-                          .setRemindersLinkedToThing(thingProvider.activeThing);
+                      //TODO: handle reminders
+                      if(thingProvider.activeThing != null){
+                        List<Reminder> remindersForThing = thingReminderProvider.getRemindersLinkedToThing(thingProvider.activeThing);
 
+                        thingProvider.activeThing!.reminderIds = remindersForThing.map((r) => r.id).toList();
+                        thingProvider.editThing(thingProvider.activeThing!);
+                        print(thingProvider.activeThing!.reminderIds);
+                      }
+                      
                       Navigator.of(context).pop();
                     },
                     child: Text(

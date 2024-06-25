@@ -27,6 +27,6 @@ class LocationIcons{
 }
 
 class ThingReminderIcons{
-  final Icon addThingReminderIcon = const Icon(Icons.note_add);
+  final Icon addThingReminderIcon = const Icon(Icons.note_add_outlined);
   final Icon containsThingRemindersIcon = const Icon(Icons.note_sharp);
 }

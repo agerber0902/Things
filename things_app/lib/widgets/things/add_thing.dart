@@ -28,8 +28,7 @@ class AddThing extends StatefulWidget {
 class _AddThingState extends State<AddThing> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _titleTextController = TextEditingController();
-  final TextEditingController _descriptionTextController =
-      TextEditingController();
+  final TextEditingController _descriptionTextController = TextEditingController();
 
   @override
   void initState() {
@@ -189,12 +188,14 @@ class _AddThingState extends State<AddThing> {
           },
           //TODO: add thingProvider.activeThing?.reminders != null) to check
           label: Text(
-            'Add Reminders',
+            thingProvider.activeThing != null && thingProvider.activeThing!.remindersExist || thingReminderProvider.thingReminders.isNotEmpty ? 'Edit Reminders' : 'Add Reminders',
             style: TextStyle(
                 color: colorScheme.primary,
                 decoration: TextDecoration.underline),
           ),
-          icon: AppBarIcons().thingReminderIcons.addThingReminderIcon,
+          icon: thingProvider.activeThing != null && thingProvider.activeThing!.remindersExist || thingReminderProvider.thingReminders.isNotEmpty
+          ? AppBarIcons().thingReminderIcons.containsThingRemindersIcon 
+          : AppBarIcons().thingReminderIcons.addThingReminderIcon,
         ),
       ],
     );
@@ -309,6 +310,7 @@ class _AddThingState extends State<AddThing> {
       final notesProvider = Provider.of<NotesProvider>(context, listen: false);
       final locationProvider =
           Provider.of<LocationProvider>(context, listen: false);
+      final thingReminderProvider = Provider.of<ThingReminderProvider>(context, listen: false);
 
       if (categoryProvider.categories.isEmpty) {
         return;
@@ -321,11 +323,13 @@ class _AddThingState extends State<AddThing> {
           isMarkedComplete: false,
           notes: notesProvider.notes,
           location: locationProvider.location,
+          reminderIds: thingReminderProvider.thingRemindersWithReminders.map((tr) => tr.reminder!.id).toList(),
           categories: categoryProvider.categories
               .where((category) => category.isNotEmpty)
               .toList(),
         );
         thingProvider.addThing(newThing);
+        print('reminderIDs: ${newThing.reminderIds}');
       } else {
         final editedThing = Thing(
           id: thingProvider.activeThing!.id,
@@ -334,11 +338,13 @@ class _AddThingState extends State<AddThing> {
           isMarkedComplete: thingProvider.activeThing!.isMarkedComplete,
           notes: notesProvider.notes,
           location: locationProvider.location,
+          reminderIds: thingReminderProvider.thingRemindersWithReminders.map((tr) => tr.reminder!.id).toList(),
           categories: categoryProvider.categories
               .where((category) => category.isNotEmpty)
               .toList(),
         );
         thingProvider.editThing(editedThing);
+        print('reminderIDs: ${editedThing.reminderIds}');
       }
 
       Navigator.pop(context);
