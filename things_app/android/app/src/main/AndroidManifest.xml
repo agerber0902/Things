@@ -1,10 +1,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:label="things_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <service
+            android:name=".MyBackgroundService"
+            android:enabled="true"
+            android:exported="false" >
+            <!-- Intent filters, if any -->
+        </service>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/models/thing_reminder.dart';
-import 'package:things_app/providers/reminder_provider.dart';
 
 class ThingReminderProvider extends ChangeNotifier{
 
@@ -19,12 +17,10 @@ class ThingReminderProvider extends ChangeNotifier{
 
   void addThingReminder(ThingReminder thingReminder){
     _thingReminders.add(thingReminder);
-    print(_thingReminders);
     notifyListeners();
   }
   void deleteThingReminder(ThingReminder thingReminder){
     _thingReminders.remove(thingReminder);
-    print(_thingReminders);
     notifyListeners();
   }
 
@@ -46,14 +42,11 @@ class ThingReminderProvider extends ChangeNotifier{
     List<Reminder> remindersToLink = [];
 
     if(thing != null){
-      remindersToLink = _thingReminders.where((tr) => (tr.thing != null && tr.thing!.id == thing!.id) && tr.reminder != null).map((r) => r.reminder!).toList();
+      remindersToLink = _thingReminders.where((tr) => (tr.thing != null && tr.thing!.id == thing.id) && tr.reminder != null).map((r) => r.reminder!).toList();
     }
     else {
       remindersToLink = _thingReminders.where((tr) => tr.reminder != null).map((r) => r.reminder!).toList();
     }
-    
-
-    print(remindersToLink);
 
     return remindersToLink;
   }
