@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
@@ -92,6 +93,14 @@ class _MyAppState extends State<MyApp> {
       if (link != null) {
         // Handle the deep link
         print('Received link: $link');
+
+         Uri uri = Uri.parse(link);
+        String? data = uri.queryParameters['data'];
+        if (data != null) {
+          String decodedJson = Uri.decodeComponent(data);
+          Map<String, dynamic> jsonMap = jsonDecode(decodedJson);
+          //Thing thing = Thing.fromJson(jsonMap['thing']);
+        }     
       }
       
     }, onError: (err) {
