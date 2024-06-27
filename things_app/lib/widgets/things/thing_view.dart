@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/category.dart';
+import 'package:things_app/models/reminder.dart';
+import 'package:things_app/models/sharable_object.dart';
 import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
@@ -320,7 +323,8 @@ class _ThingCardState extends State<ThingCard> {
                 final ReminderProvider reminderProvider =
                     Provider.of(context, listen: false);
                 Provider.of<ThingReminderProvider>(context, listen: false)
-                    .setThingRemindersForActiveThing(widget.thing, reminderProvider.reminders);
+                    .setThingRemindersForActiveThing(
+                        widget.thing, reminderProvider.reminders);
                 _showThingReminderDialog(context);
               },
               child: widget.thing.remindersExist
@@ -328,6 +332,29 @@ class _ThingCardState extends State<ThingCard> {
                   : AppBarIcons().thingReminderIcons.addThingReminderIcon,
             ),
           ],
+        ),
+        IconButton(
+          onPressed: () {
+            final reminderProvider =
+                Provider.of<ReminderProvider>(context, listen: false);
+
+            //Get Reminders to pass
+            List<Reminder> reminders = [];
+            if (widget.thing.remindersExist) {
+              reminders = reminderProvider.reminders
+                  .where((reminder) =>
+                      widget.thing.reminderIds!.contains(reminder.id))
+                  .toList();
+            }
+
+            ShareableThing dataToShare =
+                ShareableThing(thing: widget.thing, reminders: reminders);
+            shareThing(dataToShare);
+          },
+          icon: const Icon(
+            Icons.share,
+            color: Colors.black,
+          ),
         ),
         IconButton(
           icon: Icon(
@@ -338,6 +365,17 @@ class _ThingCardState extends State<ThingCard> {
         ),
       ],
     );
+  }
+
+  Future<void> shareThing(ShareableThing shareableThing) async {
+
+    String shareableThingJson = shareableThing.toJson();
+
+    await FlutterShare.share(
+        title: 'Share Thing',
+        text: shareableThing.title,
+        linkUrl: 'thingsapp://share?data=${Uri.encodeComponent(shareableThingJson)}',
+        chooserTitle: 'Select an app to share');
   }
 
   void _toggleComplete() {

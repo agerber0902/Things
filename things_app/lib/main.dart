@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
 import 'package:things_app/providers/category_provider.dart';
@@ -11,6 +14,7 @@ import 'package:things_app/providers/search_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
+import 'package:uni_links/uni_links.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +69,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+
+  late StreamSubscription<String?> _sub;
+
   @override
   void initState() {
     AwesomeNotifications().setListeners(
@@ -77,6 +84,20 @@ class _MyAppState extends State<MyApp> {
           NotificationController.onDismissActionReceivedMethod,
     );
     super.initState();
+    initUniLinks();
+  }
+
+  Future<void> initUniLinks() async {
+    _sub = linkStream.listen((String? link) {
+      if (link != null) {
+        // Handle the deep link
+        print('Received link: $link');
+      }
+      
+    }, onError: (err) {
+      // Handle error
+      print('Error occurred: $err');
+    });
   }
 
   @override
