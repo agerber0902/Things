@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
+import 'package:things_app/models/reminder.dart';
+import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/filter_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
@@ -70,7 +72,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   late StreamSubscription<String?> _sub;
 
   @override
@@ -94,15 +95,25 @@ class _MyAppState extends State<MyApp> {
         // Handle the deep link
         print('Received link: $link');
 
-         Uri uri = Uri.parse(link);
+        Uri uri = Uri.parse(link);
         String? data = uri.queryParameters['data'];
         if (data != null) {
           String decodedJson = Uri.decodeComponent(data);
           Map<String, dynamic> jsonMap = jsonDecode(decodedJson);
-          //Thing thing = Thing.fromJson(jsonMap['thing']);
-        }     
+          Thing thing = Thing.fromJson(jsonMap['thing']);
+
+          List<Reminder> reminders = [];
+          for (Map<String, dynamic> reminderMap in jsonMap['reminders']) {
+            Reminder reminder = Reminder.fromJson(reminderMap);
+            reminders.add(reminder);
+          }
+
+          Provider.of<ThingProvider>(context, listen: false)
+              .setThingFromLink(thing);
+          Provider.of<ReminderProvider>(context, listen: false)
+              .setRemindersFromLink(reminders);
+        }
       }
-      
     }, onError: (err) {
       // Handle error
       print('Error occurred: $err');

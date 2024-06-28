@@ -8,6 +8,26 @@ import 'package:timezone/timezone.dart' as tz;
 final ReminderFileManager _fileManager = ReminderFileManager();
 
 class ReminderProvider extends ChangeNotifier {
+
+  //Reminders From Link
+  List<Reminder>? _remindersFromLink;
+  List<Reminder>? get remindersFromLink => _remindersFromLink;
+  void setRemindersFromLink(List<Reminder>? reminders){
+    _remindersFromLink = reminders;
+    notifyListeners();
+  }
+
+  void addRemindersFromLink(){
+    if(remindersFromLink == null){
+      return;
+    }
+    for(Reminder reminder in remindersFromLink!){
+      addReminder(reminder);
+    }
+
+    getReminders();
+  }
+
   //Search Value
   String _searchValue = '';
   String get searchValue => _searchValue;
