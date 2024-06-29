@@ -6,6 +6,15 @@ import 'package:things_app/models/thing_location.dart';
 ThingFileManager _fileManager = ThingFileManager();
 
 class ThingProvider extends ChangeNotifier {
+
+  //Thing from Link
+  Thing? _thingFromLink;
+  Thing? get thingFromLink => _thingFromLink;
+  void setThingFromLink(Thing? thing){
+    _thingFromLink = thing;
+    notifyListeners();
+  }
+
   //Search Value
   String _searchValue = '';
   String get searchValue => _searchValue;

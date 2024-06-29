@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/models/reminder.dart';
 import 'package:intl/intl.dart';
+import 'package:things_app/models/thing_reminder.dart';
 import 'package:things_app/providers/reminder_provider.dart';
+import 'package:things_app/providers/thing_provider.dart';
+import 'package:things_app/providers/thing_reminder_provider.dart';
 
 const String titleHintText = 'Enter a title';
 const String titleValidationText = 'Enter a valid title';
@@ -11,7 +14,9 @@ const String messageHintText = 'Enter a message';
 const String messageValidationText = 'Enter a valid message';
 
 class AddReminder extends StatefulWidget {
-  const AddReminder({super.key});
+  const AddReminder({super.key, this.isFromThing});
+
+  final bool? isFromThing;
 
   @override
   State<AddReminder> createState() => _AddReminderState();
@@ -28,7 +33,8 @@ class _AddReminderState extends State<AddReminder> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final activeReminder = Provider.of<ReminderProvider>(context, listen: false).activeReminder;
+      final activeReminder =
+          Provider.of<ReminderProvider>(context, listen: false).activeReminder;
       if (activeReminder != null) {
         setState(() {
           _titleTextController.text = activeReminder.title;
@@ -59,7 +65,8 @@ class _AddReminderState extends State<AddReminder> {
         // ignore: use_build_context_synchronously
         context: context,
         initialEntryMode: TimePickerEntryMode.input,
-        initialTime: TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),
+        initialTime:
+            TimeOfDay.fromDateTime(_selectedDateTime ?? DateTime.now()),
       );
 
       if (pickedTime != null) {
@@ -87,6 +94,16 @@ class _AddReminderState extends State<AddReminder> {
           date: _selectedDateTime ?? DateTime.now(),
         );
         reminderProvider.addReminder(reminderToAdd);
+
+        //We only need to worry about this on add
+        if (widget.isFromThing ?? false) {
+          Provider.of<ThingReminderProvider>(context, listen: false)
+                  .addThingReminder(ThingReminder(
+            reminder: reminderToAdd,
+            thing:
+                Provider.of<ThingProvider>(context, listen: false).activeThing,
+          ));
+        }
       } else {
         final reminderToEdit = Reminder.forEdit(
           id: reminderProvider.activeReminder!.id,
@@ -155,15 +172,20 @@ class _AddReminderState extends State<AddReminder> {
                           if (_selectedDateTime == null)
                             Text(
                               'Select date and time',
-                              style: textTheme.bodySmall!.copyWith(color: colorScheme.error),
+                              style: textTheme.bodySmall!
+                                  .copyWith(color: colorScheme.error),
                             )
                           else
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  DateFormat.yMEd().add_jms().format(_selectedDateTime!.toLocal()).split('.')[0],
-                                  style: textTheme.bodyMedium!.copyWith(color: colorScheme.primary),
+                                  DateFormat.yMEd()
+                                      .add_jms()
+                                      .format(_selectedDateTime!.toLocal())
+                                      .split('.')[0],
+                                  style: textTheme.bodyMedium!
+                                      .copyWith(color: colorScheme.primary),
                                 ),
                                 IconButton(
                                   onPressed: () {
@@ -177,11 +199,16 @@ class _AddReminderState extends State<AddReminder> {
                             ),
                           const SizedBox(height: 16),
                           ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: colorScheme.onPrimaryContainer),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    colorScheme.onPrimaryContainer),
                             onPressed: () => _onSave(reminderProvider),
                             child: Text(
-                              reminderProvider.activeReminder == null ? 'Add' : 'Save',
-                              style: textTheme.bodyLarge!.copyWith(color: Colors.white),
+                              reminderProvider.activeReminder == null
+                                  ? 'Add'
+                                  : 'Save',
+                              style: textTheme.bodyLarge!
+                                  .copyWith(color: Colors.white),
                             ),
                           ),
                         ],

@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
+import 'package:things_app/models/reminder.dart';
+import 'package:things_app/models/thing.dart';
 import 'package:things_app/providers/category_provider.dart';
 import 'package:things_app/providers/filter_provider.dart';
 import 'package:things_app/providers/location_provider.dart';
@@ -11,6 +16,7 @@ import 'package:things_app/providers/search_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
+import 'package:uni_links/uni_links.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +71,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // ignore: unused_field
+  late StreamSubscription<String?> _sub;
+
   @override
   void initState() {
     AwesomeNotifications().setListeners(
@@ -77,13 +86,40 @@ class _MyAppState extends State<MyApp> {
           NotificationController.onDismissActionReceivedMethod,
     );
     super.initState();
+    initUniLinks();
+  }
+
+  Future<void> initUniLinks() async {
+    _sub = linkStream.listen((String? link) {
+      if (link != null) {
+        Uri uri = Uri.parse(link);
+        String? data = uri.queryParameters['data'];
+        if (data != null) {
+          String decodedJson = Uri.decodeComponent(data);
+          Map<String, dynamic> jsonMap = jsonDecode(decodedJson);
+          Thing thing = Thing.fromJson(jsonMap['thing']);
+
+          List<Reminder> reminders = [];
+          for (Map<String, dynamic> reminderMap in jsonMap['reminders']) {
+            Reminder reminder = Reminder.fromJson(reminderMap);
+            reminders.add(reminder);
+          }
+
+          Provider.of<ThingProvider>(context, listen: false)
+              .setThingFromLink(thing);
+          Provider.of<ReminderProvider>(context, listen: false)
+              .setRemindersFromLink(reminders);
+        }
+      }
+    }, onError: (err) {
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Things + Reminders',
       theme: ThemeData(
         colorScheme: kColorScheme,
         //textTheme: GoogleFonts.robotoCondensedTextTheme(),
