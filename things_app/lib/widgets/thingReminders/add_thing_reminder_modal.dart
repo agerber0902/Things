@@ -5,6 +5,7 @@ import 'package:things_app/models/thing_reminder.dart';
 import 'package:things_app/providers/reminder_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/providers/thing_reminder_provider.dart';
+import 'package:things_app/widgets/reminders/add_reminder.dart';
 
 class AddThingReminderModal extends StatelessWidget {
   const AddThingReminderModal({super.key});
@@ -30,14 +31,14 @@ class AddThingReminderModal extends StatelessWidget {
             child: Container(
               alignment: Alignment.center,
               width: 300,
-              height: 200,
+              height: thingReminderProvider.thingReminders.isEmpty ? 175 : 250,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Consumer<ReminderProvider>(
                     builder: (context, reminderProvider, child) {
                       reminderProvider.getReminders();
-                      
+
                       return DropdownButton(
                           hint: const Text('Select Reminders'),
                           items: reminderProvider.reminders.map((reminder) {
@@ -67,7 +68,8 @@ class AddThingReminderModal extends StatelessWidget {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: thingReminderProvider.thingRemindersWithReminders
+                          children: thingReminderProvider
+                              .thingRemindersWithReminders
                               .map((thingReminder) {
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -83,7 +85,8 @@ class AddThingReminderModal extends StatelessWidget {
                                       const SizedBox(width: 10),
                                       IconButton(
                                         icon: const Icon(Icons.close),
-                                        onPressed: () => thingReminderProvider.deleteThingReminder(thingReminder),
+                                        onPressed: () => thingReminderProvider
+                                            .deleteThingReminder(thingReminder),
                                         color: colorScheme.onPrimaryContainer
                                             .withOpacity(0.4),
                                       ),
@@ -99,17 +102,34 @@ class AddThingReminderModal extends StatelessWidget {
                   ),
 
                   const Spacer(),
+
+                  TextButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (ctx) {
+                            return AddReminder(isFromThing: true,);
+                          });
+                      //Provider.of<ReminderProvider>(context, listen: false);
+                    },
+                    child: Text('Add New Reminder'),
+                  ),
+
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.onPrimaryContainer),
                     onPressed: () {
-                      if(thingProvider.activeThing != null){
-                        List<Reminder> remindersForThing = thingReminderProvider.getRemindersLinkedToThing(thingProvider.activeThing);
+                      if (thingProvider.activeThing != null) {
+                        List<Reminder> remindersForThing =
+                            thingReminderProvider.getRemindersLinkedToThing(
+                                thingProvider.activeThing);
 
-                        thingProvider.activeThing!.reminderIds = remindersForThing.map((r) => r.id).toList();
+                        thingProvider.activeThing!.reminderIds =
+                            remindersForThing.map((r) => r.id).toList();
                         thingProvider.editThing(thingProvider.activeThing!);
                       }
-                      
+
                       Navigator.of(context).pop();
                     },
                     child: Text(

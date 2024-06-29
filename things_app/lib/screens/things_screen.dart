@@ -12,7 +12,7 @@ import 'package:things_app/widgets/shared/appbar/shared_app_bar_button.dart';
 import 'package:things_app/widgets/things/thing_view.dart';
 import 'package:things_app/widgets/things/things_list_view.dart';
 import 'package:things_app/helpers/file_manager.dart';
-
+//TODO: reminders are not displaying on load
 final ThingFileManager fileManager = ThingFileManager();
 
 class ThingsScreen extends StatefulWidget {
@@ -28,6 +28,9 @@ class _ThingsScreenState extends State<ThingsScreen> {
     super.initState();
     // Check for things list and verify it exists. Should exist unless it's the first time on the screen.
     fileManager.verifyThingsList();
+
+    //Call get reminders to set reminders
+    Provider.of<ReminderProvider>(context, listen: false).getReminders();
   }
 
   @override
@@ -109,6 +112,7 @@ class NoThingsView extends StatelessWidget {
     return Consumer<ThingProvider>(
       builder: (context, thingProvider, child) {
         if (thingProvider.thingFromLink != null) {
+          //TODO: make this shared
           WidgetsBinding.instance!.addPostFrameCallback((_) {
             // Show your dialog here
             showDialog(
