@@ -97,8 +97,7 @@ class _AddReminderState extends State<AddReminder> {
 
         //We only need to worry about this on add
         if (widget.isFromThing ?? false) {
-          final thingReminderProvider =
-              Provider.of<ThingReminderProvider>(context, listen: false)
+          Provider.of<ThingReminderProvider>(context, listen: false)
                   .addThingReminder(ThingReminder(
             reminder: reminderToAdd,
             thing:

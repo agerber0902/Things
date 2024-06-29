@@ -109,11 +109,11 @@ class AddThingReminderModal extends StatelessWidget {
                           context: context,
                           isScrollControlled: true,
                           builder: (ctx) {
-                            return AddReminder(isFromThing: true,);
+                            return const AddReminder(isFromThing: true,);
                           });
                       //Provider.of<ReminderProvider>(context, listen: false);
                     },
-                    child: Text('Add New Reminder'),
+                    child: const Text('Add New Reminder'),
                   ),
 
                   ElevatedButton(

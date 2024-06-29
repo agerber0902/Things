@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
 import 'package:things_app/models/reminder.dart';
@@ -72,6 +71,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // ignore: unused_field
   late StreamSubscription<String?> _sub;
 
   @override
@@ -92,9 +92,6 @@ class _MyAppState extends State<MyApp> {
   Future<void> initUniLinks() async {
     _sub = linkStream.listen((String? link) {
       if (link != null) {
-        // Handle the deep link
-        print('Received link: $link');
-
         Uri uri = Uri.parse(link);
         String? data = uri.queryParameters['data'];
         if (data != null) {
@@ -115,8 +112,6 @@ class _MyAppState extends State<MyApp> {
         }
       }
     }, onError: (err) {
-      // Handle error
-      print('Error occurred: $err');
     });
   }
 
@@ -124,7 +119,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Things + Reminders',
       theme: ThemeData(
         colorScheme: kColorScheme,
         //textTheme: GoogleFonts.robotoCondensedTextTheme(),
