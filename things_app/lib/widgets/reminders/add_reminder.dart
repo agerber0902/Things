@@ -52,11 +52,18 @@ class _AddReminderState extends State<AddReminder> {
     super.dispose();
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext context, ReminderProvider reminderProvider) async {
+
+    //Set current reminder date to the min if it exists
+    DateTime currentDate = DateTime.now();
+    if(reminderProvider.activeReminder != null){
+      currentDate = reminderProvider.activeReminder!.date;
+    }
+
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: _selectedDateTime ?? DateTime.now(),
-      firstDate: DateTime.now(),
+      firstDate: currentDate,
       lastDate: DateTime(2101),
     );
 
@@ -165,7 +172,7 @@ class _AddReminderState extends State<AddReminder> {
                             maxLines: 1,
                           ),
                           ElevatedButton(
-                            onPressed: () => _selectDate(context),
+                            onPressed: () => _selectDate(context, reminderProvider),
                             child: const Text('Select date'),
                           ),
                           const SizedBox(height: 10),

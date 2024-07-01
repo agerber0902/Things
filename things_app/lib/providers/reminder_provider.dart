@@ -43,7 +43,7 @@ class ReminderProvider extends ChangeNotifier {
   Reminder? _activeReminder;
   Reminder? get activeReminder => _activeReminder;
 
-  void setActiveReminder(Reminder reminder) {
+  void setActiveReminder(Reminder? reminder) {
     _activeReminder = reminder;
     notifyListeners();
   }
@@ -66,6 +66,8 @@ class ReminderProvider extends ChangeNotifier {
   void addReminder(Reminder reminder) async {
     await _fileManager.addReminder(reminder);
 
+    scheduleReminderNotification(reminder);
+
     //This will notify listeners
     getReminders();
   }
@@ -83,6 +85,8 @@ class ReminderProvider extends ChangeNotifier {
 
   void editReminder(Reminder reminder) async {
     await _fileManager.updateReminder(reminder);
+
+    editReminderNotification(reminder);
 
     //This will notify listeners
     getReminders();
@@ -114,6 +118,7 @@ class ReminderProvider extends ChangeNotifier {
 
   void scheduleReminderNotification(Reminder reminder) {
     int id = _reminders.indexWhere((r) => r.id == reminder.id);
+    print('scheduling');
 
     tz.initializeTimeZones();
     final String localTimeZone = tz.local.name;

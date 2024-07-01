@@ -11,6 +11,7 @@ class ProviderHelper {
 
   void setAddReminderProviders(BuildContext context) {
     Provider.of<ReminderProvider>(context, listen: false).setSearchValue('');
+    Provider.of<ReminderProvider>(context, listen: false).setActiveReminder(null);
   }
 
   void setAddThingProviders(BuildContext context){

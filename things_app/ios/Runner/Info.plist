@@ -9,6 +9,12 @@
 		<string>remote-notification</string>
 	</array>
 
+	<key>UIUserNotificationSettings</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+
 	<key>NSLocationWhenInUseUsageDescription</key>
     <string>Your location allows you to view and add locations nearby.</string>
 
