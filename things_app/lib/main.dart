@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:things_app/controllers/notification_controller.dart';
 import 'package:things_app/models/reminder.dart';
@@ -16,7 +17,7 @@ import 'package:things_app/providers/search_provider.dart';
 import 'package:things_app/providers/thing_provider.dart';
 import 'package:things_app/providers/thing_reminder_provider.dart';
 import 'package:things_app/screens/things_screen.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:app_links/app_links.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,29 +91,41 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> initUniLinks() async {
-    _sub = linkStream.listen((String? link) {
-      if (link != null) {
-        Uri uri = Uri.parse(link);
+    // Initialize AppLinks
+    final appLinks = AppLinks();
+
+    // Get initial link when the app is started
+    final initialLink = await appLinks.getInitialLink();
+    if (initialLink != null) {
+      String? data = initialLink.queryParameters['data'];
+      if (data != null) {
+        _handleLink(data);
+      }
+    }
+
+    // Listen to incoming links
+    appLinks.uriLinkStream.listen((uri) {
         String? data = uri.queryParameters['data'];
         if (data != null) {
-          String decodedJson = Uri.decodeComponent(data);
-          Map<String, dynamic> jsonMap = jsonDecode(decodedJson);
-          Thing thing = Thing.fromJson(jsonMap['thing']);
-
-          List<Reminder> reminders = [];
-          for (Map<String, dynamic> reminderMap in jsonMap['reminders']) {
-            Reminder reminder = Reminder.fromJson(reminderMap);
-            reminders.add(reminder);
-          }
-
-          Provider.of<ThingProvider>(context, listen: false)
-              .setThingFromLink(thing);
-          Provider.of<ReminderProvider>(context, listen: false)
-              .setRemindersFromLink(reminders);
+          _handleLink(data);
         }
-      }
-    }, onError: (err) {
     });
+  }
+
+  void _handleLink(String data) {
+    String decodedJson = Uri.decodeComponent(data);
+    Map<String, dynamic> jsonMap = jsonDecode(decodedJson);
+    Thing thing = Thing.fromJson(jsonMap['thing']);
+
+    List<Reminder> reminders = [];
+    for (Map<String, dynamic> reminderMap in jsonMap['reminders']) {
+      Reminder reminder = Reminder.fromJson(reminderMap);
+      reminders.add(reminder);
+    }
+
+    Provider.of<ThingProvider>(context, listen: false).setThingFromLink(thing);
+    Provider.of<ReminderProvider>(context, listen: false)
+        .setRemindersFromLink(reminders);
   }
 
   @override
@@ -127,7 +140,25 @@ class _MyAppState extends State<MyApp> {
       ),
       darkTheme: ThemeData.dark(),
       themeMode: ThemeMode.light,
+      //routerConfig: router,
       home: const ThingsScreen(),
     );
   }
 }
+
+final router = GoRouter(routes: [
+  GoRoute(
+    path: '/',
+    builder: (context, state) {
+      return const ThingsScreen();
+    },
+  ),
+  GoRoute(
+    path: 'sharedLink',
+    builder: (context, state) {
+      //TODO: need to handle link
+      //TODO: will need to change some things in android
+      return const ThingsScreen();
+    },
+  )
+]);
